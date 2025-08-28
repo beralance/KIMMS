@@ -21,7 +21,6 @@ import NotFound from "../pages/NotFound";
 // Layouts
 import AdminLayout from '../layout/AdminLayout'
 import UserLayout from '../layout/UserLayout'
-import AuthLayout from "../layout/AuthLayout";
 import Login from '../features/auth/Login'
 import Signup from '../features/auth/Signup'
 
