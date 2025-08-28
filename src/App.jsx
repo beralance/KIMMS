@@ -1,5 +1,5 @@
 import './App.css'
-import AppRoutes from './router/Routes'
+import AppRoutes from './router/routes'
 import { useEffect } from 'react';
 import { initializeAccounts } from './utils/Accounts'
 
