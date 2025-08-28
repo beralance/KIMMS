@@ -2,7 +2,7 @@ import { Box, Typography } from "@mui/material";
 import ShopGrid from "./ShopGrid";
 import React, { useState, useEffect } from "react";
 import products from "../../../data/products";
-import ShopPagination from "../../../components/ShopPagination";
+import ShopPagination from "./ShopPagination";
 import ShopFilters from "./ShopFilter";
 import Container from "@mui/material/Container";
 import AutoSlideCarousel from "../../../components/AutoSlideCarousel";
@@ -47,29 +47,29 @@ function Shop() {
     <Box>
         <AutoSlideCarousel/>
         <Container maxWidth="lg">
-        <Typography variant="h4" color="initial" sx={{m: 1, mb: 5}}>
-            Welcome!
-            One of a kind find are waiting for you!
-        </Typography>
-        <Box sx={{display: {md: 'flex'}, alignItems: 'start', justifyContent: {md: 'space-between'}, gap: {md: 5}}}>
-            <Box sx={{position: {xs: 'static', md: 'sticky'}, top: {md: 20}}}>
-                <ShopFilters
-                    sort={sort}
-                    setSort={setSort}
-                    category={category}
-                    setCategory={setCategory}
-                />
-            </Box>
+            <Typography variant="h4" color="initial" sx={{m: 1, mb: 5}}>
+                Welcome!
+                One of a kind find are waiting for you!
+            </Typography>
+            <Box sx={{display: {md: 'flex'}, alignItems: 'start', justifyContent: {md: 'space-between'}, gap: {md: 5}}}>
+                <Box sx={{position: {xs: 'static', md: 'sticky'}, top: {md: 20}}}>
+                    <ShopFilters
+                        sort={sort}
+                        setSort={setSort}
+                        category={category}
+                        setCategory={setCategory}
+                    />
+                </Box>
 
-            <Box>
-                <ShopGrid products={paginatedProducts} />
-                <ShopPagination
-                    count={Math.ceil(filteredProducts.length / PAGE_SIZE)}
-                    page={page}
-                    onChange={handlePageChange}
-                />
+                <Box>
+                    <ShopGrid products={paginatedProducts} />
+                    <ShopPagination
+                        count={Math.ceil(filteredProducts.length / PAGE_SIZE)}
+                        page={page}
+                        onChange={handlePageChange}
+                    />
+                </Box>
             </Box>
-        </Box>
         </Container>
     </Box>
   );
