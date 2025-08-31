@@ -1,0 +1,36 @@
+import React from 'react'
+import { AppBar, Toolbar, Typography, IconButton } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useNavigate } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
+
+const CartHeader = () => {
+    const navigate = useNavigate();
+    const location = useLocation()
+
+    const previousPage = location.state?.from || '/shop'
+
+    return (
+        <AppBar position="fixed" color="primary">
+            <Toolbar>
+                {/* Back button */}
+                <IconButton
+                    edge="start"
+                    color="inherit"
+                    aria-label="back"
+                    onClick={() => navigate(previousPage)} // go to previous page
+                    sx={{ mr: 2 }}
+                >
+                    <ArrowBackIcon/>
+                </IconButton>
+
+                {/* Title */}
+                <Typography variant="h6" component="div">
+                    Cart
+                </Typography>
+            </Toolbar>
+        </AppBar>
+    )
+}
+
+export default CartHeader

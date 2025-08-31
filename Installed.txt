@@ -1,0 +1,21 @@
+- axios
+- react-router-dom
+- mui
+- mui-icons
+- formik + yup
+- dayjs
+- react-slick
+- swiper
+
+remove soon
+- stripe
+
+
+BACKEND
+- npm install express cors dotenv mongoose
+- npm install express
+- npm install express cors dotenv
+- npm install --save-dev nodemon
+- npm install stripe
+
+
