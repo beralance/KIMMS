@@ -54,7 +54,7 @@ export default function UserHeader() {
                 <Toolbar sx={{ p: 0, display: "flex", justifyContent: "center" }}>
 
                     {/* Left side (mobile) */}
-                    <Box sx={{ display: { sm: "none", xs: "flex" }, mx: 3, gap: 2, flexGrow: 1, justifyContent: "start" }}>
+                    <Box sx={{ display: { sm: "none", xs: "flex" }, mx: 2, gap: 2, flexGrow: 1, justifyContent: "start" }}>
                         <IconButton onClick={() => setNavOpen(prev => !prev)} sx={{ p: 0 }}>
                             {!navOpen ? 
                                 <MenuRoundedIcon color="secondary" sx={{ fontSize: 22 }} /> :
@@ -78,7 +78,7 @@ export default function UserHeader() {
                     </Box>
 
                     {/* Right side (mobile) */}
-                    <Box sx={{ display: { sm: "none", xs: "flex" }, mx: 3, gap: 2, flexGrow: 1, justifyContent: "end" }}>
+                    <Box sx={{ display: { sm: "none", xs: "flex" }, mx: 2, gap: 2, flexGrow: 1, justifyContent: "end" }}>
                         <IconButton onClick={() => setUserDrawerOpen(true)} sx={{ p: 0 }}>
                             <PersonOutlinedIcon color="secondary" sx={{ fontSize: 22 }} />
                         </IconButton>

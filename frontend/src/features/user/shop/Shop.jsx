@@ -7,7 +7,6 @@ import ShopFilters from "./ShopFilter";
 import Container from "@mui/material/Container";
 import AutoSlideCarousel from "../../../components/AutoSlideCarousel";
 import { useCart } from "../../../contexts/CartProvider";
-import CustomSnackbar from "../../../components/CustomSnackbar";
 
 const PAGE_SIZE = 6;
 
@@ -17,10 +16,6 @@ function Shop() {
     const [category, setCategory] = useState("all");
 
     const { addToCart } = useCart();
-
-    // Snackbar state
-    const [snackBarOpen, setSnackBarOpen] = useState(false);
-    const [snackBarMessage, setSnackBarMessage] = useState("");
 
     // reset page when filters change
     useEffect(() => {
@@ -51,11 +46,9 @@ function Shop() {
         setPage(value);
     };
 
-    // Add to cart + show snackbar
+    // Add to cart — no local snackbar needed
     const handleAddToCart = (product) => {
-        addToCart(product, 1);
-        setSnackBarMessage(`${product.name} added to Cart!`);
-        setSnackBarOpen(true);
+        addToCart(product, 1); // global snackbar handles success/duplicate
     };
 
     return (
@@ -94,13 +87,6 @@ function Shop() {
                     </Box>
                 </Box>
             </Container>
-
-            {/* Global Snackbar */}
-            <CustomSnackbar
-                open={snackBarOpen}
-                onClose={() => setSnackBarOpen(false)}
-                message={snackBarMessage}
-            />
         </Box>
     );
 }

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Box, Typography, Button, TextField, Dialog, DialogContent, IconButton, Container, Snackbar, Alert } from "@mui/material";
+import { Box, Typography, Button, TextField, Dialog, DialogContent, IconButton, Container } from "@mui/material";
 import { useCart } from "../../../contexts/CartProvider";
 import products from '../../../data/products';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -15,28 +15,19 @@ export default function ProductDetails() {
     const [quantity, setQuantity] = useState(1);
     const [imageOpen, setImageOpen] = useState(false);
 
-    // Snackbar state
-    const [snackOpen, setSnackOpen] = useState(false);
-
     if (!product) {
         return <Typography variant="h5">Product not found</Typography>;
     }
 
     const handleAddToCart = () => {
-        addToCart(product, quantity);
-        setSnackOpen(true); // show snackbar
-    };
-
-    const handleSnackClose = (event, reason) => {
-        if (reason === "clickaway") return;
-        setSnackOpen(false);
+        addToCart(product, quantity); // global snackbar handles notifications
     };
 
     return (
         <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: {xs: 0, md: 4}}}>
             {/* Back button */}
             <Box sx={{position: 'fixed', top: 0, m: 2 }}>
-                <Button variant="contained" color="secondary" onClick={() => navigate(-1)} sx={{color: 'white', borderRadius: '999px', }}>
+                <Button variant="contained" color="secondary" onClick={() => navigate(-1)} sx={{color: 'white', borderRadius: '999px'}}>
                     <ArrowBackIcon sx={{fontSize: 25}}/>
                 </Button>
             </Box>
@@ -71,9 +62,7 @@ export default function ProductDetails() {
             <Container sx={{ flex: {xs: 0, md: 1} }}>
                 <Typography variant="h5" gutterBottom>{product.name}</Typography>
                 <Typography variant="h6" color="primary" gutterBottom>${product.price}</Typography>
-                <Box sx={{mx: 1, my: 2}}>
-                    <hr/>
-                </Box>
+                <Box sx={{mx: 1, my: 2}}><hr/></Box>
                 <Typography variant="body1" paragraph>{product.description}</Typography>
                 {product.category && (
                     <Typography variant="subtitle1" color="text.secondary" gutterBottom>
@@ -96,18 +85,6 @@ export default function ProductDetails() {
                     </Button>
                 </Box>
             </Container>
-
-            {/* Snackbar */}
-            <Snackbar
-                open={snackOpen}
-                autoHideDuration={3000}
-                onClose={handleSnackClose}
-                anchorOrigin={{ vertical: "top", horizontal: "center" }}
-            >
-                <Alert onClose={handleSnackClose} severity="success" sx={{ width: '100%' }}>
-                    Added {quantity} x {product.name} to cart!
-                </Alert>
-            </Snackbar>
         </Box>
     );
 }

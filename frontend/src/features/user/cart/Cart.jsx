@@ -1,9 +1,10 @@
 // pages/Cart.jsx
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Button, Container, Checkbox } from "@mui/material";
-import { useCart } from "../../../contexts/CartProvider";
+import { Box, Typography, Button, Container, Checkbox, Grid, Stack } from "@mui/material";
+import { useCart } from "../../../contexts/CartProvider"; // adjust path if needed
 import { useCheckout } from "../../../contexts/CheckoutContext";
 import { useNavigate } from "react-router-dom";
+import BottomActionBar from "../../../components/BottomActionBar";
 
 export default function Cart() {
     const { cartItems, removeFromCart, clearCart } = useCart();
@@ -11,8 +12,8 @@ export default function Cart() {
     const navigate = useNavigate();
     const [selectedIds, setSelectedIds] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
+    const cartItemCount = cartItems.length
 
-    // Update total price whenever selected items change
     useEffect(() => {
         const selectedItems = cartItems.filter(item => selectedIds.includes(item.id));
         const total = selectedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
@@ -33,55 +34,80 @@ export default function Cart() {
             return;
         }
         const itemsToCheckout = cartItems.filter(item => selectedIds.includes(item.id));
-        setCheckoutItems(itemsToCheckout); // save to context
-        navigate("/checkout", {replace: true}); // no state needed
+        setCheckoutItems(itemsToCheckout);
+        navigate("/checkout", { replace: true });
     };
 
     return (
-        <Container sx={{ mt: 4 }}>
+        <Container sx={{pb: '180px',}}>
+            <Typography variant="h6" color="initial">
+                Cart ({cartItemCount})
+            </Typography>
             {cartItems.slice().reverse().map(item => (
-                <Box
+                <Grid 
                     key={item.id}
-                    sx={{
-                        mb: 2,
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center"
-                    }}
+                    container 
+                    sx={{width: '100%', boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.3)', my: 3, backgroundColor: '#f0f0f0f1', borderRadius: '5px'}}
                 >
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                        <Checkbox
-                            checked={selectedIds.includes(item.id)}
-                            onChange={() => toggleSelect(item.id)}
-                        />
-                        <Typography
-                            sx={{ cursor: "pointer", textDecoration: "underline" }}
-                            onClick={() => navigate(`/product/${item.id}`)}
-                        >
-                            {item.name} x {item.quantity}
-                        </Typography>
-                    </Box>
-
-                    <Box>
-                        <Button variant="outlined" color="error" onClick={() => removeFromCart(item.id)}>
-                            Remove
-                        </Button>
-                    </Box>
-                </Box>
+                    <Grid size={{xs: 6, sm: 6, md: 4}}>
+                        <Box sx={{width: '100%', height: '100%'}}>
+                            <Button onClick={() => navigate(`/product/${item.id}`)} sx={{padding: 0}}>
+                                <img src={item.image} alt="" style={{width: '100%', height: '100%', objectFit: 'cover', aspectRatio: '1/1', borderRadius: '5px 0px 0px 5px'}}/>
+                            </Button>
+                        </Box>
+                    </Grid>
+                    <Grid size={{xs: 6, sm: 6, md: 4,}} sx={{p: 1}}>
+                        <Stack sx={{height: '100%', display: 'flex', justifyContent: 'space-between'}}>
+                            <Box>
+                                <Box sx={{display: 'flex', justifyContent: 'end'}}>
+                                    <Checkbox onChange={() => toggleSelect(item.id)} checked={selectedIds.includes(item.id)} sx={{p: 0}}/>
+                                </Box>
+                                <Box sx={{m: 1}}>
+                                    <Typography variant="Body1" color="secondary" noWrap sx={{ cursor: "pointer", fontWeight: 'bold' }}>
+                                        {item.name}
+                                    </Typography>
+                                    <Typography variant="body1" sx={{ cursor: "pointer" }}>
+                                        PHP {item.price}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                            <Box sx={{my: 1}}>
+                                <Button variant="outlined" fullWidth color="error" onClick={() => removeFromCart(item.id)} >
+                                    Remove
+                                </Button>
+                            </Box>
+                        </Stack>
+                    </Grid>
+                </Grid>
             ))}
 
-            <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <Typography variant="h6">
-                    Total: PHP {totalPrice.toFixed(2)}
-                </Typography>
-                <Button variant="contained" color="primary" onClick={handleCheckout}>
-                    Checkout Selected
-                </Button>
-            </Box>
+            {/* Bottom Navigation */}
+            <BottomActionBar>
+                <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                    <Typography variant="body1">
+                        <Stack>
+                            <span style={{fontWeight: 'bold'}}>Total:</span>
+                            <span style={{color: 'green'}}>PHP {totalPrice.toFixed(2)}</span>
+                        </Stack>
+                    </Typography>
 
-            <Button variant="contained" color="secondary" sx={{ mt: 1 }} onClick={clearCart}>
-                Clear Cart
-            </Button>
+                    <Button variant="contained" color="error" sx={{ mt: 1, }} onClick={clearCart}>
+                        Clear Cart
+                    </Button>
+                </Box>
+
+                {/* Only show Checkout button if at least one item is selected */}
+                {selectedIds.length > 0 && (
+                    <Button 
+                        variant="contained"
+                        color="secondary"
+                        onClick={handleCheckout}
+                        sx={{p: 1.5, fontWeight: 'bold'}}    
+                    >
+                        Checkout Selected
+                    </Button>
+                )}
+            </BottomActionBar>
         </Container>
     );
 }

@@ -1,8 +1,9 @@
 import React from 'react'
-import { AppBar, Toolbar, Typography, IconButton } from "@mui/material";
+import { AppBar, Toolbar, Typography, IconButton, Button, Box } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const CartHeader = () => {
     const navigate = useNavigate();
@@ -11,8 +12,8 @@ const CartHeader = () => {
     const previousPage = location.state?.from || '/shop'
 
     return (
-        <AppBar position="fixed" color="primary">
-            <Toolbar>
+        <AppBar position="fixed" color="secondary">
+            <Toolbar sx={{display: 'flex', justifyContent: 'space-between'}}>
                 {/* Back button */}
                 <IconButton
                     edge="start"
@@ -25,9 +26,13 @@ const CartHeader = () => {
                 </IconButton>
 
                 {/* Title */}
-                <Typography variant="h6" component="div">
-                    Cart
-                </Typography>
+                <Box>
+                    <Button component={Link} to='/home' color=''>
+                        <Typography variant="h6" component="div">
+                            K I M M S 
+                        </Typography>
+                    </Button>
+                </Box>
             </Toolbar>
         </AppBar>
     )

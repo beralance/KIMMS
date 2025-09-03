@@ -7,9 +7,6 @@
 - react-slick
 - swiper
 
-remove soon
-- stripe
-
 
 BACKEND
 - npm install express cors dotenv mongoose

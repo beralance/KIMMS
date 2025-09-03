@@ -40,7 +40,6 @@ export default function AppRoutes() {
             <Route path='/auth/signup' element={<Signup/>}/>
             <Route path="/product/:id" element={<ProductDetails/>}/>
 
-            {/* Stripe Checkout Routes */}
             <Route path='/checkout' element={
                 <UserProtectedRoute>
                     <Checkout/>
