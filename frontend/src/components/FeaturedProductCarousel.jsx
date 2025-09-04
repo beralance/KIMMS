@@ -49,7 +49,7 @@ export default function FeaturedProductCarousel() {
                 modules={[EffectCoverflow, Pagination, Navigation]}
                 breakpoints={{
                     0: { slidesPerView: 1, centeredSlides: true },
-                    400: { slidesPerView: 2, spaceBetween: 20, centeredSlides: false },
+                    500: { slidesPerView: 2, spaceBetween: 20, centeredSlides: false },
                     650: { slidesPerView: 3, spaceBetween: 20, centeredSlides: false },
                     800: { slidesPerView: 3, spaceBetween: 20, centeredSlides: false },
                     1000: { slidesPerView: 4, spaceBetween: 30, centeredSlides: false },
