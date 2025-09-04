@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import products from "../data/products";
 
 const AuthContext = createContext();
 

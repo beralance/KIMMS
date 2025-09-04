@@ -12,7 +12,7 @@ export default function FeaturedProductCarousel() {
     const { addToCart } = useCart();
 
     const handleAddToCart = (product) => {
-        addToCart(product, 1); // Global snackbar will handle success/duplicate notifications
+        addToCart(product, 1); 
     }
 
     return (

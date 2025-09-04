@@ -7,16 +7,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { Badge, Box } from '@mui/material';
 
-export default function ProductCard({
-    image,
-    name = 'Unknown',
-    price = 0,
-    description = '...',
-    onNavigate,
-    addToCart,
-    condition
-    }) {
-
+export default function ProductCard({ image, name = 'Unknown', price = 0, description = '...', onNavigate, addToCart, condition}) {
     return (
         <Card
             sx={{

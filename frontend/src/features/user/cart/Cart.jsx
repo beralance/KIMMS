@@ -84,7 +84,7 @@ export default function Cart() {
             {/* Bottom Navigation */}
             <BottomActionBar>
                 <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
-                    <Typography variant="body1">
+                    <Typography variant="body1" component='div'>
                         <Stack>
                             <span style={{fontWeight: 'bold'}}>Total:</span>
                             <span style={{color: 'green'}}>PHP {totalPrice.toFixed(2)}</span>

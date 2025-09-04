@@ -14,7 +14,7 @@ import ProductDetails from "../features/user/shop/ProductDetails";
 import Checkout from "../features/user/checkout/Checkout";
 import Success from '../features/user/checkout/Success'
 import Cancel from '../features/user/checkout/Cancel'
-
+import AuctionProductDetails from '../features/user/auction/AuctionProductDetails'
 
 // Admin Pages
 import Dashboard from '../features/admin/dashboard/Dashboard'
@@ -40,6 +40,13 @@ export default function AppRoutes() {
             <Route path='/auth/signup' element={<Signup/>}/>
             <Route path="/product/:id" element={<ProductDetails/>}/>
 
+            <Route path='/auction/:id' element={
+                <UserProtectedRoute>
+                    <AuctionProductDetails/>
+                </UserProtectedRoute>
+                }
+            />
+            
             <Route path='/checkout' element={
                 <UserProtectedRoute>
                     <Checkout/>

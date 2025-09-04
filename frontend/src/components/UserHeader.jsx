@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { 
   Box, Toolbar, Typography, Button, AppBar, 
-  Slide, IconButton, Fade
+  Slide, IconButton, Fade,
+  Badge
 } from "@mui/material";
 import { NavLink } from "react-router-dom";
 import SearchBar from "./SearchBar";
 import SearchDrawer from "./SearchDrawer";
 import UserDrawer from "./UserDrawer";
 import useScrollTrigger from "@mui/material/useScrollTrigger";
-
+import { useCart } from "../contexts/CartProvider"; 
 // Icons
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
@@ -46,7 +47,10 @@ function HideOnScroll ({children}) {
 export default function UserHeader() {
     const [userDrawerOpen, setUserDrawerOpen] = useState(false);
     const [searchDrawerOpen, setSearchDrawerOpen] = useState(false);
-    const [navOpen, setNavOpen] = useState(false);
+    const [navOpen, setNavOpen] = useState(false);    
+    const {cartItems} = useCart();
+    const isLoggedIn = !!localStorage.getItem('user')
+
 
     return (
         <HideOnScroll>
@@ -82,9 +86,11 @@ export default function UserHeader() {
                         <IconButton onClick={() => setUserDrawerOpen(true)} sx={{ p: 0 }}>
                             <PersonOutlinedIcon color="secondary" sx={{ fontSize: 22 }} />
                         </IconButton>
-                        <IconButton component={NavLink} to='/cart' sx={{ p: 0 }}>
-                            <ShoppingCartOutlinedIcon color="secondary" sx={{ fontSize: 22 }} />
-                        </IconButton>
+                        <Badge badgeContent={isLoggedIn ? cartItems.length : 0} color="secondary" showZero>
+                            <IconButton component={NavLink} to='/cart' sx={{ p: 0 }}>
+                                <ShoppingCartOutlinedIcon color="secondary" sx={{ fontSize: 22 }} />
+                            </IconButton>
+                        </Badge>
                     </Box>
 
                     {/* Desktop Search */}
