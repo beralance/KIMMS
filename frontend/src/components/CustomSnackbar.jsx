@@ -26,7 +26,7 @@ const CustomSnackbar = ({ open, onClose, message, severity = 'success' }) => {
             {queue.map(item => (
                 <Snackbar
                     key={item.id}
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                     open
                     autoHideDuration={3000}
                     onClose={() => handleClose(item.id)}

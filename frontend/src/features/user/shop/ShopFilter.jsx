@@ -14,9 +14,10 @@ import {
     FormControlLabel,
     Radio,
     } from "@mui/material";
+import products from "../../../data/products";
 
 export default function ShopFilters({ sort, setSort, category, setCategory }) {
-    const categories = ["all", "cabinet", "sofa", "bed"];
+    const categories = ["all", ...new Set(products.map(p => p.category))];
 
     return (
         <Box sx={{ mb: 2, }}>

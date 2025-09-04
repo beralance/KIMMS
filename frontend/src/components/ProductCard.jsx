@@ -5,7 +5,7 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { Box } from '@mui/material';
+import { Badge, Box } from '@mui/material';
 
 export default function ProductCard({
     image,
@@ -13,7 +13,8 @@ export default function ProductCard({
     price = 0,
     description = '...',
     onNavigate,
-    addToCart
+    addToCart,
+    condition
     }) {
 
     return (
@@ -30,16 +31,23 @@ export default function ProductCard({
             {/* Clickable area for navigation */}
             <Box onClick={onNavigate} sx={{ cursor: 'pointer' }}>
                 {/* Product Image */}
-                <CardMedia
-                    component="img"
-                    image={image}
-                    alt={name}
-                    sx={{
-                        aspectRatio: '9/12',
-                        objectFit: 'cover',
-                        borderRadius: 3
-                }}
-                />
+                <Box sx={{position: 'relative'}}>
+                    <CardMedia
+                        component="img"
+                        image={image}
+                        alt={name}
+                        sx={{
+                            aspectRatio: '9/12',
+                            objectFit: 'cover',
+                            borderRadius: 3
+                    }}
+                    />
+                    <Box sx={{position: 'absolute', top: 15, left: 10, bgcolor: 'skyblue', p: .5, px: 2, borderRadius: '999px'}}>
+                        <Typography variant="body1" color="white">
+                            {condition}
+                        </Typography>
+                    </Box>
+                </Box>
 
                 {/* Card Body */}
                 <CardContent sx={{px: .5, py: 2}}>

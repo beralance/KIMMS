@@ -10,7 +10,7 @@ export default function ShopPagination({ page, count, onChange }) {
                 onChange={onChange}    // function (event, value) => {}
                 variant="text"
                 shape="rounded"
-                color="primary"
+                color="secondary"
             />
         </Stack>
     );

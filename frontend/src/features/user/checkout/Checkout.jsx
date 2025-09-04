@@ -64,7 +64,7 @@ export default function Checkout() {
 
             {checkoutItems.map(item => (
                 <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                <Typography>{item.name} x {item.quantity}</Typography>
+                <Typography>{item.name}</Typography>
                 <Typography>PHP {(item.price * item.quantity).toFixed(2)}</Typography>
                 </Box>
             ))}

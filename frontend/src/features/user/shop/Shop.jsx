@@ -55,7 +55,7 @@ function Shop() {
         <Box>
             <AutoSlideCarousel />
             <Container maxWidth="lg">
-                <Typography variant="h4" color="initial" sx={{ m: 1, mb: 5 }}>
+                <Typography variant="h5" color="initial" sx={{ m: 1, mb: 5 }}>
                     Welcome! One of a kind find are waiting for you!
                 </Typography>
                 <Box

@@ -1,20 +1,35 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import AutoSlideCarousel from '../../../components/AutoSlideCarousel'
 import FeaturedProductCarousel from '../../../components/FeaturedProductCarousel'
-import { Box, Container, Typography } from '@mui/material'
+import { Box, Container, Fade, Slide, Typography} from '@mui/material'
+import HomeHero from './HomeHero'
 
 export default function Home () {
+    const [visible, setVisible] = useState(false);
+    const ref = useRef(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => setVisible(entry.isIntersecting),
+            { threshold: 0.05}
+        )
+        if (ref.current) observer.observe(ref.current);
+        return () => observer.disconnect();
+    }, [])
     return (
         <React.Fragment>
             <Box>
-                <AutoSlideCarousel/>
-                
+                <HomeHero/>
                 <Container maxWidth="lg">
-                    <Typography variant="h4" component='h2' color="secondary" sx={{mb: 2,}}>
-                        Don't miss out our featured products!
+                    <Typography variant="h6" component='h2' color="secondary" sx={{mb: 2, textAlign: 'center'}}>
+                        Handpicked just for you!
                     </Typography>
-                    <Box sx={{mx: 1}}>
-                        <FeaturedProductCarousel/>
+                    <Box ref={ref} sx={{mx: 1, mb: 5}}>
+                        <Fade timeout={300} in={visible}>
+                            <Box>
+                                <FeaturedProductCarousel/>
+                            </Box>
+                        </Fade>    
                     </Box>
                 </Container>
             </Box>

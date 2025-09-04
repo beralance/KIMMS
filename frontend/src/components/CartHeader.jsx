@@ -28,7 +28,7 @@ const CartHeader = () => {
                 {/* Title */}
                 <Box>
                     <Button component={Link} to='/home' color=''>
-                        <Typography variant="h6" component="div">
+                        <Typography variant="body1" component="div">
                             K I M M S 
                         </Typography>
                     </Button>

@@ -41,13 +41,13 @@ export default function Cart() {
     return (
         <Container sx={{pb: '180px',}}>
             <Typography variant="h6" color="initial">
-                Cart ({cartItemCount})
+                Shopping Cart ({cartItemCount})
             </Typography>
             {cartItems.slice().reverse().map(item => (
                 <Grid 
                     key={item.id}
                     container 
-                    sx={{width: '100%', boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.3)', my: 3, backgroundColor: '#f0f0f0f1', borderRadius: '5px'}}
+                    sx={{width: '100%', boxShadow: '0px 1px 5px rgba(0, 0, 0, 0.3)', my: 3, borderRadius: '5px'}}
                 >
                     <Grid size={{xs: 6, sm: 6, md: 4}}>
                         <Box sx={{width: '100%', height: '100%'}}>
