@@ -42,7 +42,7 @@ export default function ProductCard({
                             borderRadius: 3
                     }}
                     />
-                    <Box sx={{position: 'absolute', top: 15, left: 10, bgcolor: '#37353E', p: .5, px: 2, borderRadius: '999px'}}>
+                    <Box sx={{position: 'absolute', top: 15, left: 10, bgcolor: '#37353E', p: .5, px: 2, borderRadius: 2}}>
                         <Typography variant="body1" color="white">
                             {condition}
                         </Typography>
