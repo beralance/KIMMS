@@ -36,7 +36,6 @@ export default function FeaturedProductCarousel() {
                 "--swiper-pagination-color": "#222222ff",
                 "--swiper-pagination-bullet-size": ".4rem",
             }}
-
         >
             <Swiper 
                 style={{
