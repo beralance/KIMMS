@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import AuthLayout from "../../layout/AuthLayout";
 import SignupForm from "../../features/auth/components/SignupForm";
 import { useAuth } from "../../contexts/AuthContext";
-
+import { Outlet } from "react-router-dom";
 export default function SignupPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -13,12 +13,12 @@ export default function SignupPage() {
 
   const from = location.state?.from?.pathname || "/";
 
-  const handleRegisterSuccess = (user) => {
-        login(user);
-        navigate(from, { replace: true });
-  };
+    const handleRegisterSuccess = (user) => {
+        // redirect to VerifyPage with email
+        navigate(`/auth/signup/verify?email=${encodeURIComponent(user.email)}`);
+    };
 
-  return (
+    return (
         <AuthLayout>
             <Container>
                 <Box sx={{display: 'flex', justifyContent: 'center', m: 4}}>
@@ -28,7 +28,7 @@ export default function SignupPage() {
                     <Typography variant="h4" component="h1" sx={{fontWeight: 'bold'}} mb={3}>
                         Let's get you started
                     </Typography>
-                    <Typography variant="body2" component="h1" mb={3}>
+                    <Typography variant="body2" color="secondary" component="h1" mb={3}>
                         Join our community and start your journey.
                     </Typography>
                                 

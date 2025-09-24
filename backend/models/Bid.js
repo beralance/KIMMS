@@ -1,0 +1,28 @@
+import mongoose from "mongoose";
+
+const bidSchema = new mongoose.Schema(
+    {
+        auctionId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Auction",
+            required: true,
+        },
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+        amount: {
+            type: Number,
+            required: true,
+        },
+    },
+    { timestamps: true }
+);
+
+// Ensure on bid per user per auction
+
+bidSchema.index({ auctionId: 1, userId: 1}, {unique: true})
+
+const Bid = mongoose.model("Bid", bidSchema);
+export default Bid;

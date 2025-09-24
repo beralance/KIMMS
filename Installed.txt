@@ -6,6 +6,9 @@
 - dayjs
 - react-slick
 - swiper
+- jwtdecode
+- qrcode.react
+- lodash.debounce
 
 
 BACKEND
@@ -14,5 +17,13 @@ BACKEND
 - npm install express cors dotenv
 - npm install --save-dev nodemon
 - npm install stripe
-
+- npm install bcryptjs
+- npm install jsonwebtoken
+- npm install multer
+- npm install ngrok
+- npm install node-cron
+- npm install socket.io
+- npm install bcrypt validator
+- npm install nodemailer
+- npm install express-rate-limit
 

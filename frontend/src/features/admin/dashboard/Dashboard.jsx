@@ -1,13 +1,23 @@
 import React from 'react'
-import { Box, Typography } from '@mui/material'
+import { Box, Button, Container, Typography } from '@mui/material'
+import AdminAutoSlideCarousel from '../../../components/AdminAutoSlideCarousel'
+
 
 const Dashboard = () => {
     return (
-        <Box color={error}>
-            <Typography variant="h1" color="initial">
-                This is dashboard page
-            </Typography>
-        </Box>
+        <>
+            <Container>
+                <AdminAutoSlideCarousel/>
+                <Box>
+                    <Typography variant="body1" color="initial">
+                        Hello World!
+                    </Typography>
+                    <Button fullWidth variant='contained' color='secondary'>
+                        hello world
+                    </Button>
+                </Box>
+            </Container>
+        </>
     )       
 }
 

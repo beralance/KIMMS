@@ -1,0 +1,207 @@
+// src/context/ProductContext.jsx
+import { createContext, useState, useEffect, use } from "react";
+import {useAuth} from '../contexts/AuthContext'
+export const ProductContext = createContext();
+
+export function ProductProvider({ children }) {
+    const [products, setProducts] = useState([]);
+    const [inventory, setInventory] = useState([]);
+    const API_URL = "http://localhost:5000/api/products";
+    const INVENTORY_URL = "http://localhost:5000/api/inventory";
+    const {token} = useAuth()
+
+    // Fetch all products
+    const fetchProducts = async () => {
+        try {
+            const res = await fetch(API_URL, {
+            });
+            const data = await res.json();
+            setProducts(data);
+        } catch (err) {
+            console.error("Error fetching products:", err);
+        }
+    };
+
+    // Fetch available inventory (for posting)
+    const fetchInventory = async () => {
+        try {
+            const res = await fetch(`${INVENTORY_URL}?status=available`,);
+            const data = await res.json();
+            setInventory(data);
+        } catch (err) {
+            console.error("Error fetching inventory:", err);
+        }
+    };
+    
+    const addProduct = async (inventoryId) => {
+        try {
+            const res = await fetch(API_URL, {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json",
+                    'Authorization' : `Bearer ${token}`,
+                },
+                body: JSON.stringify({ inventoryId }),
+            });
+            const newProduct = await res.json();
+
+            setProducts((prevProducts) => {
+                if (prevProducts.some((p) => p.inventoryId === inventoryId)) return prevProducts;
+                return [newProduct, ...prevProducts];
+            });
+
+            return newProduct;
+        } catch (err) {
+            console.error("Error adding product:", err);
+        }
+    };
+
+    const updateProduct = async (id, updatedData) => {
+        try {
+            const res = await fetch(`${API_URL}/${id}`, {
+                method: "PUT",
+                headers: { 
+                    "Content-Type": "application/json",
+                    'Authorization' : `Bearer ${token}`,
+                    
+                },
+                body: JSON.stringify(updatedData),
+            });
+            const updated = await res.json();
+            setProducts(products.map((p) => (p._id === id ? updated : p)));
+        } catch (err) {
+            console.error("Error updating product:", err);
+        }
+    };
+
+    // Soft delete product
+    const deleteProduct = async (id) => {
+        try {
+            const res = await fetch(`${API_URL}/${id}`, { method: "DELETE"});
+            const result = await res.json();
+            setProducts(products.map((p) =>
+                p._id === id ? { ...p, visibility: 'inactive' } : p
+            ));
+            console.log(result.message);
+        } catch (err) {
+            console.error("Error deleting product:", err);
+        }
+    };
+
+    // Update product highlight
+    const updateProductHighlight = async (id, highlight) => {
+        const res = await fetch(`${API_URL}/highlight/${id}`, {
+            method: "PATCH",
+            headers: {
+                    "Content-Type": "application/json"
+                },
+            body: JSON.stringify({ highlight }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Failed to update product highlight");
+        setProducts((prev) => prev.map((p) => (p._id === id ? data : p)));
+        return data;
+    };
+
+    // ProductContext.jsx
+    // Add this function inside ProductProvider
+
+    const updateProductStatus = async (productId, newStatus) => {
+        try {
+            // 1️⃣ Update product visibility
+            const res = await fetch(`${API_URL}/${productId}/status`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    },
+                body: JSON.stringify({ visibility: newStatus }),
+            });
+            const updatedProduct = await res.json();
+
+            if (!res.ok) {
+                return { error: updatedProduct.message || "Failed to update product status" };
+            }
+
+            // 2️⃣ Update linked inventory if status is sold
+            if (newStatus === "sold") {
+                await fetch(`${INVENTORY_URL}/${updatedProduct.inventoryId}/status`, {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                        },
+                    body: JSON.stringify({ status: "sold" }),
+                });
+            }
+
+            // 3️⃣ Update local state
+            setProducts((prev) =>
+                prev.map((p) => (p._id === productId ? updatedProduct : p))
+            );
+
+            return updatedProduct;
+        } catch (err) {
+            console.error(err);
+            return { error: "Failed to update product status" };
+        }
+    };
+
+
+    // Search products
+    const searchProducts = async (query) => {
+        try {
+            const res = await fetch(`${API_URL}/search/query?q=${encodeURIComponent(query)}`);
+            const data = await res.json();
+            return data;
+        } catch (err) {
+            console.error("Error searching products:", err);
+        }
+    };
+
+    // Increment product views
+    const incrementViews = async (id) => {
+        try {
+            await fetch(`${API_URL}/views/${id}`, { method: "PATCH" });
+        } catch (err) {
+            console.error("Error incrementing views:", err);
+        }
+    };
+
+    // Get product by ID
+    const getProductById = async (id) => {
+        try {
+            const res = await fetch(`${API_URL}/${id}`)
+            if (!res.ok) throw new Error('Failed to fetch product');
+            return await res.json()
+        }
+        catch (err) {
+            console.error('Error fetching product by id: ', err)
+        }
+    }
+
+
+    useEffect(() => {
+        fetchProducts();
+        fetchInventory();
+    }, []);
+
+    return (
+        <ProductContext.Provider
+            value={{
+                products,
+                inventory,
+                fetchProducts,
+                fetchInventory,
+                addProduct,
+                updateProduct,
+                deleteProduct,
+                updateProductHighlight,
+                updateProductStatus,  // ✅ new
+                searchProducts,
+                incrementViews,
+                getProductById,
+            }}
+        >
+            {children}
+        </ProductContext.Provider>
+    );
+}

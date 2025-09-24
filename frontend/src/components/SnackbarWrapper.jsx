@@ -1,5 +1,5 @@
 import React from 'react'
-import { CartProvider, useCart } from '../contexts/CartProvider'
+import { CartProvider, useCart } from '../contexts/CartContext'
 import CustomSnackbar from './CustomSnackbar'
 
 function SnackbarWrapper () {

@@ -1,9 +1,11 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation, Outlet } from "react-router-dom";
 
 // Restriction
 import UserProtectedRoute from "./UserProtectedRoute";
 import AdminRoute from "./AdminRoute";
+import StaffProtectedRoute from "./StaffProtectedRoute";
+import AdminStaffRoute from "./AdminStaffRoute";
 
 // User Pages
 import Home from '../features/user/home/Home'
@@ -15,10 +17,20 @@ import Checkout from "../features/user/checkout/Checkout";
 import Success from '../features/user/checkout/Success'
 import Cancel from '../features/user/checkout/Cancel'
 import AuctionProductDetails from '../features/user/auction/AuctionProductDetails'
+import AuctionListing from "../features/user/auction/AuctionListing";
+import AuctionBidding from '../features/user/auction/AuctionBidding'
 
 // Admin Pages
 import Dashboard from '../features/admin/dashboard/Dashboard'
-import ManageProducts from '../features/admin/manageProducts/ManageProducts'
+import Inventory from '../features/admin/Inventory/Inventory' // change Inventory to inventory  soon
+import Orders from "../features/admin/orders/Orders";
+import Reports from "../features/admin/reports/Reports";
+import QrPreview from "../pages/QrPreview";
+import StaffManagement from "../features/admin/staff/StaffManagement"; 
+import InventoryManagement from "../features/admin/Inventory/inventoryManagement/InventoryManagement";
+import ProductManagement from "../features/admin/Inventory/productManagement/ProductManagement";
+import AuctionManagement from "../features/admin/Inventory/auctionManagement/AuctionManagement";
+import StaffDashboard from '../features/staff/StaffDashboard'
 
 // Public Pages
 import NotFound from "../pages/NotFound";
@@ -26,6 +38,7 @@ import NotFound from "../pages/NotFound";
 // Auth 
 import Login from '../features/auth/Login'
 import Signup from '../features/auth/Signup'
+import VerifyForm from "../features/auth/components/VerifyForm";
 
 // Layouts
 import AdminLayout from '../layout/AdminLayout'
@@ -38,11 +51,13 @@ export default function AppRoutes() {
             {/* User Layout */}
             <Route path='/auth/login' element={<Login/>}/>
             <Route path='/auth/signup' element={<Signup/>}/>
+            <Route path="/auth/signup/verify" element={<VerifyForm/>}/>
+
             <Route path="/product/:id" element={<ProductDetails/>}/>
 
-            <Route path='/auction/:id' element={
+            <Route path='/auction/bid/:id' element={
                 <UserProtectedRoute>
-                    <AuctionProductDetails/>
+                    <AuctionBidding/> {/* can be removed or modified later, not right now if the auction is replaced with auctionlisting */}
                 </UserProtectedRoute>
                 }
             />
@@ -75,39 +90,53 @@ export default function AppRoutes() {
             </Route>
             <Route element={<UserLayout/>}>
                 {/* Public Routes */}
-                <Route path="/" element={<Home/>}/>
+                <Route path="/" index element={<Home/>}/>
                 <Route path='/shop' element={<Shop/>}/>
 
                 {/* User Protected Routes*/}
                 <Route path="/auction" element={
                     <UserProtectedRoute>
-                        <Auction/>
+                        <AuctionListing/> {/* changed from auctin to auctionList */}
                     </UserProtectedRoute>
                     }
                 />
             </Route>
 
-            {/* Admin Layout*/}
-            <Route element={<AdminLayout/>}>
-
-                {/* Admin Protected Routes*/}
-                <Route
-                    path="/admin"
-                    element={
-                        <AdminRoute>
-                            <Dashboard/>
-                        </AdminRoute>
-                    }
-                />
-                <Route
-                    path="/admin/manage-products"
-                    element={
-                        <AdminRoute>
-                            <ManageProducts />
-                        </AdminRoute>
-                    }
-                />
+            {/* ADMIN ROUTES */}
+            <Route path="admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+                <Route index element={<Dashboard />} />
+                <Route path="inventory" element={<Inventory />}>
+                    <Route path="manage-inventory" element={<InventoryManagement />} />
+                    <Route path="manage-product" element={<ProductManagement />} />
+                    <Route path="manage-auction" element={<AuctionManagement />} />
+                </Route>
+                <Route path="orders" element={<Orders />} />
+                <Route path="reports" element={<Reports />} />
+                <Route path="manage-staff" element={<StaffManagement />} />
             </Route>
+
+            {/* STAFF ROUTES */}
+            <Route element={<StaffProtectedRoute/>}>
+                <Route path="staff" element={<AdminLayout/>}>
+                    <Route index element={<StaffProtectedRoute moduleName='dashboard'><StaffDashboard /></StaffProtectedRoute>} />
+                    <Route path="inventory" element={<StaffProtectedRoute moduleName="inventory"><Inventory /></StaffProtectedRoute>}>
+                        <Route path="manage-inventory" element={<StaffProtectedRoute moduleName="inventory-management"><InventoryManagement /></StaffProtectedRoute>} />
+                        <Route path="manage-product" element={<StaffProtectedRoute moduleName="product-management"><ProductManagement /></StaffProtectedRoute>} />
+                        <Route path="manage-auction" element={<StaffProtectedRoute moduleName="auction-management"><AuctionManagement /></StaffProtectedRoute>} />
+                    </Route>
+                    <Route path="orders" element={<StaffProtectedRoute moduleName="order"><Orders /></StaffProtectedRoute>} />
+                    <Route path="reports" element={<StaffProtectedRoute moduleName="report"><Reports /></StaffProtectedRoute>} />
+                </Route>
+            </Route>
+            {/* QR Preview */}
+            <Route
+                path="/qr-preview/:id"
+                element={
+                    <AdminStaffRoute>
+                        <QrPreview/>
+                    </AdminStaffRoute>
+                }
+            />
 
             {/* Fallback */}
             <Route path="*" element={<NotFound />} />

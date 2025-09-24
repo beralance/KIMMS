@@ -1,21 +1,25 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useNavigate } from 'react-router-dom';
 import ProductCardSimple from "./ProductCardSimple";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, EffectCoverflow, Navigation } from 'swiper/modules';
-import products from '../data/products';
-import { useCart } from '../contexts/CartProvider';
-import { Box } from "@mui/material";
+import { ProductContext } from '../contexts/ProductContext';
+import { useCart } from '../contexts/CartContext';
+import { Box, Typography } from "@mui/material";
 
 export default function FeaturedProductCarousel() {
     const navigate = useNavigate();
     const { addToCart } = useCart();
+    const { products } = useContext(ProductContext); // get products from context
 
     const handleAddToCart = (product) => {
-        addToCart(product, 1); 
+        addToCart(product); 
     }
 
-    return (
+    // Filter only featured products
+    const featuredProducts = products.filter(p => p.highlight === "featured");
+
+    return featuredProducts.length > 0 ? (
         <Box
             sx={{
                 "& .swiper-button-next, & .swiper-button-prev": {
@@ -30,17 +34,19 @@ export default function FeaturedProductCarousel() {
                     justifyContent: "center",
                 },
                 "& .swiper-button-next::after, & .swiper-button-prev::after": {
-                    fontSize: "1rem", // control arrow size
+                    fontSize: "1rem",
                 },
                 "--swiper-navigation-size": "2rem",
                 "--swiper-pagination-color": "#222222ff",
                 "--swiper-pagination-bullet-size": ".4rem",
             }}
         >
+            <Typography variant="h6" component='h2' color="secondary" sx={{mb: 2, textAlign: 'center'}}>
+                Handpicked just for you!
+            </Typography>
+            
             <Swiper 
-                style={{
-                    padding: '.4rem',
-                }}
+                style={{ padding: '.4rem' }}
                 slidesPerView={2}
                 navigation
                 spaceBetween={10}
@@ -54,16 +60,17 @@ export default function FeaturedProductCarousel() {
                     1000: { slidesPerView: 4, spaceBetween: 30, centeredSlides: false },
                 }}
             >
-                {products.map(product => (
-                    <SwiperSlide key={product.id}>
+                
+                {featuredProducts.map(product => (
+                    <SwiperSlide key={product._id}>
                         <ProductCardSimple 
                             product={product} 
-                            onNavigate={() => navigate(`/product/${product.id}`)} 
+                            onNavigate={() => navigate(`/product/${product._id}`)} 
                             addToCart={() => handleAddToCart(product)}
                         />
                     </SwiperSlide>
                 ))}
             </Swiper>
         </Box>
-    );
+    ) : null;
 }

@@ -1,26 +1,54 @@
-// pages/Cart.jsx
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Button, Container, Checkbox, Grid, Stack } from "@mui/material";
-import { useCart } from "../../../contexts/CartProvider"; // adjust path if needed
+import { Box, Typography, Button, Container, Checkbox, Grid, Stack, List, ListItem, Divider, Grow, ButtonGroup, Collapse, IconButton, Fade } from "@mui/material";
+import { useCart } from "../../../contexts/CartContext";
 import { useCheckout } from "../../../contexts/CheckoutContext";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import BottomActionBar from "../../../components/BottomActionBar";
+import { UPLOADS_URL } from "../../../utils/constants";
+import {DeleteRounded, DoneAllRounded, KeyboardArrowDownRounded, KeyboardArrowUpRounded, RemoveDoneRounded } from '@mui/icons-material'
 
 export default function Cart() {
-    const { cartItems, removeFromCart, clearCart } = useCart();
+    const { cartItems, removeFromCart } = useCart();
     const { setCheckoutItems } = useCheckout();
     const navigate = useNavigate();
     const [selectedIds, setSelectedIds] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
-    const cartItemCount = cartItems.length
+    const [summaryOpen, setSummaryOpen] = useState(false)
 
+    // Only consider valid products
+    const validCartItems = cartItems.filter(item => item.productId);
+
+    // Calculate total price whenever selection or cart changes
     useEffect(() => {
-        const selectedItems = cartItems.filter(item => selectedIds.includes(item.id));
-        const total = selectedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+        const selectedItems = validCartItems.filter(item =>
+            selectedIds.includes(item.productId._id)
+        );
+        const total = selectedItems.reduce(
+            (acc, item) => acc + ((item.productId.price ?? 0) * (item.quantity ?? 1)),
+            0
+        );
         setTotalPrice(total);
-    }, [selectedIds, cartItems]);
+        
+    }, [selectedIds, validCartItems]);
 
-    if (!cartItems.length) return <Typography>Your cart is empty</Typography>;
+    if (!validCartItems.length) {
+        return (
+            <Stack sx={{height: '80vh', justifyContent: 'center', alignItems: 'center'}}>
+                <Grow in={true} mountOnEnter unmountOnExit timeout={1000}>
+                    <Box sx={{width: 80}}>
+                        <img src="emoji-sick-svgrepo-com.svg" alt="emoji-sick" style={{width: '100%', objectFit: 'cover'}} />
+                    </Box>
+                </Grow>
+                <Typography variant="h6" fontWeight='bold'>Your cart is empty</Typography>
+                <Typography variant="body2" color="grey">Click the button below to browse our products</Typography>
+                <Fade mountOnEnter unmountOnExit in={true} timeout={600}>
+                    <Button variant="contained" sx={{borderRadius: '999px', width: 150, py: 1, my: 4}} color="secondary" component={NavLink} to='/shop'>
+                        Browse Product
+                    </Button>
+                </Fade>
+            </Stack>
+        )
+    }
 
     const toggleSelect = (id) => {
         setSelectedIds(prev =>
@@ -28,86 +56,260 @@ export default function Cart() {
         );
     };
 
+    const handleSelectAll = () => {
+        if (selectedIds.length === validCartItems.length) {
+            setSelectedIds([]); // unselect all
+        } else {
+            setSelectedIds(validCartItems.map(item => item.productId._id)); // select all
+        }
+    };
+
+    const handleRemoveSelected = async () => {
+        for (const id of selectedIds) {
+            await removeFromCart(id);
+        }
+        setSelectedIds([])
+    };
+
     const handleCheckout = () => {
         if (!selectedIds.length) {
             alert("Please select at least one item to checkout.");
             return;
         }
-        const itemsToCheckout = cartItems.filter(item => selectedIds.includes(item.id));
+        const itemsToCheckout = validCartItems.filter(item =>
+            selectedIds.includes(item.productId._id)
+        );
         setCheckoutItems(itemsToCheckout);
         navigate("/checkout", { replace: true });
     };
 
+    const selectedItemsDetails = validCartItems
+        .filter(item => selectedIds.includes(item.productId._id))
+        .map(item => ({
+            name: item.productId.productName,
+            price: item.productId.price,
+        }))
+    
     return (
-        <Container sx={{pb: '180px',}}>
-            <Typography variant="h6" color="initial">
-                Shopping Cart ({cartItemCount})
-            </Typography>
-            {cartItems.slice().reverse().map(item => (
-                <Grid 
-                    key={item.id}
-                    container 
-                    sx={{width: '100%', boxShadow: '0px 1px 5px rgba(0, 0, 0, 0.3)', my: 3, borderRadius: '5px'}}
-                >
-                    <Grid size={{xs: 6, sm: 6, md: 4}}>
-                        <Box sx={{width: '100%', height: '100%'}}>
-                            <Button onClick={() => navigate(`/product/${item.id}`)} sx={{padding: 0}}>
-                                <img src={item.image} alt="" style={{width: '100%', height: '100%', objectFit: 'cover', aspectRatio: '1/1', borderRadius: '5px 0px 0px 5px'}}/>
-                            </Button>
-                        </Box>
-                    </Grid>
-                    <Grid size={{xs: 6, sm: 6, md: 4,}} sx={{p: 1}}>
-                        <Stack sx={{height: '100%', display: 'flex', justifyContent: 'space-between'}}>
-                            <Box>
-                                <Box sx={{display: 'flex', justifyContent: 'end'}}>
-                                    <Checkbox onChange={() => toggleSelect(item.id)} checked={selectedIds.includes(item.id)} sx={{p: 0}}/>
-                                </Box>
-                                <Box sx={{m: 1}}>
-                                    <Typography variant="Body1" color="secondary" noWrap sx={{ cursor: "pointer", fontWeight: 'bold' }}>
-                                        {item.name}
-                                    </Typography>
-                                    <Typography variant="body1" sx={{ cursor: "pointer" }}>
-                                        PHP {item.price}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                            <Box sx={{my: 1}}>
-                                <Button variant="outlined" fullWidth color="error" onClick={() => removeFromCart(item.id)} >
-                                    Remove
-                                </Button>
-                            </Box>
-                        </Stack>
-                    </Grid>
-                </Grid>
-            ))}
+        <Container sx={{ pb: {xs: "120px", md: 0 }}}>
 
-            {/* Bottom Navigation */}
-            <BottomActionBar>
-                <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
-                    <Typography variant="body1" component='div'>
-                        <Stack>
-                            <span style={{fontWeight: 'bold'}}>Total:</span>
-                            <span style={{color: 'green'}}>PHP {totalPrice.toFixed(2)}</span>
-                        </Stack>
-                    </Typography>
-
-                    <Button variant="contained" color="error" sx={{ mt: 1, }} onClick={clearCart}>
-                        Clear Cart
+            {/* Mobile On*/}
+            <Box sx={{ display: {xs: "flex", md: 'none'}, mb: 2, justifyContent: "space-between", alignItems: "center" }}>
+                <Typography variant="body1" sx={{fontWeight: 'bold'}} >
+                    Shopping Cart
+                </Typography>
+                <Box>
+                    {selectedIds.length > 0 && (
+                        <Button variant="text" color="error" onClick={handleRemoveSelected}>
+                            <DeleteRounded fontSize="small" sx={{mr: 1}}/>
+                        </Button>
+                    )}
+                    <Button variant={selectedIds.length === validCartItems.length ? 'contained' : 'text'} color="secondary" onClick={handleSelectAll}>
+                        {selectedIds.length === validCartItems.length ? <RemoveDoneRounded fontSize="small" sx={{mr: 1}}/> : <DoneAllRounded fontSize="small" sx={{mr: 1}}/>}
                     </Button>
                 </Box>
-
-                {/* Only show Checkout button if at least one item is selected */}
-                {selectedIds.length > 0 && (
-                    <Button 
-                        variant="contained"
-                        color="secondary"
-                        onClick={handleCheckout}
-                        sx={{p: 1.5, fontWeight: 'bold'}}    
-                    >
-                        Checkout Selected
+            </Box>
+            <Box sx={{boxShadow: 2, p: 2, borderRadius: 2, mb: 3, display: {xs: 'block', md: 'none'}}}>
+                <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1}}>
+                    <Typography variant="subtitle2" color="initial" fontWeight='bold'>
+                        Shipping Address:
+                    </Typography>
+                    <Button variant="outlined" color="secondary">
+                        Change
                     </Button>
-                )}
-            </BottomActionBar>
+                </Box>
+                <Typography variant="body2" color="grey">
+                    {/* Add backend here, if user has no address, add fallback*/}
+                    Brgy 1, Mabini Street, Malilipot, Albay
+                </Typography>
+            </Box>
+            <Box sx={{display: {xs: 'flex', md: 'none'}, width: 100, justifyContent: 'center', position: selectedIds.length && 'sticky', top: 70, backdropFilter: 'blur(10px)', WebkitBackdropFilter: "blur(10px)", zIndex: 1000, p: 2, py: 1, borderRadius: '0px 5px 5px 0px'}}>
+                <Typography variant="body2" color="secondary" fontWeight='bold'>
+                    {selectedIds.length} selected
+                </Typography>
+            </Box>
+            <Box sx={{display: {md: 'flex'}, gap: {xs: 0, md: 1}}}>
+                <Box  sx={{ width: {md: '60%'},}}>
+                    {/* Desktop On*/}
+                    <Box sx={{ display: {xs: 'none', md: "flex"}, mb: {md: 2}, mx: {md: 1}, justifyContent: "space-between", alignItems: "center" }}>
+                        <Typography variant="Subtitle1" fontWeight='bold'>
+                            Shopping Cart ({validCartItems.length})
+                        </Typography>
+                        <Box sx={{display: 'flex', gap: 2}}>
+                            {selectedIds.length > 0 && (
+                                <Button variant="text" color="error" onClick={handleRemoveSelected}>
+                                    <DeleteRounded fontSize="small" sx={{mr: 1}}/> Delete Selected
+                                </Button>
+                            )}
+                            <Button variant={selectedIds.length === validCartItems.length ? 'contained' : 'text'} color="secondary" onClick={handleSelectAll}>
+                                {selectedIds.length === validCartItems.length ? <><RemoveDoneRounded fontSize="small" sx={{mr: 1}}/> Unselect All</> : <><DoneAllRounded fontSize="small" sx={{mr: 1}}/> Select All</>}
+                            </Button>
+                        </Box>
+                    </Box>
+                    <Box sx={{ mt: 2, px: {xs: 2, sm: 2}, m: {md: 1}, py: {xs: 0, md: 1}, bgcolor: '#f8f8f8', borderRadius: {xs: 2, md: 4},  overflowY: 'auto', height: {md: '79vh'}}}>
+                        {validCartItems.slice().reverse().map((item) => {
+                            const product = item.productId;
+                            return (
+                                <Box key={item._id} >
+                                    <Grid container sx={{ boxShadow: 4, my: {xs: 2, sm: 1.5}, borderRadius: 2, overflow: 'hidden', bgcolor: 'white'}}>
+                                        <Grid size={{xs: 5}}>
+                                            <Button
+                                                onClick={() => navigate(`/product/${product._id}`)}
+                                                sx={{ padding: 0 }}
+                                            >
+                                                <Box>
+                                                    <img
+                                                        src={`${UPLOADS_URL}${product.image ?? ""}`}
+                                                        alt={product.productName ?? "Product"}
+                                                        style={{ width: "100%", display: 'block', height: '100%', aspectRatio: '1/1', objectFit: "cover" }}
+                                                    />
+                                                </Box>
+                                            </Button>
+                                        </Grid>
+                                        <Grid size={{ xs: 7 }}>
+                                            <Stack sx={{position: 'relative', height: '100%'}}>
+                                                <Box sx={{position:'absolute', top: 0, right: 0}}>
+                                                    <Checkbox
+                                                        color="secondary"
+                                                        checked={selectedIds.includes(product._id)}
+                                                        onChange={() => toggleSelect(product._id)}
+                                                    />
+                                                </Box>
+                                                <Box sx={{display: 'flex', justifyContent: 'center', pt: {xs: 2}, my: {xs: 2, md: 2}, mx: {xs: 1.5, sm: 2}, height: '100%', flexDirection: "column"}}>
+                                                    <Typography sx={{typography: {xs: 'body1', sm: 'h6'}}}>{product.productName ?? "Product not found"}</Typography>
+                                                    <Typography sx={{typography: {xs: 'body2'}}} gutterBottom>{product.category ?? "Product not found"}</Typography>
+                                                    <Typography variant="body2" color="grey">{product.description}</Typography>
+                                                    <Box sx={{bgcolor: '#37353E', display: 'flex', justifyContent: 'center', mt: 'auto', p: {xs: .5, md: 1}, px: {xs: 1, md: 2}, mx: 2, borderRadius: '999px'}}>
+                                                        <Typography  sx={{typography: {xs: 'body2'}, fontWeight: {xs: '', sm: 'bold',}}} color="white" >
+                                                            PHP {(product.price ?? 0).toLocaleString('en-PH', {minimumFractionDigits: 2})}
+                                                        </Typography>
+                                                    </Box>
+                                                </Box>
+                                            </Stack>
+                                        </Grid>
+                                    </Grid>
+                                </Box>
+                            );
+                        })}
+                    </Box>
+                </Box>
+                {/* Right Container */}
+                <Box sx={{display: {xs: 'none', md: 'flex'}, flexDirection: 'column', width: {xs: 0, md: '40%'}, height: 400, p: 2}}>
+                    <Typography variant="subtitle1" fontWeight='bold' color="secondary" sx={{mb: 1}}>
+                        Order Summary
+                    </Typography>
+                    <Box sx={{boxShadow: 2, p: 2, borderRadius: 2, mb: 2}}>
+                        <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1}}>
+                            <Typography variant="subtitle2" color="initial" fontWeight='bold'>
+                                Shipping Address:
+                            </Typography>
+                            <Button variant="outlined" color="secondary">
+                                Change
+                            </Button>
+                        </Box>
+                        <Typography variant="body2" color="grey">
+                            {/* Add backend here, if user has no address, add fallback*/}
+                            Brgy 1, Mabini Street, Malilipot, Albay
+                        </Typography>
+                    </Box>
+                    <Box sx={{boxShadow: 2, p: 2, borderRadius: 2}}>
+                        <Typography variant="body1" color="initial" fontWeight='bold'>
+                            Selected Item:
+                        </Typography>
+                        <Box sx={{my: 1}}>
+                            {selectedItemsDetails.map((item, index) => (
+                                <Grow in={true} mountOnEnter unmountOnExit timeout={500}>
+                                    <List sx={{py: 0}} key={index}>
+                                        <ListItem sx={{display: 'flex', px: 0, justifyContent: 'space-between', py: 1, my: 0}}>
+                                            <Typography noWrap variant="subtitle2" color="initial">
+                                                - {item.name}
+                                            </Typography>
+                                            <Typography variant="subtitle2" color="grey">
+                                                PHP {item.price.toLocaleString('en-PH', {minimumFractionDigits: 2})}
+                                            </Typography>
+                                        </ListItem>
+                                    </List>
+                                </Grow>
+                            ))}
+                        </Box>
+                        <Divider/>
+                        <Box sx={{my: 2, display: 'flex', justifyContent: 'space-between'}}> 
+                            <Typography variant="subtitle2" fontWeight='bold'>
+                                Sub-total (
+                                    {selectedIds.length ?
+                                        (
+                                            `${selectedIds.length} item${selectedIds.length <= 1 ? '' : 's'}`
+                                        )
+                                        :
+                                        ''
+                                    }
+                                ) :
+                            </Typography>
+                            <Typography variant="subtitle2">
+                                PHP {totalPrice.toLocaleString('en-PH', {minimumFractionDigits: 2})} 
+                            </Typography>
+                        </Box>
+                        <Box sx={{width: '100%'}}>
+                            {selectedIds.length > 0 && (
+                                <Button variant="contained" color="secondary" fullWidth onClick={handleCheckout}>
+                                    Checkout Selected
+                                </Button>
+                            )}
+                        </Box>
+                    </Box>
+                </Box>
+            </Box>
+            
+            <Box sx={{ display: {xs: "flex", md: 'none'}, }}>
+                <BottomActionBar>
+                    <Box>
+                        <Box sx={{display: 'flex', mb: summaryOpen ? 1 : 0, alignItems: 'center', justifyContent: 'space-between'}}>
+                            <Typography variant="body2" fontWeight='bold'>
+                                Order Summary:
+                            </Typography>
+                            <IconButton onClick={() => setSummaryOpen(!summaryOpen)}>
+                                {summaryOpen ? <KeyboardArrowUpRounded/> : <KeyboardArrowDownRounded/>}
+                            </IconButton>
+                        </Box>
+                        <Collapse in={summaryOpen}>
+                            {selectedIds.length ? 
+                                <Box sx={{ justifyContent: "space-between", p: 1,  mb: 1, overflowY: 'auto', bgcolor: '#f8f8f8', borderRadius: 2, maxHeight: 100}}>
+                                    {selectedItemsDetails.map((item, index) => (
+                                        <List sx={{py: 0}} key={index}>
+                                            <ListItem sx={{display: 'flex', px: 0, justifyContent: 'space-between', py: 2, my: 0}}>
+                                                <Typography noWrap variant="subtitle2" color="initial">
+                                                    - {item.name}
+                                                </Typography>
+                                                <Typography variant="subtitle2" color="grey">
+                                                    PHP {item.price.toLocaleString('en-PH', {minimumFractionDigits: 2})}
+                                                </Typography>
+                                            </ListItem>
+                                            <Divider/>
+                                        </List>
+                                    ))}
+                                </Box>
+                                :
+                                <Typography variant="subtitle2" sx={{justifySelf: 'center'}}>
+                                    - No Items Selected -
+                                </Typography>    
+                            }
+                        </Collapse>
+                         <Box sx={{my: 1, display: 'flex', justifyContent: 'space-between'}}> 
+                            <Typography variant="subtitle2" fontWeight='bold'>
+                                Sub-total:
+                            </Typography>
+                            <Typography variant="subtitle2">
+                                PHP {totalPrice.toLocaleString('en-PH', {minimumFractionDigits: 2})} 
+                            </Typography>
+                        </Box>
+                    </Box>
+                    {selectedIds.length > 0 && (
+                        <Button variant="contained" color="secondary" onClick={handleCheckout}>
+                            Checkout Selected
+                        </Button>
+                    )}
+                </BottomActionBar>
+            </Box>
         </Container>
     );
 }

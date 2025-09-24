@@ -2,6 +2,8 @@ import React from 'react'
 import { Container, Box, IconButton } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { useNavigate } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
+
 const AuthLayout = ({children}) => {
     const navigate = useNavigate();
     
@@ -17,7 +19,7 @@ const AuthLayout = ({children}) => {
         >
         {/* Go back / close button */}
         <Box alignSelf="flex-start" sx={{position: 'absolute'}}>
-            <IconButton onClick={() => navigate(-1)}>
+            <IconButton component={NavLink} to='/'>
                 <ArrowBackIcon />
             </IconButton>
         </Box>

@@ -21,9 +21,7 @@ export default function Home () {
             <Box>
                 <HomeHero/>
                 <Container maxWidth="lg">
-                    <Typography variant="h6" component='h2' color="secondary" sx={{mb: 2, textAlign: 'center'}}>
-                        Handpicked just for you!
-                    </Typography>
+                    
                     <Box ref={ref} sx={{mx: 1, mb: 5}}>
                         <Fade timeout={300} in={visible}>
                             <Box>

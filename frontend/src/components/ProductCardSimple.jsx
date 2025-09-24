@@ -5,6 +5,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded'
 import { Box, Button, Grid, CardActions, IconButton, } from '@mui/material';
+import { UPLOADS_URL } from '../utils/constants'
 
 export default function ProductCardSimple ({ product, onNavigate, addToCart }) { 
     return (
@@ -12,7 +13,7 @@ export default function ProductCardSimple ({ product, onNavigate, addToCart }) {
             <CardMedia
                 onClick={onNavigate}
                 sx={{ minHeight: 100, maxHeight: 500, height: '100%', aspectRatio: '9/12', borderRadius: 1 }}
-                image={product.image}
+                image={`${UPLOADS_URL}${product.image}`}
                 title={product.name} 
             />
             <CardContent sx={{ flexGrow: 1, px: .5, py: 2  }}>

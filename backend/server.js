@@ -2,26 +2,139 @@
 import express from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
-import paymentRoutes from './routes/payement.js'
+import path from 'path'
+import bcrypt from 'bcryptjs'
+import dotenv from 'dotenv'
+dotenv.config()
+
+// Routes import
+import paymentRoutes from './routes/paymentRoutes.js'
+import authRoutes from './routes/authRoutes.js'
+import cartRoutes from './routes/cartRoutes.js'
+import inventoryRoutes from './routes/inventoryRoutes.js'
+import productRoutes from './routes/productRoutes.js'
+import checkoutRoutes from './routes/checkoutRoutes.js'
+import orderRoutes from './routes/orderRoutes.js'
+import auctionRoutes from './routes/auctionRoutes.js'
+import bidRoutes from './routes/bidRoutes.js'
+import auctionNotificationRoutes from './routes/auctionNotificationRoutes.js'
+import staffPermissionRoutes from './routes/staffPermissionRoutes.js'
+import categoryRoutes from './routes/categoryRoutes.js'
+
+// cron
+import { auctionLifecycleCron } from './cron/auctionCron.js'
+import { auctionFinalizeCron } from './cron/auctionFinalizeCron.js'
+
+// models
+import User from './models/User.js'
+
+import http from 'http'
+import { Server } from 'socket.io'
+
+
 
 const app = express()
+const server = http.createServer(app)
+const io = new Server(server, {
+    cors: {
+        origin: 'http://localhost:5173',
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+    }
+})
+
+
 
 // Middleware
 app.use(cors({
     origin: 'http://localhost:5173',
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }))
 app.use(express.json())
+app.use("/uploads", express.static(path.join(process.cwd(), "/uploads"))); // serve image
+
+
 
 // Routes
-app.use('/api', paymentRoutes)
+app.use('/api/payment', paymentRoutes)
+app.use('/api/auth', authRoutes)
+app.use('/api/cart', cartRoutes)
+app.use('/api/inventory', inventoryRoutes)
+app.use('/api/products', productRoutes)
+app.use('/api/checkout', checkoutRoutes)
+app.use('/api/orders', orderRoutes)
+app.use('/api/auctions', auctionRoutes)
+app.use('/api/bids', bidRoutes)
+app.use('/api/auction-notification', auctionNotificationRoutes)
+app.use('/api/staff-permissions', staffPermissionRoutes)
+app.use('/api/categories', categoryRoutes)
+
+
+
+
+
+// hash password match testing
+const testPassword = async () => {
+    const hashed = '$2b$10$nL7l300trZVegcJFiQOpQ.J9I5oocqll71.rWqyxawvlPj9a.wWdC'
+    const match = await bcrypt.compare('test', hashed)
+    console.log(match)
+}
+
+
+
+
+// password hash comparing function
+// testPassword()
+
+// account creation for admin or stuff
+const createAdmin = async () => {
+    const existingAdmin = await User.findOne({ email: 'ad@gmail.com' });
+    if (!existingAdmin) {
+        const admin = new User({
+            email: 'ad@gmail.com',
+            password: 'admin123',
+            fullName: 'Admin',
+            role: 'admin'
+        });
+
+        await admin.save();
+        console.log('Admin account created');
+    } else {
+        console.log('Admin already exists');
+    }
+};
+
+
+
 
 // MongoDB + Server
 const PORT = process.env.PORT || 5000
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => {
+    .then(async () => {
         console.log('MongoDB connected')
-        app.listen(PORT, () => console.log(`Server running on ${PORT}`))
+        server.listen(PORT, () => console.log(`Server running on ${PORT}`))
+
+        // start auction lifescycle cron job
+        auctionLifecycleCron();
+
+        // start auction finalize cron, using io for real-time notificaiton
+        auctionFinalizeCron(io)
+        
+        // Account creation function for admin or stuff
+        // await createAdmin();
+    }
+)
+.catch(err => console.error(err))
+
+
+
+
+
+// socket.io connection for debugging
+io.on('connection', (socket) => {
+    console.log('New client connected', socket.id)
+
+    socket.on('disconnect', () => {
+        console.log('Client disconnected:', socket.id)
     })
-    .catch(err => console.error(err))
+})

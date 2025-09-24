@@ -1,12 +1,12 @@
 import { Box, Typography } from "@mui/material";
 import ShopGrid from "./ShopGrid";
-import React, { useState, useEffect } from "react";
-import products from "../../../data/products";
+import React, { useState, useEffect, useContext } from "react";
 import ShopPagination from "./ShopPagination";
 import ShopFilters from "./ShopFilter";
 import Container from "@mui/material/Container";
 import AutoSlideCarousel from "../../../components/AutoSlideCarousel";
-import { useCart } from "../../../contexts/CartProvider";
+import { useCart } from "../../../contexts/CartContext";
+import { ProductContext } from "../../../contexts/ProductContext"; // import context
 
 const PAGE_SIZE = 6;
 
@@ -16,24 +16,37 @@ function Shop() {
     const [category, setCategory] = useState("all");
 
     const { addToCart } = useCart();
+    const { products, fetchProducts } = useContext(ProductContext); // get products from context
+    const [filteredProducts, setFilteredProducts] = useState([]);
 
     // reset page when filters change
     useEffect(() => {
         setPage(1);
     }, [sort, category]);
 
-    // filter by category
-    let filteredProducts = [...products];
-    if (category !== "all") {
-        filteredProducts = filteredProducts.filter((p) => p.category === category);
-    }
+    // fetch products on mount
+    useEffect(() => {
+        fetchProducts();
+    }, []);
 
-    // sort
-    if (sort === "price-low-high") {
-        filteredProducts.sort((a, b) => a.price - b.price);
-    } else if (sort === "price-high-low") {
-        filteredProducts.sort((a, b) => b.price - a.price);
-    }
+    // filter and sort whenever products, category, or sort changes
+    useEffect(() => {
+        let tempProducts = [...products];
+
+        // filter by category
+        if (category !== "all") {
+            tempProducts = tempProducts.filter((p) => p.category === category);
+        }
+
+        // sort
+        if (sort === "price-low-high") {
+            tempProducts.sort((a, b) => a.price - b.price);
+        } else if (sort === "price-high-low") {
+            tempProducts.sort((a, b) => b.price - a.price);
+        }
+
+        setFilteredProducts(tempProducts);
+    }, [products, category, sort]);
 
     // pagination
     const startIndex = (page - 1) * PAGE_SIZE;
@@ -48,7 +61,7 @@ function Shop() {
 
     // Add to cart — no local snackbar needed
     const handleAddToCart = (product) => {
-        addToCart(product, 1); // global snackbar handles success/duplicate
+        addToCart(product);
     };
 
     return (

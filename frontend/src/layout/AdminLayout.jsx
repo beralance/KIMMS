@@ -1,18 +1,15 @@
-import { Box } from '@mui/material'
+import { Box, Container, Stack, Typography } from '@mui/material'
 import React from 'react'
 import { Outlet } from 'react-router-dom'
-import UserHeader from '../components/UserHeader'
+import AdminSidebar from '../features/admin/AdminSidebar'
+import AutoSlideCarousel from '../components/AutoSlideCarousel'
 
 const AdminLayout = () => {
     return (
         <Box>
-            <div>
-                <h1>Admin Layout Sample</h1>
-            </div>
-
-            <main>
+            <AdminSidebar>
                 <Outlet/>
-            </main>
+            </AdminSidebar>
         </Box>
     )
 }
