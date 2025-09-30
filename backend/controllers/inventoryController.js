@@ -3,7 +3,7 @@ import Inventory from '../models/Inventory.js';
 import {generatePhysicalCode, generateProductId } from '../utils/generatedIds.js'
 import {v4 as uuidv4} from 'uuid'
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
-// CREATE Inventory Items
+// CREATE Inventory
 export const createInventoryItem = async (req, res) => {
     try {
         const files = req.files;
