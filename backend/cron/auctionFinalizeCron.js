@@ -2,7 +2,7 @@ import cron from "node-cron";
 import Auction from "../models/Auction.js";
 import Bid from "../models/Bid.js";
 import Inventory from "../models/Inventory.js";
-import { createNotification } from "../controllers/AuctionNotificationController.js";
+import { createNotification } from "../controllers/auctionNotificationController.js"
 
 export const auctionFinalizeCron = () => {
     cron.schedule("* * * * *", async () => {
