@@ -28,4 +28,6 @@ BACKEND
 - npm install bcrypt validator
 - npm install nodemailer
 - npm install express-rate-limit
+- npm install @supabase/supabase-js multer
+
 
