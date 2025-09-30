@@ -7,7 +7,7 @@ import Container from "@mui/material/Container";
 import AutoSlideCarousel from "../../../components/AutoSlideCarousel";
 import { useCart } from "../../../contexts/CartContext";
 import { ProductContext } from "../../../contexts/ProductContext"; // import context
-import { ScrollOnTop } from "../../../utils/scrollOnTop";
+import { ScrollOnTop } from "../../../utils/ScrollOnTop";
 import { useLocation, useParams } from "react-router-dom";
 
 const PAGE_SIZE = 6;
