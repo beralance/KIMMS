@@ -17,7 +17,6 @@ import {
 } from "@mui/material";
 import { InventoryContext } from "../../../../contexts/InventoryContext";
 import { ProductContext } from "../../../../contexts/ProductContext";
-import {UPLOADS_URL} from '../../../../utils/constants'
 import { DoneAll, DoneAllRounded, RemoveDoneRounded } from "@mui/icons-material";
 
 export default function ManageProducts() {
@@ -133,7 +132,7 @@ export default function ManageProducts() {
                             sx={{ display: "flex", justifyContent: "space-between" }}
                         >
                             <Stack direction={"row"} gap={2} alignItems={'center'}>
-                                <img src={`${UPLOADS_URL}${item.images[0]}`} style={{objectFit: 'cover',  aspectRatio: '1/1', borderRadius: 5, padding: 2, width: 80,  height: 80}}/>
+                                <img src={`${item.images[0]}`} style={{objectFit: 'cover',  aspectRatio: '1/1', borderRadius: 5, padding: 2, width: 80,  height: 80}}/>
                                 <ListItemText
                                     primary={item.productName}
                                     secondary={`Category: ${item.category?.name} | Price: ₱${item.price}`}

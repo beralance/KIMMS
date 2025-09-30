@@ -2,7 +2,6 @@ import { ArrowCircleRightRounded, ArrowRightRounded } from '@mui/icons-material'
 import { Box, Button, Divider, Grid, IconButton, Stack, Typography } from '@mui/material'
 import { ProductContext } from '../../../contexts/ProductContext'
 import { useContext, useEffect } from 'react'
-import { UPLOADS_URL } from '../../../utils/constants'
 import {formatNumber, toTitleCase} from '../../../utils/stringUtils'
 import { useNavigate } from 'react-router-dom'
 import {ScrollSectionLeft} from '../../../components/SectionTransitionX' 
@@ -18,7 +17,7 @@ const NewArrival = () => {
                     <Grid container spacing={2} sx={{mb: .5, p: 1}}>
                             <Grid size={{xs: 6}}>
                                 <img 
-                                    src={`${UPLOADS_URL}${product.images[0]}`} 
+                                    src={`${product.images[0]}`} 
                                     alt={product.productName} 
                                     style={{
                                         width: '100%',

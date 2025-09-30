@@ -4,7 +4,7 @@ import path from "path";
 
 // ✅ File filter to allow only certain image formats
 const fileFilter = (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|webp/;
+    const allowedTypes = /jpeg|jpg|png|webp|svg/;
     const ext = path.extname(file.originalname).toLowerCase();
     const mime = file.mimetype;
 
@@ -21,7 +21,7 @@ const storage = multer.memoryStorage();
 const upload = multer({
     storage,
     fileFilter,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
+    limits: { fileSize: 50 * 1024 * 1024 }, // 5 MB
 });
 
 export default upload;

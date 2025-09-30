@@ -3,7 +3,6 @@ import { Box, Typography, TextField, Button, Card, CardContent } from "@mui/mate
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../../contexts/AuthContext";
-import { UPLOADS_URL } from "../../../utils/constants";
 
 const AuctionBiddingPage = () => {
     const { id } = useParams();
@@ -107,7 +106,7 @@ const AuctionBiddingPage = () => {
                 <CardContent>
                     <Box>
                         <img 
-                            src={`${UPLOADS_URL}${auction.inventoryId?.image}`} 
+                            src={`${auction.inventoryId?.image}`} 
                             alt={auction.inventoryId?.productName}
                             style={{
                                 objectFit: 'cover',

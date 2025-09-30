@@ -7,7 +7,6 @@ import {
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { OrderContext } from "../../../contexts/OrderContext";
-import { UPLOADS_URL } from '../../../utils/constants'
 
 const statusOptions = ["Pending", "Confirmed", "Processing", "Out for Delivery", "Delivered", "Cancelled"];
 
@@ -49,7 +48,7 @@ function Row({ row, onUpdateStatus }) {
                                     <TableRow key={item.productId._id}>
                                         <TableCell>
                                             <img
-                                                src={`${UPLOADS_URL}${item.productId?.images[0]}`}
+                                                src={`${item.productId?.images[0]}`}
                                                 alt={item.productId.productName}
                                                 width="50"
                                             />

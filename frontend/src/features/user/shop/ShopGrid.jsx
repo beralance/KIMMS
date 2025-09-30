@@ -3,7 +3,6 @@ import { Box, Container, } from '@mui/material'
 import Grid from '@mui/material/Grid'
 import ProductCard from '../../../components/ProductCard'
 import { useNavigate } from 'react-router-dom'
-import { UPLOADS_URL } from '../../../utils/constants'
 
 const ShopGrid = ({ products, handleAddToCart }) => {
     const navigate = useNavigate()
@@ -23,7 +22,7 @@ const ShopGrid = ({ products, handleAddToCart }) => {
                             price={product.price}
                             description={product.description}
                             category={product.category?.name}
-                            images={`${UPLOADS_URL}${product.images[0]}`}
+                            images={`${product.images[0]}`}
                             condition={product.condition}
                             onNavigate={() => navigate(`/product/${product._id}`)}
                             addToCart={() => handleAddToCart(product)}

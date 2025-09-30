@@ -16,7 +16,6 @@ import {
 } from "@mui/material";
 import {AdjustRounded, EditRounded, KeyboardArrowDownRounded, KeyboardArrowUpRounded, QrCode, SortRounded} from "@mui/icons-material";
 import { InventoryContext } from "../../../../contexts/InventoryContext";
-import {UPLOADS_URL} from '../../../../utils/constants'
 import CustomPopover from '../../../../components/CustomPopover'
 import dayjs from 'dayjs'
 import PhysicalCodeDisplayer from './PhysicalCodeDisplayer'
@@ -35,7 +34,7 @@ function Row({ product, open, onToggle }) {
                 <TableCell>
                     {product.images?.length > 0 && (
                         <img
-                            src={`${UPLOADS_URL}${product.images[0]}`}
+                            src={product.images[0]}
                             alt={product.productName}
                             style={{ width: 60, height: 60, objectFit: "cover", aspectRatio: '1/1', borderRadius: 5}}
                         />
@@ -93,7 +92,7 @@ function Row({ product, open, onToggle }) {
                                     category={product.category}
                                     physicalCode={product.physicalCode}
                                     status={product.status}
-                                    image={`${UPLOADS_URL}${product.images[0]}`}
+                                    image={product.images[0]}
                                     open={qrOpen} 
                                     onClose={handleQrClose}
                                 />
@@ -125,7 +124,7 @@ function Row({ product, open, onToggle }) {
                                                     <SwiperSlide key={idx}>
                                                         <Box sx={{height: {xs: 200, md: 220}, width: {xs: 200, md: 220}, justifySelf: 'center'}}>
                                                             <img
-                                                                src={`${UPLOADS_URL}${img}`}
+                                                                src={img}
                                                                 alt={`${product.productName}`}
                                                                 style={{ width: "100%", height: "100%", borderRadius: 10, boxShadow: '0px 0px 5px rgba(0, 0, 0, 0.6)', backgroundColor: 'white', objectFit: "cover", aspectRatio: '1/1' }}
                                                             />
@@ -278,9 +277,9 @@ export default function InventoryTable({ searchTerm }) {
                     </TableHead>
                     <TableBody>
                         {sortedItems.length > 0 ? (
-                            sortedItems.map((product) => (
+                            sortedItems.map((product, idx) => (
                                 <Row
-                                    key={product._id} 
+                                    key={idx} 
                                     product={product}
                                     open={open === product._id}
                                     onToggle={() => setOpen(open === product._id ? null : product._id)}

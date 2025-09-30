@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useAuth } from "../../../../contexts/AuthContext";
-import { UPLOADS_URL } from "../../../../utils/constants";
 import { toTitleCase } from "../../../../utils/stringUtils";
 import { Category, ChevronRightRounded } from "@mui/icons-material";
 import {useSnackbar} from '../../../../contexts/SnackbarContext'
@@ -148,7 +147,7 @@ const ManageAuction = () => {
                                 <MenuItem key={item._id} value={item._id}>
                                     <Stack direction={'row'} alignItems={'center'} gap={2} width={'100%'} sx={{pr: 2}}>
                                         <img 
-                                            src={`${UPLOADS_URL}${item.images[0]}`} 
+                                            src={`${item.images[0]}`} 
                                             alt={item.productName} 
                                             style={{
                                                 aspectRatio: '1/1', 

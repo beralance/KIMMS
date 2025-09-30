@@ -8,6 +8,7 @@ export function InventoryProvider({ children }) {
     
     const [inventoryItems, setInventoryItems] = useState([]);
     const API_URL = import.meta.env.VITE_API_URL;
+    const [error, setError] = useState(null)
     //const API_URL = "http://localhost:5000/api/inventory";
     const {token} = useAuth()
     console.log("VITE_API_URL:", import.meta.env.VITE_API_URL);
@@ -33,11 +34,20 @@ export function InventoryProvider({ children }) {
                 headers: {'Authorization' : `Bearer ${token}`,},
                 body: itemData, // FormData with image
             });
-            const newItem = await res.json();
-            setInventoryItems([newItem, ...inventoryItems]);
-            return newItem;
+
+            const data = await res.json()
+            if (!res.ok) {
+                console.error('Error adding inventory item: ', data.error)
+                setError(data.error)
+                return null;
+            }
+
+            setInventoryItems([data, ...inventoryItems]);
+            return data;
         } catch (err) {
             console.error("Error adding inventory item:", err);
+            setError("Upload failed: network or server error");
+            return null;
         }
     };
 
@@ -87,6 +97,7 @@ export function InventoryProvider({ children }) {
         <InventoryContext.Provider
             value={{
                 inventoryItems,
+                error,
                 fetchInventoryItems,
                 addInventoryItem,
                 updateInventoryItem,

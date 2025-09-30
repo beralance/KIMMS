@@ -28,7 +28,7 @@ export default function ProductForm() { // <-- accept callback
     const [success, setSuccess] = useState(false);
     const [lastAddedItem, setLastAddedItem] = useState(null)
     const [open, setOpen] = useState(false);
-    const { addInventoryItem } = useContext(InventoryContext)
+    const { addInventoryItem, error } = useContext(InventoryContext)
     const { showSnackbar } = useSnackbar()
     const [openAddCategory, setOpenAddCategory] = useState(false)
     const [isEnabled, setIsEnabled] = useState(false)
@@ -134,10 +134,15 @@ export default function ProductForm() { // <-- accept callback
     };
 
     const handleSubmit = async () => {
+        if (error) {
+            showSnackbar(error, 'error')
+            return
+        }
         if (!productName || !description || !details || !price || !category || !condition || images.length === 0) {
             showSnackbar("Please fill in all fields and upload an image.", 'warning');
             return;
         }
+        
         const numericPrice = Number(price.replace(/,/g, ''))
         setLoading(true);
         setSuccess(false);

@@ -13,7 +13,6 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useAuth } from "../../../../contexts/AuthContext";
-import {UPLOADS_URL} from '../../../../utils/constants'
 import KeyboardArrowDownOutlined from '@mui/icons-material/KeyboardArrowDownOutlined'
 import KeyboardArrowUpOutlined from '@mui/icons-material/KeyboardArrowUpRounded'
 import { RefreshRounded } from '@mui/icons-material'
@@ -94,7 +93,7 @@ const AdminAuctionMonitor = ({searchTerm}) => {
                                 <CardContent sx={{display: 'flex', height: {xs: 300}, gap: 1, p: 1, '&:last-child': {pb: 1}}}>
                                     <Box sx={{width: {xs: '50%'}}}>
                                         <img 
-                                            src={`${UPLOADS_URL}${auction.inventoryId?.images[0]}`}
+                                            src={`${auction.inventoryId?.images[0]}`}
                                             alt={auction.inventoryId?.productName}
                                             style={{
                                                 width: '100%',

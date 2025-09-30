@@ -3,6 +3,7 @@ import Inventory from '../models/Inventory.js';
 import {generatePhysicalCode, generateProductId } from '../utils/generatedIds.js'
 import {v4 as uuidv4} from 'uuid'
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
+
 // CREATE Inventory
 export const createInventoryItem = async (req, res) => {
     try {
@@ -12,7 +13,9 @@ export const createInventoryItem = async (req, res) => {
         const uploadedFiles = [];
 
         for (const file of files) {
-            const fileName = `products/${Date.now()}-${uuidv4()}-${file.originalname}`
+
+            const sanitizedOriginal = file.originalname.replace(/[\s()]/g, '_');
+            const fileName = `products/${Date.now()}-${uuidv4()}-${sanitizedOriginal}`
             const {data, error} = await supabase.storage
                 .from('Product-Uploads')
                 .upload(fileName, file.buffer, {
@@ -21,9 +24,18 @@ export const createInventoryItem = async (req, res) => {
                     contentType: file.mimetype,
                 })
             if(error) throw error;
+            
+            console.log('$$$ DATA PATH', data.path)
+            const publicUrl = data
+                ? supabase.storage.from('Product-Uploads').getPublicUrl(data.path).data.publicUrl
+                : null
+        
+            if (!publicUrl) throw new Error('Failed to generate public URL');
 
-            const {publicURL} = supabase.storage.from('Product-Uploads').getPublicUrl(data.path)
-            uploadedFiles.push(publicURL) 
+            console.log(supabase.storage.from('Product-Uploads').getPublicUrl(data.path))
+            console.log('$$$ PUBLIC URL', publicUrl)
+            
+            uploadedFiles.push(publicUrl) 
         }
 
         const {productName, description, price, category, details, condition, isLocal, tags } = req.body;
@@ -31,6 +43,7 @@ export const createInventoryItem = async (req, res) => {
         const generatedProductId = await generateProductId(category);
         const generatedPhysicalCode = await generatePhysicalCode(category);
 
+        console.log('### UPLOADED FILES', uploadedFiles)
         const inventoryItem = new Inventory({
             productId: generatedProductId,
             physicalCode: generatedPhysicalCode,
@@ -46,13 +59,22 @@ export const createInventoryItem = async (req, res) => {
             images: uploadedFiles,
         });
 
-        const savedItem = await inventoryItem.save()
-        await savedItem.populate('category', 'name')
-
-        res.status(201).json(savedItem);
+        try {
+            const savedItem = await inventoryItem.save()
+            await savedItem.populate('category', 'name')
+            res.status(201).json(savedItem)
+        }
+        catch (dbError) {
+            for (const fileUrl of uploadedFiles) {
+                const path = fileUrl.split('/Product-Uploads/')[1]
+                await supabase.storage.from('Product-Uploads').remove([path])
+            }
+            throw dbError;
+        }
 
     } catch (err) {
         res.status(500).json({ error: err.message });
+        console.error('Inventory creation error:', err);
     }
 };
 

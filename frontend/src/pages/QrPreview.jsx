@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Box, Button, IconButton, Stack, Tooltip, Typography } from '@mui/material'
 import { useNavigate, useParams } from 'react-router-dom'
 import { InventoryContext } from '../contexts/InventoryContext'
-import { UPLOADS_URL } from '../utils/constants'
 import { Pagination} from 'swiper/modules'
 import {Swiper, SwiperSlide} from 'swiper/react'
 import FullScreenLoader from '../components/FullScreenLoader'
@@ -107,7 +106,7 @@ const QrPreview = () => {
                         {images.map((img, index) => (
                             <SwiperSlide key={index} style={{position: 'relative',}}>
                                 <img 
-                                    src={`${UPLOADS_URL}${img}`} 
+                                    src={`${img}`} 
                                     alt={img.productName} 
                                     style={{
                                         width: '100%', 

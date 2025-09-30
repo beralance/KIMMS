@@ -5,7 +5,6 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded'
 import { Box, Button, Grid, CardActions, IconButton, Stack, } from '@mui/material';
-import { UPLOADS_URL } from '../utils/constants'
 import { toTitleCase, formatNumber } from '../utils/stringUtils'
 import SectionTransition from './SectionTransition'
 import { useNavigate } from 'react-router-dom';
@@ -30,7 +29,7 @@ export default function ProductCardSimple ({ product, onNavigate, addToCart }) {
                 
                 <Box sx={{position: 'relative'}}>
                     <img 
-                        src={`${UPLOADS_URL}${product.images[0]}`}
+                        src={product.images[0]}
                         alt={product.productName} 
                         style={{
                             aspectRatio: '9/10',

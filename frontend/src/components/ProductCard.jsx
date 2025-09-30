@@ -41,6 +41,16 @@ export default function ProductCard({ images, category, name = 'Unknown', price 
                             {toTitleCase(condition)}
                         </Typography>
                     </Box>
+                    <Box sx={{position: 'absolute', boxShadow: 5, bottom: 15, right: 10, borderRadius: '0px 5px 5px 0px'}}>
+                        {/* Category */}
+                        <Typography
+                            variant="body2"
+                            fontWeight={'bold'}
+                            sx={{border: '1px solid black', px: 1,py: .5, color: 'black', backdropFilter: 'blur(10px)', bgcolor: 'rgba(255, 255, 255, 255)', borderRadius: '999px'}}
+                        >
+                            {category}
+                        </Typography>
+                    </Box>
                 </Box>
 
                 {/* Card Body */}
@@ -59,18 +69,9 @@ export default function ProductCard({ images, category, name = 'Unknown', price 
                         {/* Price */}
                         <Typography
                             variant="body2"
-                            color='white'
-                            sx={{py: .5, px: 2, width: '100%', display: 'flex', justifyContent: 'center', borderRadius: '999px', bgcolor: '#37353E', fontWeight: 'bold',}}
+                            sx={{py: .5, px: 2, width: '100%', border: '1px solid black', display: 'flex', justifyContent: 'center', borderRadius: '999px', bgcolor: 'white', fontWeight: 'bold',}}
                         >
                             PHP {price.toLocaleString()}
-                        </Typography>
-
-                        {/* Category */}
-                        <Typography
-                            variant="body2"
-                            sx={{border: 1, px: 1,py: .5, borderRadius: '999px'}}
-                        >
-                            {category}
                         </Typography>
                     </Stack>
                     {/* Description */}

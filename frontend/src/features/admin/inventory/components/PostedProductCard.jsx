@@ -1,6 +1,5 @@
 // src/components/productManagement/ProductCard.jsx
 import { Card, CardMedia, CardContent, Typography, CardActions, Button, Switch, FormControlLabel, Box, IconButton, Stack, Divider, Container } from "@mui/material";
-import { UPLOADS_URL } from '../../../../utils/constants';
 import { useContext, useState } from "react";
 import { ProductContext } from "../../../../contexts/ProductContext";
 import { useSnackbar } from '../../../../contexts/SnackbarContext'
@@ -70,7 +69,7 @@ export default function ProductCard({ product, onEdit, onDelete }) {
                 <Box sx={{position: 'relative'}}>
                     <Box>
                         <img 
-                            src={product.images ? `${UPLOADS_URL}${product.images[1]}` : "/placeholder-image.png"} 
+                            src={product.images ? `${product.images[1]}` : "/placeholder-image.png"} 
                             alt={product.productName}
                             style={{
                                 objectFit: 'cover',

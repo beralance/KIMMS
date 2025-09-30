@@ -10,6 +10,7 @@ import {
     deleteInventoryItem 
 } from "../controllers/inventoryController.js";
 import { verifyToken, adminOnly, requireRole } from '../middleware/authMiddleware.js'
+import multer from "multer";
 
 const router = express.Router();
 
@@ -30,7 +31,20 @@ router.patch("/:id/status", async (req, res) => {
     }
 });
 
-router.post("/", upload.array("images"), verifyToken, requireRole(['admin', 'staff']), createInventoryItem);
+router.post("/", (req,res,next) => {
+    upload.array('images')(req, res, (err) => {
+        if (err instanceof multer.MulterError) {
+            if (err.code === 'LIMIT_FILE_SIZE') {
+                return res.status(400).json({error: 'File too large. Max 50MB allowed'})
+            }
+            return res.status(400).json({error: err.message})
+        }
+        else if (err) {
+            return res.status(500).json({error: 'Server error during file upload.'})
+        }
+        next();
+    })
+}, verifyToken, requireRole(['admin', 'staff']), createInventoryItem);
 router.get("/", getInventoryItems);
 router.get("/:id", getInventoryItemById);
 router.put("/:id", verifyToken, requireRole(['admin', 'staff']), upload.single("images"), updateInventoryItem);

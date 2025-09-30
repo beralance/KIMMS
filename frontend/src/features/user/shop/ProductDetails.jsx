@@ -9,7 +9,6 @@ import ProductCartRecommendation from "../../../components/ProductCardRecommenda
 import BottomActionBar from '../../../components/BottomActionBar';
 import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded';
 import { useCheckout } from "../../../contexts/CheckoutContext";
-import { UPLOADS_URL } from "../../../utils/constants";
 import { ScrollOnTop } from "../../../utils/ScrollOnTop";
 import { toTitleCase, formatNumber } from "../../../utils/stringUtils";
 import {Navigation, Pagination} from 'swiper/modules'
@@ -100,7 +99,7 @@ export default function ProductDetails() {
                                 <SwiperSlide key={idx} style={{height: '50vh'}}>
                                     <Box sx={{justifySelf: 'center', height: '100%', width: '100%'}}>
                                         <img
-                                            src={`${UPLOADS_URL}${img}`}
+                                            src={`${img}`}
                                             alt={`${product.productName}`}
                                             style={{ 
                                                 display: 'block',
@@ -217,7 +216,7 @@ export default function ProductDetails() {
                                     <SwiperSlide key={idx} style={{height: '50vh',}}>
                                         <Box sx={{justifySelf: 'center', height: '100%', width: '100%'}}>
                                             <img
-                                                src={`${UPLOADS_URL}${img}`}
+                                                src={`${img}`}
                                                 alt={`${product.productName}`}
                                                 style={{ 
                                                     display: 'block',

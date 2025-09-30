@@ -7,7 +7,6 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { fetchCategoriesFromProducts } from '../../../utils/categoryApi'
 import { useState, useEffect } from 'react';
 import Typography from '@mui/material/Typography'
-import { UPLOADS_URL } from '../../../utils/constants';
 import { Box, Grid, Stack } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import {ScrollSectionLeft, ScrollSectionRight} from '../../../components/SectionTransitionX';
@@ -41,7 +40,7 @@ export default function CategoriesList() {
                             <Box onClick={() => navigate(`/shop?category=${category.categoryId}`)}>
                                 <Box sx={{width: '100%', height: '100%',}}>
                                     <img 
-                                        src={`${UPLOADS_URL}${category.image[0]}`}
+                                        src={`${category.image[0]}`}
                                         alt={category.name}
                                         style={{
                                             display: 'block',
@@ -60,6 +59,7 @@ export default function CategoriesList() {
                                     sx={{
                                         position: 'absolute',
                                         bottom: 0,
+                                        cursor: 'pointer',
                                         width: '100%',
                                         display: 'flex',
                                         alignItems: 'flex-end',

@@ -4,7 +4,6 @@ import { useCart } from "../../../contexts/CartContext";
 import { useCheckout } from "../../../contexts/CheckoutContext";
 import { NavLink, useNavigate } from "react-router-dom";
 import BottomActionBar from "../../../components/BottomActionBar";
-import { UPLOADS_URL } from "../../../utils/constants";
 import {DeleteRounded, DoneAllRounded, KeyboardArrowDownRounded, KeyboardArrowUpRounded, RemoveDoneRounded } from '@mui/icons-material'
 
 export default function Cart() {
@@ -159,7 +158,7 @@ export default function Cart() {
                                             >
                                                 <Box>
                                                     <img
-                                                        src={`${UPLOADS_URL}${product.image ?? ""}`}
+                                                        src={`${product.image ?? ""}`}
                                                         alt={product.productName ?? "Product"}
                                                         style={{ width: "100%", display: 'block', height: '100%', aspectRatio: '1/1', objectFit: "cover" }}
                                                     />

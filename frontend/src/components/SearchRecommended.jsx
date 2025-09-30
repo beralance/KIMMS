@@ -5,7 +5,6 @@ import ImageListItemBar from '@mui/material/ImageListItemBar';
 import ListSubheader from '@mui/material/ListSubheader';
 import IconButton from '@mui/material/IconButton';
 import InfoIcon from '@mui/icons-material/Info';
-import { UPLOADS_URL } from '../utils/constants';
 import { Button, Popover, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,8 +17,8 @@ export default function TitlebarImageList({products}) {
             {products.map((item) => (
                 <ImageListItem key={item._id} sx={{borderRadius: 1}}>
                     <img
-                        srcSet={`${UPLOADS_URL}${item.images[0]}?w=248&fit=crop&auto=format&dpr=2 2x`}
-                        src={`${UPLOADS_URL}${item.images[0]}?w=248&fit=crop&auto=format`}
+                        srcSet={`${item.images[0]}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                        src={`${item.images[0]}?w=248&fit=crop&auto=format`}
                         alt={item.productName}
                         loading="lazy"
                         style={{aspectRatio: '1/1'}}

@@ -12,7 +12,6 @@ import { useContext, useState } from "react";
 import ProductCardSimple from './ProductCardSimple'
 import { useNavigate } from 'react-router-dom'
 import SearchRecommended from './SearchRecommended'
-import { UPLOADS_URL } from '../utils/constants'
 
 export default function SearchDrawer({ open, onClose, anchor = "top" }) {
     const { searchProducts, products } = useContext(ProductContext);
@@ -121,7 +120,7 @@ export default function SearchDrawer({ open, onClose, anchor = "top" }) {
                                                             </Typography>
                                                         </Box>
                                                         <Box sx={{width: 100, height: 100}}>
-                                                            <img src={`${UPLOADS_URL}${product.images[0]}`} alt={product.productName} style={{objectFit: 'cover', aspectRatio: '1/1', width: '100%', height: '100%', borderRadius: 3}}/> 
+                                                            <img src={product.images[0]} alt={product.productName} style={{objectFit: 'cover', aspectRatio: '1/1', width: '100%', height: '100%', borderRadius: 3}}/> 
                                                         </Box>
                                                     </Box>
                                                 </ListItemButton>

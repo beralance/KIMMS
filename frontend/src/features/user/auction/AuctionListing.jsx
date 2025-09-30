@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Box, Card, CardContent, Typography, Button, Grid } from "@mui/material";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { UPLOADS_URL } from "../../../utils/constants";
 
 const AuctionListing = () => {
     const [auctions, setAuctions] = useState([]);
@@ -51,7 +50,7 @@ const AuctionListing = () => {
                             <CardContent>
                                 <Box>
                                     <img 
-                                        src={`${UPLOADS_URL}${auction.inventoryId?.image}`} 
+                                        src={`${auction.inventoryId?.image}`} 
                                         alt={auction.inventoryId?.productName}
                                         style={{
                                             objectFit: 'cover',
