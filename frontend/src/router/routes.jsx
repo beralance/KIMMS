@@ -22,7 +22,7 @@ import AuctionBidding from '../features/user/auction/AuctionBidding'
 
 // Admin Pages
 import Dashboard from '../features/admin/dashboard/Dashboard'
-import Inventory from '../features/admin/Inventory/Inventory' // change Inventory to inventory  soon
+import Inventory from '../features/admin/inventory/Inventory' // change Inventory to inventory  soon
 import Orders from "../features/admin/orders/Orders";
 import Reports from "../features/admin/reports/Reports";
 import QrPreview from "../pages/QrPreview";
