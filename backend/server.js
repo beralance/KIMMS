@@ -46,7 +46,11 @@ const io = new Server(server, {
 
 // Middleware
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: [
+        'http://localhost:5173',
+        'https://kimms-furniture-and-merchandise-mai-chi.vercel.app'
+    ],
+    credentials: true,
     methods: ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }))
