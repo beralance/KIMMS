@@ -1,4 +1,3 @@
-import { fetchCategories } from '../../frontend/src/utils/categoryApi.js';
 import { createClient } from '@supabase/supabase-js';
 import Inventory from '../models/Inventory.js';
 import {generatePhysicalCode, generateProductId } from '../utils/generatedIds.js'

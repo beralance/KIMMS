@@ -10,7 +10,7 @@ export function InventoryProvider({ children }) {
     const API_URL = import.meta.env.VITE_API_URL;
     //const API_URL = "http://localhost:5000/api/inventory";
     const {token} = useAuth()
-
+    console.log("VITE_API_URL:", import.meta.env.VITE_API_URL);
     // Fetch all inventory items (filter out reserved/inactive items)
     const fetchInventoryItems = async () => {
         try {
