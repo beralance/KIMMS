@@ -9,7 +9,7 @@ import {
   getPastAuctions,
 } from "../controllers/auctionController.js";
 
-import { verifyToken, adminOnly, requireRole } from "../middleware/authmiddleware.js";
+import { verifyToken, adminOnly, requireRole } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
