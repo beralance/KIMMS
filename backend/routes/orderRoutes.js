@@ -6,7 +6,7 @@ import {
     getOrder,
     updateOrderStatus,
 } from "../controllers/orderController.js";
-import { verifyToken, adminOnly, requireRole } from "../middleware/authmiddleware.js";
+import { verifyToken, adminOnly, requireRole } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
