@@ -1,5 +1,5 @@
 import express from "express";
-import { placeBid, getBidsByAuction } from "../controllers/bidcontroller.js";
+import { placeBid, getBidsByAuction } from "../controllers/bidController.js";
 import { verifyToken, adminOnly } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
