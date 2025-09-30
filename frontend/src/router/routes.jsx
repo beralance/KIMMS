@@ -27,9 +27,9 @@ import Orders from "../features/admin/orders/Orders";
 import Reports from "../features/admin/reports/Reports";
 import QrPreview from "../pages/QrPreview";
 import StaffManagement from "../features/admin/staff/StaffManagement"; 
-import InventoryManagement from "../features/admin/Inventory/inventoryManagement/InventoryManagement";
-import ProductManagement from "../features/admin/Inventory/productManagement/ProductManagement";
-import AuctionManagement from "../features/admin/Inventory/auctionManagement/AuctionManagement";
+import InventoryManagement from "../features/admin/inventory/inventoryManagement/InventoryManagement";
+import ProductManagement from "../features/admin/inventory/productManagement/ProductManagement";
+import AuctionManagement from "../features/admin/inventory/auctionManagement/AuctionManagement";
 import StaffDashboard from '../features/staff/StaffDashboard'
 
 // Public Pages
