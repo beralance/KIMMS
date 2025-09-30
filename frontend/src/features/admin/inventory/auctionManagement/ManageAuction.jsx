@@ -36,7 +36,7 @@ const ManageAuction = () => {
     const [search, setSearch] = useState('')
     const {showSnackbar} = useSnackbar()
     const { inventoryItems, fetchInventoryItems} = useContext(InventoryContext)
-    
+    const API_URL = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
         if (selectedItem) {
@@ -83,7 +83,7 @@ const ManageAuction = () => {
         try {
             setLoading(true)
             await axios.post(
-                "http://localhost:5000/api/auctions",
+                `${API_URL}/api/auctions`,
                 {
                     inventoryId: selectedItem,
                     startPrice: parseFloat(startPrice),

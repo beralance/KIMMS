@@ -5,14 +5,16 @@ import {useAuth} from '../contexts/AuthContext'
 export const InventoryContext = createContext();
 
 export function InventoryProvider({ children }) {
+    
     const [inventoryItems, setInventoryItems] = useState([]);
-    const API_URL = "http://localhost:5000/api/inventory";
+    const API_URL = import.meta.env.VITE_API_URL;
+    //const API_URL = "http://localhost:5000/api/inventory";
     const {token} = useAuth()
 
     // Fetch all inventory items (filter out reserved/inactive items)
     const fetchInventoryItems = async () => {
         try {
-            const res = await fetch(API_URL, {
+            const res = await fetch(`${API_URL}/api/inventory`, {
                 headers: {'Authorization' : `Bearer ${token}`}
             })
             const data = await res.json();
@@ -26,7 +28,7 @@ export function InventoryProvider({ children }) {
 
     const addInventoryItem = async (itemData) => {
         try {
-            const res = await fetch(API_URL, {
+            const res = await fetch(`${API_URL}/api/inventory`, {
                 method: "POST",
                 headers: {'Authorization' : `Bearer ${token}`,},
                 body: itemData, // FormData with image
@@ -41,7 +43,7 @@ export function InventoryProvider({ children }) {
 
     const updateInventoryItem = async (id, updatedData) => {
         try {
-            const res = await fetch(`${API_URL}/${id}`, {
+            const res = await fetch(`${API_URL}/api/inventory/${id}`, {
                 method: "PUT",
                 headers: {'Authorization' : `Bearer ${token}`,},
                 body: updatedData, // FormData if updating image
@@ -55,7 +57,7 @@ export function InventoryProvider({ children }) {
 
     const deleteInventoryItem = async (id) => {
         try {
-            await fetch(`${API_URL}/${id}`, { 
+            await fetch(`${API_URL}/api/inventory/${id}`, { 
                 method: "DELETE",
                 headers: {'Authorization' : `Bearer ${token}`,},
             });
@@ -67,7 +69,7 @@ export function InventoryProvider({ children }) {
 
     const getInventoryById = async (id) => {
         try {
-            const res = await fetch(`${API_URL}/${id}`, {
+            const res = await fetch(`${API_URL}/api/inventory/${id}`, {
                 headers: {'Authorization' : `Bearer ${token}`,},
             });
             if (!res.ok) throw new Error("Failed to fetch inventory item");

@@ -4,11 +4,12 @@ import axios from "axios";
 
 const AuctionHistory = () => {
     const [auctions, setAuctions] = useState([]);
+    const API_URL = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
         const fetchHistory = async () => {
             try {
-                const res = await axios.get("http://localhost:5000/api/auctions/history/past");
+                const res = await axios.get(`${API_URL}/api/auctions/history/past`);
                 setAuctions(res.data);
             } catch (err) {
                 console.error("Failed to fetch auction history:", err);

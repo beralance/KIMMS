@@ -1,5 +1,5 @@
 // src/utils/api.js
-
+const API_URL = import.meta.env.VITE_API_URL;
 // Generic helper for POST requests
 const postRequest = async (url, payload) => {
     const res = await fetch(url, {
@@ -18,20 +18,20 @@ const postRequest = async (url, payload) => {
 
 // Signup new user
 export const signupUser = async (payload) => {
-    return postRequest("http://localhost:5000/api/auth/signup", payload);
+    return postRequest(`${API_URL}/api/auth/signup`, payload);
 };
 
 // Login existing user
 export const loginUser = async (payload) => {
-    return postRequest("http://localhost:5000/api/auth/login", payload);
+    return postRequest(`${API_URL}/api/auth/login`, payload);
 };
 
 // Verify email with code
 export const verifyEmail = async (payload) => {
-    return postRequest("http://localhost:5000/api/auth/verify", payload);
+    return postRequest(`${API_URL}/api/auth/verify`, payload);
 };
 
 // Resend verification code
 export const resendCode = async (payload) => {
-    return postRequest("http://localhost:5000/api/auth/resend-code", payload);
+    return postRequest(`${API_URL}/api/auth/resend-code`, payload);
 };

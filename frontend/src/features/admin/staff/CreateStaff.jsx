@@ -27,7 +27,8 @@ const nestedInventoryModules = [
 
 const CreateStaff = ({ open, onClose, onStaffCreated }) => {
     const { token } = useAuth();
-    const API_URL = "http://localhost:5000/api";
+    //const API_URL = "http://localhost:5000/api";
+    const API_URL = import.meta.env.VITE_API_URL;
 
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
@@ -94,7 +95,7 @@ const CreateStaff = ({ open, onClose, onStaffCreated }) => {
 
         try {
             const res = await axios.post(
-                `${API_URL}/auth/create-staff`,
+                `${API_URL}/api/auth/create-staff`,
                 { email, password, fullName, allowedModules },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

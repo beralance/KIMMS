@@ -4,13 +4,13 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export default function Cancel() {
     const navigate = useNavigate();
-
+    const API_URL = import.meta.env.VITE_API_URL;
     const checkoutSessionId = localStorage.getItem('checkoutSessionId')//pass session_id in URL
     console.log('This is the checkout session id from local storage: ', checkoutSessionId)
     useEffect(() => {
         if (!checkoutSessionId) return;
 
-        fetch('http://localhost:5000/api/payment/cancel', {
+        fetch(`${API_URL}/api/payment/cancel`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({checkoutSessionId}),

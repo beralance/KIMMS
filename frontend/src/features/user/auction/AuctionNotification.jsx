@@ -6,10 +6,11 @@ import { useAuth } from "../../../contexts/AuthContext";
 const AuctionNotifications = () => {
     const [notifications, setNotifications] = useState([]);
     const {token} = useAuth()
+    const API_URL = import.meta.env.VITE_API_URL;
 
     const fetchNotifications = async () => {
         try {
-            const res = await axios.get("http://localhost:5000/api/notifications", {
+            const res = await axios.get(`${API_URL}/api/notifications`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setNotifications(res.data);
@@ -21,7 +22,7 @@ const AuctionNotifications = () => {
     const markAsRead = async (id) => {
         try {
             await axios.patch(
-                `http://localhost:5000/api/notifications/${id}/read`,
+                `${API_URL}/api/notifications/${id}/read`,
                 {},
                 { headers: { Authorization: `Bearer ${token}` } }
             );

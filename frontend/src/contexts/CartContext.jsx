@@ -19,6 +19,7 @@ export const CartProvider = ({ children }) => {
 
     const [cartItems, setCartItems] = useState([]);
     const [notification, setNotification] = useState(null);
+    const API_URL = import.meta.env.VITE_API_URL;
 
     /** 🔹 Fetch Cart */
     const fetchCart = async () => {
@@ -26,10 +27,10 @@ export const CartProvider = ({ children }) => {
             setCartItems([]);
             return;
         }
-
+        
         try {
             const res = await fetchWithAuth(
-                "http://localhost:5000/api/cart",
+                `${API_URL}/api/cart`,
                 {token},
                 logout
             );
@@ -61,7 +62,7 @@ export const CartProvider = ({ children }) => {
 
         try {
             const res = await fetchWithAuth(
-                "http://localhost:5000/api/cart",
+                `${API_URL}/api/cart`,
                 {
                     method: "POST",
                     body: { productId: product._id },
@@ -99,7 +100,7 @@ export const CartProvider = ({ children }) => {
 
         try {
             const res = await fetchWithAuth(
-                `http://localhost:5000/api/cart/${productId}`,
+                `${API_URL}/api/cart/${productId}`,
                 { method: "DELETE", token },
                 logout
             );
@@ -118,7 +119,7 @@ export const CartProvider = ({ children }) => {
 
         try {
             await fetchWithAuth(
-                "http://localhost:5000/api/cart/clear",
+                `${API_URL}/api/cart/clear`,
                 { method: "DELETE", token },
                 logout
             );

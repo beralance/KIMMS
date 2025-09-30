@@ -22,6 +22,7 @@ const AdminAuctionMonitor = ({searchTerm}) => {
     const [auctions, setAuctions] = useState([]);
     const { token } = useAuth()
     const [showTop, setShowTop] = useState(false);
+    const API_URL = import.meta.env.VITE_API_URL;
 
     const handleTop = (id) => {
         setShowTop((prev) => ({
@@ -32,7 +33,7 @@ const AdminAuctionMonitor = ({searchTerm}) => {
 
     const fetchAuctions = async () => {
         try {
-        const res = await axios.get("http://localhost:5000/api/auctions", {
+        const res = await axios.get(`${API_URL}/api/auctions`, {
             headers: { Authorization: `Bearer ${token}` },
         });
         setAuctions(res.data);

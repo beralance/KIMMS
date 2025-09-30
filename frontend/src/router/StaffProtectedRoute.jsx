@@ -10,13 +10,13 @@ const StaffProtectedRoute = ({moduleName, children}) => {
     const {user, token} = useAuth()
     const [permissions, setPermissions] = useState([])
     const [loading, setLoading] = useState(true)
-
+    const API_URL = import.meta.env.VITE_API_URL;
     useEffect(() => {
         const fetchPermissions = async () => {
             if (!user) return;
             if (user.role === 'staff') {
                 try{ 
-                    const res = await axios.get(`http://localhost:5000/api/staff-permissions/${user.userId}`, {
+                    const res = await axios.get(`${API_URL}/api/staff-permissions/${user.userId}`, {
                         headers: {Authorization: `Bearer ${token}`}
                     })
                     setPermissions(res.data.allowedModules || []);

@@ -10,7 +10,7 @@ export default function Success() {
     const { token } = useAuth();
     const { refreshCart } = useCart();
     const { checkoutItems } = useCheckout();
-
+    const API_URL = import.meta.env.VITE_API_URL;
     const handleBack = () => {
         navigate('/'); // back to shop
     };
@@ -27,7 +27,7 @@ export default function Success() {
             console.log("🟡 Sending request to clear purchased items...", purchasedIds);
 
             try {
-                const res = await fetch("http://localhost:5000/api/cart/remove-purchased", {
+                const res = await fetch(`${API_URL}/api/cart/remove-purchased`, {
                     method: "DELETE",
                     headers: {
                         "Authorization": `Bearer ${token}`,

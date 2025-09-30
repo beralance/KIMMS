@@ -13,16 +13,16 @@ const AuctionBiddingPage = () => {
     const [message, setMessage] = useState("");
     const [timeRemaining, setTimeRemaining] = useState("");
     const { token } = useAuth()
-    
+    const API_URL = import.meta.env.VITE_API_URL;
     // Fetch auction and current highest bid
     const fetchAuction = async () => {
         try {
-            const auctionRes = await axios.get(`http://localhost:5000/api/auctions/${id}`);
+            const auctionRes = await axios.get(`${API_URL}/api/auctions/${id}`);
             console.log('!!!!THIS IS THE AUCITON RES', auctionRes)
             console.log('@@@@THIS IS THE ID', id)
             console.log('@@@@THIS IS THE DATA INVENTORY', auctionRes.data)
 
-            const bidRes = await axios.get(`http://localhost:5000/api/bids/${id}`, {
+            const bidRes = await axios.get(`${API_URL}/api/bids/${id}`, {
                 headers: {
                     'Content-Type' : 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -82,7 +82,7 @@ const AuctionBiddingPage = () => {
         
         try {
             await axios.post(
-                `http://localhost:5000/api/bids`,
+                `${API_URL}/api/bids`,
                 { auctionId: id, amount: Number(bidAmount) },
                 {
                     headers: { Authorization: `Bearer ${token}` }

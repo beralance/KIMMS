@@ -8,14 +8,15 @@ export function ProductProvider({ children }) {
     const [products, setProducts] = useState([]);
     const [inventory, setInventory] = useState([]);
     const [newProducts, setNewProducts] = useState([])
-    const API_URL = "http://localhost:5000/api/products";
-    const INVENTORY_URL = "http://localhost:5000/api/inventory";
+    const API_URL = import.meta.env.VITE_API_URL;
+    //const API_URL = "http://localhost:5000/api/products";
+    const INVENTORY_URL = `${API_URL}/api/inventory`;
     const {user, token} = useAuth()
 
     // Fetch all products
     const fetchProducts = async () => {
         try {
-            const res = await fetch(API_URL)
+            const res = await fetch(`${API_URL}/api/products`)
             const data = await res.json();
             console.log('Products from API: ', data)
 
@@ -57,7 +58,7 @@ export function ProductProvider({ children }) {
     // Fetch new products
     const fetchNewProducts = async () => {
         try {
-            const res = await fetch(`${API_URL}/new`)
+            const res = await fetch(`${API_URL}/api/products/new`)
             const data = await res.json()
 
             const visibleNewProducts = user
@@ -75,7 +76,7 @@ export function ProductProvider({ children }) {
 
     const addProduct = async (inventoryId) => {
         try {
-            const res = await fetch(API_URL, {
+            const res = await fetch(`${API_URL}/api/products`, {
                 method: "POST",
                 headers: { 
                     "Content-Type": "application/json",
@@ -98,7 +99,7 @@ export function ProductProvider({ children }) {
 
     const updateProduct = async (id, updatedData) => {
         try {
-            const res = await fetch(`${API_URL}/${id}`, {
+            const res = await fetch(`${API_URL}/api/products/${id}`, {
                 method: "PUT",
                 headers: { 
                     "Content-Type": "application/json",
@@ -117,7 +118,7 @@ export function ProductProvider({ children }) {
     // Soft delete product
     const deleteProduct = async (id) => {
         try {
-            const res = await fetch(`${API_URL}/${id}`, { method: "DELETE"});
+            const res = await fetch(`${API_URL}/api/products/${id}`, { method: "DELETE"});
             const result = await res.json();
             setProducts(products.map((p) =>
                 p._id === id ? { ...p, visibility: 'inactive' } : p
@@ -130,7 +131,7 @@ export function ProductProvider({ children }) {
 
     // Update product highlight
     const updateProductHighlight = async (id, highlight) => {
-        const res = await fetch(`${API_URL}/highlight/${id}`, {
+        const res = await fetch(`${API_URL}/api/products/highlight/${id}`, {
             method: "PATCH",
             headers: {
                     "Content-Type": "application/json"
@@ -149,7 +150,7 @@ export function ProductProvider({ children }) {
     const updateProductStatus = async (productId, newStatus) => {
         try {
             // 1️⃣ Update product visibility
-            const res = await fetch(`${API_URL}/${productId}/status`, {
+            const res = await fetch(`${API_URL}/api/products/${productId}/status`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -189,7 +190,7 @@ export function ProductProvider({ children }) {
     // Search products
     const searchProducts = async (query) => {
         try {
-            const res = await fetch(`${API_URL}/search/query?q=${encodeURIComponent(query)}`);
+            const res = await fetch(`${API_URL}/api/products/search/query?q=${encodeURIComponent(query)}`);
             const data = await res.json();
             return data;
         } catch (err) {
@@ -200,7 +201,7 @@ export function ProductProvider({ children }) {
     // Increment product views
     const incrementViews = async (id) => {
         try {
-            await fetch(`${API_URL}/views/${id}`, { method: "PATCH" });
+            await fetch(`${API_URL}/api/products/views/${id}`, { method: "PATCH" });
         } catch (err) {
             console.error("Error incrementing views:", err);
         }
@@ -209,7 +210,7 @@ export function ProductProvider({ children }) {
     // Get product by ID
     const getProductById = async (id) => {
         try {
-            const res = await fetch(`${API_URL}/${id}`)
+            const res = await fetch(`${API_URL}/api/products/${id}`)
             if (!res.ok) throw new Error('Failed to fetch product');
             return await res.json()
         }

@@ -8,13 +8,13 @@ export function OrderProvider({ children }) {
     const [orders, setOrders] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const { user, token } = useAuth()
-
+    const API_URL = import.meta.env.VITE_API_URL;
 
     // 1️⃣ Fetch all orders (admin) or optionally filter by userId
     const fetchOrders = async () => {
         try {
             setIsLoading(true)
-            const res = await fetch('http://localhost:5000/api/orders', {
+            const res = await fetch(`${API_URL}/api/orders`, {
                 headers: {
                     'Content-Type' : 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -43,7 +43,7 @@ export function OrderProvider({ children }) {
     const createOrder = async ({ userId, products, totalPrice }) => {
         try {
             setIsLoading(true);
-            const res = await fetch(API_URL, {
+            const res = await fetch(`${API_URL}/api/orders`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ userId, products, totalPrice }),
@@ -62,7 +62,7 @@ export function OrderProvider({ children }) {
     // 3️⃣ Update order status (admin or webhook)
     const updateOrderStatus = async (orderId, newStatus) => {
         try {
-            const res = await fetch(`${API_URL}/${orderId}/status`, {
+            const res = await fetch(`${API_URL}/api/orders/${orderId}/status`, {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ purchaseStatus: newStatus }),

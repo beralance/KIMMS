@@ -19,10 +19,11 @@ const StaffList = () => {
     const [staffs, setStaffs] = useState([]);
     const [editingId, setEditingId] = useState(null);
     const [tempModules, setTempModules] = useState({}); // { staffId: [modules] }
+    const API_URL = import.meta.env.VITE_API_URL;
 
     const fetchStaffs = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/staff-permissions/all', {
+            const res = await axios.get(`${API_URL}/api/staff-permissions/all`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setStaffs(res.data);
@@ -38,7 +39,7 @@ const StaffList = () => {
     const updatePermissions = async (staffId, allowedModules) => {
         try {
             await axios.post(
-                'http://localhost:5000/api/staff-permissions/set-permissions',
+                `${API_URL}/api/staff-permissions/set-permissions`,
                 { staffId, allowedModules },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -51,7 +52,7 @@ const StaffList = () => {
     const deleteStaff = async (staffId) => {
         if (!window.confirm('Are you sure you want to delete this staff?')) return;
         try {
-            await axios.delete(`http://localhost:5000/api/auth/delete-staff/${staffId}`, {
+            await axios.delete(`${API_URL}/api/auth/delete-staff/${staffId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             fetchStaffs();

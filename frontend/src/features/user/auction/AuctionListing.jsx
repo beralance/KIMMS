@@ -7,11 +7,11 @@ import { UPLOADS_URL } from "../../../utils/constants";
 const AuctionListing = () => {
     const [auctions, setAuctions] = useState([]);
     const [tick, setTick] = useState(0)
-
+    const API_URL = import.meta.env.VITE_API_URL;
     useEffect(() => {
         const fetchAuctions = async () => {
             try {
-                const res = await axios.get("http://localhost:5000/api/auctions");
+                const res = await axios.get(`${API_URL}/api/auctions`);
                 // Only LIVE auctions
                 const liveAuctions = res.data.filter(a => a.status === "LIVE");
                 setAuctions(liveAuctions);
