@@ -41,23 +41,18 @@ export default function FeaturedProductCarousel() {
                 "--swiper-pagination-bullet-size": ".4rem",
             }}
         >
-            <Typography variant="h6" component='h2' color="secondary" sx={{mb: 2, textAlign: 'center'}}>
-                Handpicked just for you!
-            </Typography>
             
             <Swiper 
-                style={{ padding: '.4rem' }}
-                slidesPerView={2}
+                style={{maxHeight: '600px'}}
                 navigation
-                spaceBetween={10}
+                loop={true}
                 pagination
                 modules={[EffectCoverflow, Pagination, Navigation]}
                 breakpoints={{
-                    0: { slidesPerView: 1, centeredSlides: true },
-                    500: { slidesPerView: 2, spaceBetween: 20, centeredSlides: false },
-                    650: { slidesPerView: 3, spaceBetween: 20, centeredSlides: false },
-                    800: { slidesPerView: 3, spaceBetween: 20, centeredSlides: false },
-                    1000: { slidesPerView: 4, spaceBetween: 30, centeredSlides: false },
+                    0: {slidesPerView: 1, centeredSlides: true},
+                    600: { slidesPerView: 2, centeredSlides: true },
+                    800: { slidesPerView: 3, centeredSlides: false },
+                    1000: { slidesPerView: 4, centeredSlides: false },
                 }}
             >
                 

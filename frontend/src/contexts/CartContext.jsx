@@ -70,10 +70,23 @@ export const CartProvider = ({ children }) => {
                 logout
             );
 
+            if (!res.ok) {
+                const errText = await res.text();
+                console.error('Add to cart failed: ', errText);
+                showSnackbar('Failed to add item', 'error')
+                return;
+            }
+
             const data = await res.json();
             const validItems = (data.items || []).filter(item => item.productId);
             setCartItems(validItems);
-            showSnackbar("Item added to cart!", "success");
+
+            if (validItems.some(item => item.productId?._id === product._id)){
+                showSnackbar('Item added to cart!', 'success')
+            }
+            else {
+                showSnackbar('Failed to add item', 'error')
+            }
         } catch (err) {
             console.error("Failed to add item:", err);
             showSnackbar("Failed to add item", "error");

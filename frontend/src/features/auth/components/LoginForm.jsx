@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Box, Button, TextField, Typography, IconButton, InputAdornment } from "@mui/material";
+import { Box, Button, TextField, Typography, IconButton, InputAdornment, Fade, Grow } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext";
+import { ScrollSectionLeft, ScrollSectionRight } from '../../../components/SectionTransitionX';
 
 export default function LoginForm({ onSuccess }) {
     const [email, setEmail] = useState("");
@@ -43,6 +44,7 @@ export default function LoginForm({ onSuccess }) {
                 role: data.role,
                 fullName: data.fullName,
                 userId: data.userId,
+                isLocal: data.isLocal,
             });
 
             // Optional callback
@@ -62,7 +64,8 @@ export default function LoginForm({ onSuccess }) {
     return (
         <form onSubmit={handleLogin}>
             <Box sx={{ my: 0.5 }}>
-                <Box sx={{ mb: 2, display: "flex", flexDirection: "column", gap: 2 }}>
+                <Box sx={{display: "flex", flexDirection: "column", gap: 2 }}>
+                    <Fade in={true} timeout={800} mountOnEnter unmountOnExit>
                     <TextField
                         label="Email"
                         type="email"
@@ -70,10 +73,25 @@ export default function LoginForm({ onSuccess }) {
                         onChange={(e) => setEmail(e.target.value)}
                         fullWidth
                         sx={{
-                            "& .MuiInputLabel-root": { color: error ? "red" : "grey" },
-                            "& .MuiInputLabel-root.Mui-focused": { color: error ? "red" : "" },
+                            input: {color: 'white'},
+                            bgcolor: 'rgba(0, 0, 0, 0.5)',
+                            "& .MuiInputLabel-root": { color: error ? "red" : "white" },
+                            "& .MuiInputLabel-root.Mui-focused": { color: error ? "red" : "white" },
+                            '& .MuiOutlinedInput-root': {
+                                '& fieldset': {
+                                    borderColor: 'gray', // default border color
+                                },
+                                '&:hover fieldset': {
+                                    borderColor: 'white', // hover border color
+                                },
+                                '&.Mui-focused fieldset': {
+                                    borderColor: 'white', // focused border color
+                                },
+                            }
                         }}
                     />
+                    </Fade>
+                    <Fade in={true} timeout={800} mountOnEnter unmountOnExit>
                     <TextField
                         label="Password"
                         type={showPassword ? "text" : "password"}
@@ -84,23 +102,60 @@ export default function LoginForm({ onSuccess }) {
                             endAdornment: (
                                 <InputAdornment position="end">
                                     <IconButton onClick={toggleShowPassword} edge="end">
-                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                        {showPassword ? <VisibilityOff sx={{color: 'white'}}/> : <Visibility sx={{color: 'white'}}/>}
                                     </IconButton>
                                 </InputAdornment>
                             ),
                         }}
                         sx={{
-                            "& .MuiInputLabel-root": { color: error ? "red" : "grey" },
-                            "& .MuiInputLabel-root.Mui-focused": { color: error ? "red" : "" },
+                            input: {color: 'white'},
+                            bgcolor: 'rgba(0, 0, 0, 0.5)',
+                            "& .MuiInputLabel-root": { color: error ? "red" : "white" },
+                            "& .MuiInputLabel-root.Mui-focused": { color: error ? "red" : "white" },
+                            '& .MuiOutlinedInput-root': {
+                                '& fieldset': {
+                                    borderColor: 'gray', // default border color
+                                },
+                                '&:hover fieldset': {
+                                    borderColor: 'white', // hover border color
+                                },
+                                '&.Mui-focused fieldset': {
+                                    borderColor: 'white', // focused border color
+                                },
+                            }
                         }}
                     />
+                    </Fade>
                 </Box>
+                
+                {error && 
+                    <Typography 
+                        color="red" 
+                        sx={{
+                            my: 3,
+                            justifySelf: 'center' 
+                        }}
+                    >
+                        {error}
+                    </Typography>
+                }
 
-                {error && <Typography color="red" sx={{ mb: 2 }}>{error}</Typography>}
-
-                <Button type="submit" variant="contained" color="secondary" fullWidth sx={{ p: 1 }}>
-                    <Typography variant="body1">LOGIN</Typography>
-                </Button>
+                <Fade in={true} timeout={800} mountOnEnter unmountOnExit>
+                    <Button 
+                        type="submit" 
+                        variant="contained" 
+                        fullWidth 
+                        sx={{
+                            bgcolor: 'rgba(0, 0, 0, 0.2)',
+                            border: '1px solid white',
+                            py: 2, 
+                            borderRadius: '999px',
+                            my: error ? 0 : 3,
+                        }}
+                    >
+                        LOGIN
+                    </Button>
+                </Fade>
             </Box>
         </form>
     );

@@ -22,7 +22,8 @@ const ShopGrid = ({ products, handleAddToCart }) => {
                             name={product.productName}
                             price={product.price}
                             description={product.description}
-                            image={`${UPLOADS_URL}${product.image}`}
+                            category={product.category?.name}
+                            images={`${UPLOADS_URL}${product.images[0]}`}
                             condition={product.condition}
                             onNavigate={() => navigate(`/product/${product._id}`)}
                             addToCart={() => handleAddToCart(product)}

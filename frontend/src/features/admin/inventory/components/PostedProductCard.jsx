@@ -1,5 +1,5 @@
 // src/components/productManagement/ProductCard.jsx
-import { Card, CardMedia, CardContent, Typography, CardActions, Button, Switch, FormControlLabel, Box, IconButton, Stack } from "@mui/material";
+import { Card, CardMedia, CardContent, Typography, CardActions, Button, Switch, FormControlLabel, Box, IconButton, Stack, Divider, Container } from "@mui/material";
 import { UPLOADS_URL } from '../../../../utils/constants';
 import { useContext, useState } from "react";
 import { ProductContext } from "../../../../contexts/ProductContext";
@@ -7,6 +7,10 @@ import { useSnackbar } from '../../../../contexts/SnackbarContext'
 import ConfirmDialog from "../../../../components/ConfirmDialog";
 import { CheckRounded, DeleteRounded, EditRoadRounded, EditRounded } from '@mui/icons-material'
 import CustomPopover from '../../../../components/CustomPopover'
+import {toTitleCase} from '../../../../utils/stringUtils'
+import dayjs from "dayjs";
+import { formatNumber } from "../../../../utils/stringUtils";
+
 
 export default function ProductCard({ product, onEdit, onDelete }) {
     const { updateProductHighlight, updateProductStatus } = useContext(ProductContext);
@@ -75,15 +79,10 @@ export default function ProductCard({ product, onEdit, onDelete }) {
                                 height: '100%'
                             }}  
                         />
-                    </Box>
-                    <Box sx={{ position: 'absolute', bottom: 7, right: 0, borderRadius: 20, overflow: 'hidden'}}>
-                        <Box sx={{display: "flex", gap: 1, p: 1, backdropFilter: 'blur(10px)', WebkitBackdropFilter: "blur(10px)"}}>
-                            <IconButton size="small" color="primary" sx={{p:0}} onClick={() => onEdit(product._id)}>
-                                <EditRounded/>
-                            </IconButton>
-                            <IconButton size="small" color="error" sx={{p:0}} onClick={() => setConfirmOpen(true)}>
-                                <DeleteRounded/>
-                            </IconButton>
+                        <Box sx={{position: 'absolute', top: 0, left: 0, py: 3, display: 'flex'}}>
+                            <Typography variant="body2" color="white" sx={{bgcolor: '#37353E', p: 2, py: .5, borderRadius: '0px 10px 10px 0px'}}>
+                                {toTitleCase(product.condition)}
+                            </Typography>
                         </Box>
                     </Box>
                 </Box>
@@ -100,15 +99,34 @@ export default function ProductCard({ product, onEdit, onDelete }) {
                         <p>{product.productName}</p>
                     </CustomPopover>
                     <Typography variant="body2" color="textSecondary">{product.category?.name}</Typography>
-                    <Typography variant="body1">₱{product.price}</Typography>
+                    <Typography variant="body2">PHP {formatNumber(product.price)}</Typography>
+                    <Typography variant="body2">{dayjs(product.createdAt).format('MMMM D, YYYY h:mm A')}</Typography>
                 </CardContent>
+                <Container>
+                    <Divider/>
+                </Container>
                 <CardActions>
-                    <Stack direction={'row'} px={1} alignItems={'center'} width={'100%'} justifyContent={'space-between'}>
-                        <Typography variant="body1" fontWeight={'bold'} color={isFeatured ? "secondary" : 'grey'} sx={{display: 'flex', gap: .5, alignItems: 'center'}}>
-                            {isFeatured && <CheckRounded/>}
-                            Featured
-                        </Typography>
-                        <Switch color="secondary" checked={isFeatured} onChange={handleToggleFeatured} disabled={loading} />
+                    <Stack width={'100%'} gap={1}>
+                        <Stack direction={'row'} justifyContent={'space-between'}>
+                            <Box sx={{display: "flex", gap: 1, px: 1, justifyContent: 'flex-start'}}>
+                                <IconButton size="small" color="secondary" sx={{p:0}} onClick={() => onEdit(product._id)}>
+                                    <EditRounded/>
+                                </IconButton>
+                                <IconButton size="small" color="secondary" sx={{p:0}} onClick={() => setConfirmOpen(true)}>
+                                    <DeleteRounded/>
+                                </IconButton>
+                            </Box>
+                            <Typography variant="body2" color="secondary" sx={{border: '1px solid #37353E', p: 1, py: .5, borderRadius: '999px', fontSize: 'clamp(10px, 12px, 20px)'}}>
+                                {product.isLocal ? 'Local' : 'International'}
+                            </Typography>
+                        </Stack>
+                        <Stack direction={'row'} px={1} alignItems={'center'} width={'100%'} justifyContent={'space-between'}>
+                            <Typography variant="body1" fontWeight={'bold'} color={isFeatured ? "secondary" : 'grey'} sx={{display: 'flex', gap: .5, alignItems: 'center'}}>
+                                {isFeatured && <CheckRounded/>}
+                                Featured
+                            </Typography>
+                            <Switch color="secondary" checked={isFeatured} onChange={handleToggleFeatured} disabled={loading} />
+                        </Stack>
                     </Stack>
                 </CardActions>
             </Card>

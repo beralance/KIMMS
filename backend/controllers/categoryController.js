@@ -1,5 +1,6 @@
 import Category from "../models/Category.js";
 import Inventory from '../models/Inventory.js'
+import Product from '../models/Product.js'
 
 export const getCategories = async (req, res) => {
     const categories = await Category.find();
@@ -41,3 +42,86 @@ export const deleteCategory = async (req, res) => {
         return res.status(500).json({message: 'Server error'})
     }
 };
+
+export const getPostedCategories = async (req, res) => {
+    try {
+        const categoryIds = await Product.distinct('category', {visibility: 'active'})
+        const categories = await Category.find({_id: {$in: categoryIds}})
+
+        res.json(categories)
+    }
+    catch (err) {
+        res.status(500).json({message: err.message})
+    }
+}
+
+
+// controllers/categoryController.js
+
+export const getAllCategoriesFromProducts = async (req, res) => {
+    try {
+        const user = req.user;
+        console.log('USER@@', user)
+
+        let matchStage = {visibility: 'active'}
+
+        if (user && user.role !== 'admin' && user.role !== 'staff') {
+            if (!user.isLocal) {
+                matchStage.isLocal = false;
+            }
+        }
+        console.log('match stage%%%%%%%%%%', matchStage)
+        const categories = await Product.aggregate([
+            { $match: matchStage },
+
+            { 
+                $group: { 
+                    _id: '$category',                
+                    count: { $sum: 1 },         
+                    image: { $first: '$images' }
+                } 
+            },
+
+            {
+                $lookup: {
+                    from: 'categories',    
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'category'
+                }
+            },
+            { $unwind: '$category' },
+
+            // Shape the output
+            { 
+                $project: { 
+                    _id: 0, 
+                    categoryId: '$_id', 
+                    name: '$category.name', 
+                    image: 1,
+                    count: 1
+                } 
+            }
+        ]);
+        res.json(categories);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+export const updateCategoryCounts = async () => {
+    try {
+        const categories = await Category.find();
+
+        for (const category of categories) {
+            const count = await Product.countDocuments({ category: category._id });
+            category.productCount = count;
+            await category.save();
+        }
+
+        console.log("✅ Category counts updated successfully");
+    } catch (error) {
+        console.error("❌ Error updating category counts:", error);
+    }
+};
+

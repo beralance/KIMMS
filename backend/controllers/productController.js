@@ -45,14 +45,52 @@ export const postProduct = async (req, res) => {
 // GET all active posted products
 export const getProducts = async (req, res) => {
     try {
-        const products = await Product.find({ visibility: "active" })
+        const user = req.user;
+        let query = {visibility: 'active'}
+        
+        if (user) {
+            if (user.role === 'admin' || user.role === 'staff') {
+                // see all products
+            } else {
+                query.isLocal = user.isLocal;
+            }
+        }
+
+        const products = await Product.find(query)
                                       .sort({ createdAt: -1 })
                                       .populate('category', 'name');
         res.json(products);
     } catch (err) {
+        console.error(err)
         res.status(500).json({ error: err.message });
     }
 };
+
+// GET new products
+export const getNewestProducts = async (req, res) => {
+    try {
+        const user = req.user;
+        let query = {visibility: 'active'}
+
+         if (user) {
+            if (user.role === 'admin' || user.role === 'staff') {
+                // see all products
+            } else {
+                query.isLocal = user.isLocal;
+            }
+        }
+
+        const products = await Product
+            .find({visibility: 'active'})
+            .sort({createdAt: -1})
+            .limit(10)
+            .populate('category', 'name')
+        res.json(products)
+    }
+    catch (err) {
+        res.status(500).json({error: err.message})
+    }
+}
 
 // GET single product (for product detail page)
 export const getProductById = async (req, res) => {
@@ -116,8 +154,7 @@ export const searchProducts = async (req, res) => {
                 { description: regex },
                 { condition: regex},
                 { tags: regex},
-                { productId: regex },
-                { category: regex }
+                { 'category.name': regex }
 
             ],
         }).sort({ createdAt: -1 }).populate('category', 'name');

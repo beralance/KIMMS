@@ -6,6 +6,7 @@ const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
+    const navigate = useNavigate()
     const [user, setUser] = useState(() => {
         const savedUser = localStorage.getItem("user");
         if (savedUser) {
@@ -22,14 +23,15 @@ export const AuthProvider = ({ children }) => {
         return null;
     });
 
-    const login = ({ userId, fullName, role, token, allowedModules }) => {
-        setUser({ userId, fullName, role, token, allowedModules });
-        localStorage.setItem("user", JSON.stringify({ userId, fullName, role, token, allowedModules }));
+    const login = ({ userId, fullName, role, token, allowedModules, isLocal}) => {
+        setUser({ userId, fullName, role, token, allowedModules, isLocal });
+        localStorage.setItem("user", JSON.stringify({ userId, fullName, role, token, allowedModules, isLocal }));
     };
 
     const logout = () => {
         setUser(null);
         localStorage.removeItem("user");
+        navigate('/')
     };
 
     return (

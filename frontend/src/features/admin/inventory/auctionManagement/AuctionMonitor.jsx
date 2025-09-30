@@ -8,15 +8,15 @@ import {
     Button,
     Divider,
     Collapse, IconButton,
-    colors,
-    CardActionArea, CardHeader, Avatar,
+    Stack,
+    Grow,
 } from "@mui/material";
 import axios from "axios";
 import { useAuth } from "../../../../contexts/AuthContext";
 import {UPLOADS_URL} from '../../../../utils/constants'
 import KeyboardArrowDownOutlined from '@mui/icons-material/KeyboardArrowDownOutlined'
 import KeyboardArrowUpOutlined from '@mui/icons-material/KeyboardArrowUpRounded'
-
+import { RefreshRounded } from '@mui/icons-material'
 
 const AdminAuctionMonitor = ({searchTerm}) => {
     const [auctions, setAuctions] = useState([]);
@@ -57,21 +57,16 @@ const AdminAuctionMonitor = ({searchTerm}) => {
         fetchAuctions();
     }, []);
 
+
     return (
-        <Box sx={{ p: 3 }}>
-            <Typography variant="h5" gutterBottom>
-                Admin Auction Monitoring
-            </Typography>
-            
+        <Box>
             {/*refresh button*/}
-             <Button
-                variant="contained"
-                color="secondary"
+             <IconButton
                 sx={{ mt: 1 }}
                 onClick={fetchAuctions} // refresh list
             >
-                Refresh
-            </Button>
+                <RefreshRounded sx={{color: '#37353E'}}/>
+            </IconButton>
             <Grid container spacing={3} >
                 {filteredAuctions.length > 0 ? (
                     filteredAuctions.map((auction) => (
@@ -95,28 +90,29 @@ const AdminAuctionMonitor = ({searchTerm}) => {
                                 </IconButton>
                             </Box>
                             <Card sx={{border: 0, boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.5)', borderRadius: 2, height: 'auto'}}>
-                                <CardContent sx={{display: 'flex', height: {xs: 200}, gap: 1, p: 1, '&:last-child': {pb: 1}}}>
+                                <CardContent sx={{display: 'flex', height: {xs: 300}, gap: 1, p: 1, '&:last-child': {pb: 1}}}>
                                     <Box sx={{width: {xs: '50%'}}}>
                                         <img 
-                                            src={`${UPLOADS_URL}${auction.inventoryId?.image}`}
+                                            src={`${UPLOADS_URL}${auction.inventoryId?.images[0]}`}
                                             alt={auction.inventoryId?.productName}
                                             style={{
                                                 width: '100%',
                                                 height: '100%',
                                                 objectFit: 'cover',
                                                 borderRadius: '5px',
+                                                boxShadow: '0px 0px 3px rgba(0, 0, 0, 0.5)'
                                             }} 
                                         />
                                     </Box>
                                     <Box sx={{ width: {xs: '50%'}, my: 1, overflow: 'auto'}}>
-                                        <Typography variant="h6" noWrap gutterBottom sx={{ fontWeight: 'bold'}}>
+                                        <Typography variant="Body1" noWrap gutterBottom sx={{ fontWeight: 'bold'}}>
                                             {auction.inventoryId?.productName || "Unnamed Item"}
                                         </Typography>
-                                        <Typography>
+                                        <Typography variant='body2' >
                                             <b>Starting Price:</b> {auction.startPrice || "Unnamed Item"}
                                         </Typography>
-                                        <Typography><b>Status:</b> {auction.status}</Typography>
-                                        <Typography><b>Winner:</b> {auction.winner || "No winner yet"}</Typography>
+                                        <Typography variant='body2' colo><b>Status:</b> {auction.status}</Typography>
+                                        <Typography variant='body2'><b>Winner:</b> {auction.winner || "No winner yet"}</Typography>
                                     </Box>
                                 </CardContent>
                                 <Box sx={{p: 1,}}>
@@ -162,7 +158,15 @@ const AdminAuctionMonitor = ({searchTerm}) => {
                     )))
                     :
                     (
-                        <Typography> No Results found </Typography>
+                        <Stack alignItems={'center'}  sx={{mt: 5, width: '100%'}}>
+                            <Grow in={true} mountOnEnter unmountOnExit timeout={800}>
+                                <img src="/shocked-shock.svg" alt="shocked-shock" style={{ paddingBottom: '10px', width: 80, opacity: .8,}}/>
+                            </Grow>
+                            <Typography variant="body1" fontWeight={'bold'} color="secondary"> No Results found </Typography>
+                            <Typography variant="body2" color="grey"> 
+                                Click the + button to start an auction
+                            </Typography>
+                        </Stack>
                 )}
             </Grid>
         </Box>

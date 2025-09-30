@@ -49,7 +49,7 @@ function Row({ row, onUpdateStatus }) {
                                     <TableRow key={item.productId._id}>
                                         <TableCell>
                                             <img
-                                                src={`${UPLOADS_URL}${item.productId.image}`}
+                                                src={`${UPLOADS_URL}${item.productId?.images[0]}`}
                                                 alt={item.productId.productName}
                                                 width="50"
                                             />

@@ -17,17 +17,17 @@ const AuthLayout = ({children}) => {
                 p: 3,
             }}
         >
-        {/* Go back / close button */}
-        <Box alignSelf="flex-start" sx={{position: 'absolute'}}>
-            <IconButton component={NavLink} to='/'>
-                <ArrowBackIcon />
-            </IconButton>
-        </Box>
+            {/* Go back / close button */}
+            <Box alignSelf="flex-start" sx={{position: 'absolute'}}>
+                <IconButton component={NavLink} to='/'>
+                    <ArrowBackIcon />
+                </IconButton>
+            </Box>
 
-        {/* Render either login or signup form */}
-        <Box sx={{ width: "100%"}}>{children}</Box>
-        
-    </Container>
+            {/* Render either login or signup form */}
+            <Box sx={{ width: "100%"}}>{children}</Box>
+            
+        </Container>
     )
 }
 

@@ -352,6 +352,7 @@ export default function ProductForm() { // <-- accept callback
                                 variant='standard'
                                 label="New Category"
                                 value={newCategory}
+                                inputProps={{ maxLength: 15}}
                                 onChange={(e) => setNewCategory(e.target.value)}
                                 size="small"
                             />

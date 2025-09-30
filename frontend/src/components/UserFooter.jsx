@@ -3,7 +3,7 @@ import { Box, Container, Stack, Typography, Link, Divider, TextField, Button, Gr
 import FacebookIcon from '@mui/icons-material/Facebook'
 export default function UserFooter() {
     return (
-        <Box sx={{ backgroundColor: "#f8f8f8", pt: 6, pb: 4, mt: 8 }}>
+        <Box sx={{ backgroundColor: "#f8f8f8", pt: 6, pb: 4}}>
             <Container maxWidth="lg">
                 <Stack
                     direction={{ xs: "column", md: "row" }}

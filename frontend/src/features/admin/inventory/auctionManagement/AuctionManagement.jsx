@@ -1,15 +1,22 @@
 import React from 'react'
 import AuctionMonitor from './AuctionMonitor'
 import { useOutletContext } from 'react-router-dom'
+import { Box, Typography } from '@mui/material' 
 
 const AuctionManagement = () => {
     const {searchTerm, setSearchTerm} = useOutletContext()
     
     return (
-        <div>
-            <h1>This is auction list</h1>
+        <Box>
+            <Typography variant="h6" color="secondary" sx={{fontWeight: 'bold'}} gutterBottom>
+                Auction Monitoring
+            </Typography>
+            <Typography variant="body2" color="grey" gutterBottom>
+                * This section allows you to track auction activity. Any new bids or status changes will be displayed automatically as they occur.
+            </Typography>
+
             <AuctionMonitor searchTerm={searchTerm}/>
-        </div>
+        </Box>
     )
 }
 

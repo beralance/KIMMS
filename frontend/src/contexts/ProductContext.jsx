@@ -1,22 +1,43 @@
 // src/context/ProductContext.jsx
 import { createContext, useState, useEffect, use } from "react";
 import {useAuth} from '../contexts/AuthContext'
+
 export const ProductContext = createContext();
 
 export function ProductProvider({ children }) {
     const [products, setProducts] = useState([]);
     const [inventory, setInventory] = useState([]);
+    const [newProducts, setNewProducts] = useState([])
     const API_URL = "http://localhost:5000/api/products";
     const INVENTORY_URL = "http://localhost:5000/api/inventory";
-    const {token} = useAuth()
+    const {user, token} = useAuth()
 
     // Fetch all products
     const fetchProducts = async () => {
         try {
-            const res = await fetch(API_URL, {
-            });
+            const res = await fetch(API_URL)
             const data = await res.json();
-            setProducts(data);
+            console.log('Products from API: ', data)
+
+            console.log('USER', user)
+            const visibleProducts = user
+                ? (user.role === 'admin' || user.role === 'staff')
+                    ? data
+                    : data.filter((product) => !product.isLocal || user.isLocal)
+                : data;
+
+            console.log('VISIBLE PRODUCTS', visibleProducts)
+            if (user) {
+                console.log('IS USER LOCAL', user.isLocal);
+            } else {
+                console.log('Guest mode (no user)');
+            }
+            
+
+            setProducts(visibleProducts);
+            console.log('!PRODUCTS', products)
+
+
         } catch (err) {
             console.error("Error fetching products:", err);
         }
@@ -33,6 +54,25 @@ export function ProductProvider({ children }) {
         }
     };
     
+    // Fetch new products
+    const fetchNewProducts = async () => {
+        try {
+            const res = await fetch(`${API_URL}/new`)
+            const data = await res.json()
+
+            const visibleNewProducts = user
+                ? (user.role === 'admin' || user.role === 'staff')
+                    ? data // admin/staff see everything
+                    : data.filter((product) => !product.isLocal || user.isLocal)
+                : data;
+
+            setNewProducts(visibleNewProducts);
+        }
+        catch (err) {
+            console.error('Error fetching newest products.')
+        }
+    }
+
     const addProduct = async (inventoryId) => {
         try {
             const res = await fetch(API_URL, {
@@ -181,14 +221,18 @@ export function ProductProvider({ children }) {
 
     useEffect(() => {
         fetchProducts();
+        fetchProducts(user)
         fetchInventory();
-    }, []);
+        fetchNewProducts();
+        fetchNewProducts(user);
+    }, [user]);
 
     return (
         <ProductContext.Provider
             value={{
                 products,
                 inventory,
+                newProducts,
                 fetchProducts,
                 fetchInventory,
                 addProduct,
@@ -199,6 +243,7 @@ export function ProductProvider({ children }) {
                 searchProducts,
                 incrementViews,
                 getProductById,
+                fetchNewProducts,
             }}
         >
             {children}

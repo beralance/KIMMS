@@ -1,4 +1,5 @@
 import Cart from "../models/Cart.js";
+import Product from '../models/Product.js'
 import mongoose from "mongoose";
 
 
@@ -39,6 +40,15 @@ export const addToCart = async (req, res) => {
     try {
         const userId = req.user.id;
         const { productId } = req.body;
+
+        // find product
+        const product = await Product.findById(productId);
+        if (!product) return res.status(404).json({error: 'Product not found'})
+
+        // backend restriction, block local only items for non local user
+        if (product.isLocal && !req.user.isLocal) {
+            return res.status(403).json({error: 'You cannot add local-only products to your cart'})
+        }
 
         let cart = await Cart.findOne({ userId });
         if (!cart) cart = await Cart.create({ userId, items: [] });

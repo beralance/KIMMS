@@ -1,56 +1,73 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
-import {Box, Slide, Button, Fade, Grow, Stack, Typography} from '@mui/material'
+import { Box, Button, Container, Fade, Grow, Stack, Typography } from '@mui/material'
+import React, {useEffect, useRef, useState} from 'react'
+import { motion } from 'framer-motion'
+import SectionTransition from '../../../components/SectionTransition'
 
-const HomeHero = () => {
-    const navigate = useNavigate()
-
-    return (
-        <Box sx={{height: '100vh', overflow: 'hidden', position: 'relative', mb: 5}}>
-            <Box sx={{position: 'absolute', inset: 0, transform: 'scale(1.1)', filter: 'blur(8px)', backgroundImage: "url('/home-background.jpg')", backgroundSize: 'cover',  }}></Box>
-            <Stack sx={{alignItems: 'center', justifyContent: 'center', height: '100%', position: 'relative', pb: 20, pt: 10}}>
-                
-                {/* Top right leaf graphic */}
-                <Slide direction='left' in={true} timeout={800} mountOnEnter unmountOnExit>
-                    <Box sx={{position: 'absolute', top: 0, right: 0}}>
-                        <img src="/home-leaf-graphic.png" alt="home-furniture-graphic" style={{width: '350px'}}/>
+export default function UserHero() {
+    return(
+        <>
+            <Box
+                sx={{
+                    height: '100vh',
+                    backgroundImage: 'url(/modern-clean-interior-design.jpg)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    zIndex: -1,
+                    width: '100%'
+                }}  
+            />
+            <Stack sx={{ position: 'absolute', justifyContent: 'center', alignItems: 'center', top: 0, width: '100%', height: '100%'}}>
+                <Grow in={true} mountOnEnter unmountOnExit timeout={1000}>
+                    <img src="/kimms-logo.svg" alt="" style={{filter: 'invert(1)', zIndex: 2, width: 60, height: 60}}/>
+                </Grow>
+                <Fade in={true} mountOnEnter unmountOnExit timeout={1000}>
+                    <Box sx={{zIndex: 2}}>
+                        <Typography color='white' variant='h4' align='center'>
+                            Discover hidden gems
+                        </Typography>
+                        <Typography color='white' variant='subtitle2' gutterBottom align='center'>
+                            “Timeless pieces made for every home.”
+                        </Typography>
                     </Box>
-                </Slide>
-
-                {/* Main graphic */}
-                <Stack sx={{justifyContent: 'center', alignItems: 'center', zIndex: 1}}>
-                    <Slide direction='down' in={true} timeout={600} mountOnEnter unmountOnExit>
-                        <img src="/kimms-logo-full.svg" alt="kimms-logo-full" style={{width: '150px'}} />
-                    </Slide>
-                    
-                    <Fade in={true} timeout={2000} mountOnEnter unmountOnExit>
-                        <Stack sx={{alignItems: 'center'}}>
-                            <Typography variant="body1" color='#575757ff' sx={{fontWeight: 'bold'}}>
-                                "Style your space with unique finds"
-                            </Typography>
-                        </Stack>
-                    </Fade>
-
-                    <Slide direction='up' in={true} timeout={800} mountOnEnter unmountOnExit>
-                        <img src="/home-furniture-graphic.png" alt="home-furniture-graphic" style={{width: '350px'}}/>
-                    </Slide>
-
-                    <Grow timeout={1500} in={true} mountOnEnter unmountOnExit>
-                        <Button variant='contained' color='secondary' onClick={() => navigate('/shop')} sx={{ fontWeight: 'bold', my: 5, borderRadius: '999px', p: 1, px: 4}}> 
-                            Shop Now
-                        </Button>
-                    </Grow>
-                </Stack>
-
-                {/* Bottom left leaf graphic */}
-                <Slide direction='right' in={true} timeout={800} mountOnEnter unmountOnExit>
-                    <Box sx={{position: 'absolute', bottom: -6, left: 0}}>
-                        <img src="/home-leaf-graphic.png" alt="home-furniture-graphic" style={{width: '350px', transform: 'scale(-1, -1'}}/>
-                    </Box>
-                </Slide>
+                </Fade>
+                <Grow in={true} mountOnEnter unmountOnExit timeout={1000}>
+                    <Button variant='contained' sx={{zIndex: 2, bgcolor: 'rgba(0,0,0,.5)', my: 2, boxShadow: 5, borderRadius: '999px', px: 3}}>
+                        Shop Now
+                    </Button>
+                </Grow>
             </Stack>
-        </Box>
+            <Box
+                sx={{
+                    height: "180vh",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    color: "white",
+                    position: "relative", // important to anchor the gradient
+                    background:
+                    "linear-gradient(to top, rgba(255,255,255,255), rgba(0,0,0,.5))",
+                }}
+            >
+                <Container sx={{mt: 'auto'}}>
+                    <SectionTransition>
+                        <Stack mb={10} mt={5}>
+                            <Box sx={{width: '100%', flexDirection: 'column', alignItems: 'center', pb: 1, display: 'flex', justifyContent: 'center',}}>
+                                <img src="/sofa.svg" alt="" style={{aspectRatio: '1/1', opacity: 0.8, width: 100}}/>
+                                <img src="/kimms-text.svg" alt="" style={{width: 250}}/>
+                            </Box>
+                            <Typography variant="subtitle1" color="initial" align='center'>
+                                Kimms Furniture and Merchandise brings you affordable finds with lasting quality that never goes out of style.
+                            </Typography>
+                            <Button variant='outlined' color='secondary' sx={{width: 150, alignSelf: 'center', borderRadius: '999px', fontWeight: 'bold', my: 2}}>
+                                About Us
+                            </Button>
+                        </Stack>
+                    </SectionTransition>
+                </Container>
+            </Box>
+        </>
     )
 }
-
-export default HomeHero

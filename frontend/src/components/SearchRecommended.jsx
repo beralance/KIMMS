@@ -18,8 +18,8 @@ export default function TitlebarImageList({products}) {
             {products.map((item) => (
                 <ImageListItem key={item._id} sx={{borderRadius: 1}}>
                     <img
-                        srcSet={`${UPLOADS_URL}${item.image}?w=248&fit=crop&auto=format&dpr=2 2x`}
-                        src={`${UPLOADS_URL}${item.image}?w=248&fit=crop&auto=format`}
+                        srcSet={`${UPLOADS_URL}${item.images[0]}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                        src={`${UPLOADS_URL}${item.images[0]}?w=248&fit=crop&auto=format`}
                         alt={item.productName}
                         loading="lazy"
                         style={{aspectRatio: '1/1'}}
@@ -27,7 +27,7 @@ export default function TitlebarImageList({products}) {
                     <Box onClick={() => navigate(`/product/${item._id}`)} sx={{p: 0}}>
                         <ImageListItemBar
                             title={item.productName}
-                            subtitle={item.category}
+                            subtitle={item.category?.name}
                         />
                     </Box>
                 </ImageListItem>

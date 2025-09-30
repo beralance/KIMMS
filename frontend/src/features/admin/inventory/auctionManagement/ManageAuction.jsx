@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import {
     TextField,
     Button,
@@ -8,13 +8,20 @@ import {
     Select,
     InputLabel,
     FormControl,
-    FormHelperText
+    FormHelperText,
+    Stack,
+    Divider
 } from "@mui/material";
 import axios from "axios";
 import { useAuth } from "../../../../contexts/AuthContext";
+import { UPLOADS_URL } from "../../../../utils/constants";
+import { toTitleCase } from "../../../../utils/stringUtils";
+import { Category, ChevronRightRounded } from "@mui/icons-material";
+import {useSnackbar} from '../../../../contexts/SnackbarContext'
+import { InventoryContext } from "../../../../contexts/InventoryContext";
+import { useContext } from "react";
 
 const ManageAuction = () => {
-    const [inventoryItems, setInventoryItems] = useState([]);
     const [selectedItem, setSelectedItem] = useState("");
     const [startPrice, setStartPrice] = useState("");
     const [startTime, setStartTime] = useState("");
@@ -26,24 +33,41 @@ const ManageAuction = () => {
     const { token } = useAuth()
     const [loading, setLoading] = useState(false)
     const [fixedAmount, setFixedAmount] = useState(0)
+    const [search, setSearch] = useState('')
+    const {showSnackbar} = useSnackbar()
+    const { inventoryItems, fetchInventoryItems} = useContext(InventoryContext)
+    
 
     useEffect(() => {
-        const fetchInventory = async () => {
-            try {
-                const res = await axios.get("http://localhost:5000/api/inventory");
-                setInventoryItems(res.data.filter(item => item.status === "available"));
-            } catch (err) {
-                console.error(err);
+        if (selectedItem) {
+            const item = inventoryItems.find(i => i._id === selectedItem);
+            if(item) {
+                setStartPrice(item.price)
             }
-        };
-        fetchInventory();
-    }, []);
+        }
+    }, [selectedItem, inventoryItems])
+    
+    const filteredInventory = inventoryItems.filter((item) => {
+
+    const query = search.toLowerCase();
+        return (
+            item.productName.toLowerCase().includes(query) ||
+            item.category?.name?.toLowerCase().includes(query) ||
+            item.physicalCode?.toLowerCase().includes(query) ||
+            item.productId?.toLowerCase().includes(query)
+        );
+    });
 
     const validate = () => {
         const errs = {};
         if (!selectedItem) errs.selectedItem = "Select an inventory item.";
         if (!startPrice || startPrice <= 0) errs.startPrice = "Starting price must be greater than 0.";
-        if (!reservePrice || reservePrice <= 0) errs.reservePrice = "Reserve price must be greater than 0.";
+        if (!reservePrice || reservePrice <= 0) {
+            errs.reservePrice = "Reserve price must be greater than 0.";
+        }
+        else if (reservePrice < startPrice) {
+            errs.reservePrice = `Reserve price must be at least Php ${startPrice}`
+        }
         if (!startTime) errs.startTime = "Start time is required.";
         if (!endTime) errs.endTime = "End time is required.";
         if (startTime && endTime && new Date(startTime) >= new Date(endTime)) errs.endTime = "End time must be after start time.";
@@ -71,7 +95,10 @@ const ManageAuction = () => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            setMessage("Auction created successfully!");
+            showSnackbar("Auction created successfully!", 'success');
+            
+            await fetchInventoryItems()
+
             setSelectedItem("");
             setStartPrice("");
             setStartTime("");
@@ -79,6 +106,7 @@ const ManageAuction = () => {
             setReservePrice("");
             setDescription("");
             setErrors({});
+            
         } catch (err) {
             console.error("Auction create error:", err);
             setMessage(err.response?.data?.message || "Failed to create auction");
@@ -92,23 +120,79 @@ const ManageAuction = () => {
 
     return (
         <Box sx={{mx: "auto"}}>
+            <Stack direction={'row'} alignItems={'center'} gap={2} sx={{m: 2}}>
+                <img src="/time.svg" alt="time" style={{width: 50, opacity: .8}}/>
+                <Box>
+                    <Typography variant="body2" color="grey">
+                        "Fill in the item details to include them in the auction list. Complete and clear information helps attract more bidders."
+                    </Typography>
+                </Box>
+            </Stack>
             <form onSubmit={handleSubmit}>
-                <FormControl fullWidth margin="normal" error={!!errors.selectedItem}>
+                <FormControl fullWidth margin="normal" error={!!errors.selectedItem} >
                     <InputLabel id="inventory-label">Inventory Item</InputLabel>
                     <Select
+                        MenuProps={{
+                            MenuListProps: {
+                                sx: {
+                                    paddingTop: 2,
+                                }
+                            }
+                        }}
                         labelId="inventory-label"
                         value={selectedItem}
                         onChange={(e) => setSelectedItem(e.target.value)}
                     >
-                        {inventoryItems.map((item) => (
-                            <MenuItem key={item._id} value={item._id}>
-                                {item.productName}
-                            </MenuItem>
-                        ))}
+                        {filteredInventory.length > 0 ? (
+                            filteredInventory.map((item) => (
+                                <MenuItem key={item._id} value={item._id}>
+                                    <Stack direction={'row'} alignItems={'center'} gap={2} width={'100%'} sx={{pr: 2}}>
+                                        <img 
+                                            src={`${UPLOADS_URL}${item.images[0]}`} 
+                                            alt={item.productName} 
+                                            style={{
+                                                aspectRatio: '1/1', 
+                                                borderRadius: 5, 
+                                                width: 80, 
+                                                height: 80,
+                                                objectFit: 'cover'
+                                            }}
+                                        />
+                                        <Stack width={'100%'}>
+                                            <Typography variant="body1" color="initial">
+                                                {item.productName}
+                                            </Typography>
+                                            <Divider/>
+                                            <Typography variant="body2" noWrap maxWidth={200} color="grey">
+                                                {`Php ${item.price} | ${item.isLocal ? 'Local' : 'international'}`}
+                                            </Typography>
+                                            <Typography variant="body2" color="grey">
+                                                {`${item.category?.name} | ${item.condition}`}
+                                            </Typography>
+                                        </Stack>
+
+                                    </Stack>
+                                </MenuItem>
+                                )))
+                                :
+                                (
+                                    <MenuItem disabled>
+                                        <Stack sx={{width: '100%', my: 2}} justifyContent={'center'} alignItems={'center'}>
+                                            <img src="/emoji-sick-svgrepo-com.svg" alt="emoji-sick" style={{width: 50}}/>
+                                            <Typography variant="body2" color="initial">
+                                                No Items found
+                                            </Typography>
+                                        </Stack>
+                                    </MenuItem>
+                                )
+                            }
                     </Select>
                     {errors.selectedItem && <FormHelperText>{errors.selectedItem}</FormHelperText>}
                 </FormControl>
 
+                <Typography variant="body2" color="grey">
+                    * The starting price for the auction item will be set based on its current inventory price.
+                </Typography>
                 <TextField
                     label="Starting Price"
                     type="number"
@@ -118,10 +202,14 @@ const ManageAuction = () => {
                     margin="normal"
                     error={!!errors.startPrice}
                     helperText={errors.startPrice}
+                    InputProps={{readOnly: true}}
                 />
-
+                <Typography variant="body2" color="grey">
+                    * The reserve price sets the minimum acceptable bid. The product will not be sold unless this price is reached.
+                </Typography>
                 <TextField
                     label="Reserve Price"
+                    placeholder={startPrice}
                     type="number"
                     value={reservePrice}
                     onChange={(e) => setReservePrice(e.target.value)}
@@ -131,6 +219,9 @@ const ManageAuction = () => {
                     helperText={errors.reservePrice}
                 />
 
+                <Typography variant="body2" color="grey">
+                    * Please double-check the auction start-end date and time to ensure accuracy to avoid scheduling issues.
+                </Typography>
                 <TextField
                     label="Start Time"
                     type="datetime-local"
@@ -143,7 +234,7 @@ const ManageAuction = () => {
                     error={!!errors.startTime}
                     helperText={errors.startTime}
                 />
-
+                
                 <TextField
                     label="End Time"
                     type="datetime-local"
@@ -156,9 +247,9 @@ const ManageAuction = () => {
                     error={!!errors.endTime}
                     helperText={errors.endTime}
                 />
-
                 <TextField
-                    label="Description"
+                    label="Description(optional)"
+                    placeholder="You may provide additional auction-related details about the product here..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     fullWidth
@@ -166,18 +257,15 @@ const ManageAuction = () => {
                     multiline
                     rows={3}
                 />
-                <Box sx={{display: 'flex', justifyContent: 'flex-end'}}>
+                <Typography variant="body2" color="grey">
+                    <b>Note: </b> Make sure everything is correct before finalizing the auction entry.
+                </Typography>
+                <Box sx={{display: 'flex', justifyContent: 'flex-end', py: 2}}>
                     <Button type="submit" variant="contained" color="secondary" sx={{ mt: 2 }} disabled={loading}>
                         {loading ? 'Creating...' : 'Create Auction'}
                     </Button>
                 </Box>
             </form>
-
-            {message && (
-                <Typography sx={{ mt: 2 }} color={message.includes("successfully") ? "green" : "red"}>
-                    {message}
-                </Typography>
-            )}
         </Box>
     );
 };

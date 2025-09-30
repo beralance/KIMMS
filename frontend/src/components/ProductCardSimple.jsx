@@ -4,35 +4,65 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded'
-import { Box, Button, Grid, CardActions, IconButton, } from '@mui/material';
+import { Box, Button, Grid, CardActions, IconButton, Stack, } from '@mui/material';
 import { UPLOADS_URL } from '../utils/constants'
+import { toTitleCase, formatNumber } from '../utils/stringUtils'
+import SectionTransition from './SectionTransition'
+import { useNavigate } from 'react-router-dom';
+import { ArrowRightRounded } from '@mui/icons-material';
 
 export default function ProductCardSimple ({ product, onNavigate, addToCart }) { 
+    const navigate = useNavigate()
+
     return (
-        <Card sx={{ boxShadow: 'none', borderRadius: 0 }}>
-            <CardMedia
-                onClick={onNavigate}
-                sx={{ minHeight: 100, maxHeight: 500, height: '100%', aspectRatio: '9/12', borderRadius: 1 }}
-                image={`${UPLOADS_URL}${product.image}`}
-                title={product.name} 
-            />
-            <CardContent sx={{ flexGrow: 1, px: .5, py: 2  }}>
-                <Grid container sx={{pb: 2}}>
-                    <Grid size={{xs: 9}}>
-                        <Typography variant="h5" noWrap sx={{ mb: 1, fontSize: {xs: 20, md: 25, xl: 30, } }}>
-                            {product.name}
-                        </Typography>
-                        <Typography color='grey' sx={{ fontWeight: 500, fontSize: {xs: 18, md: 25, xl: 30,}}}>
-                            PHP {product.price.toLocaleString()}
-                        </Typography>
-                    </Grid>
-                    <Grid size={{xs: 3}} sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        <Button variant='outlined' color='secondary' onClick={addToCart} sx={{p: 0, height: '100%', width: '100%'}}>
-                            <ShoppingCartRoundedIcon color='secondary' sx={{fontSize: 30}}/>
-                        </Button>
-                    </Grid>
-                </Grid>
-            </CardContent>
-        </Card>
+        <SectionTransition>
+            <Card 
+                sx={{
+                    p: 2, 
+                    m: 1, 
+                    boxShadow: '3px 3px 8px rgba(0, 0, 0, 0.5)', 
+                    borderRadius: 2, 
+                    minWidth: 100, 
+                    maxWidth: 300,
+                    
+                }}
+            >
+                
+                <Box sx={{position: 'relative'}}>
+                    <img 
+                        src={`${UPLOADS_URL}${product.images[0]}`}
+                        alt={product.productName} 
+                        style={{
+                            aspectRatio: '9/10',
+                            width: '100%',
+                            borderRadius: 2,
+                            height: '100%',
+                            objectFit: 'cover',
+                            cursor: 'pointer'
+                        }}
+                    />
+                </Box>
+                <CardContent sx={{pb: '10px !important'}}>
+                    <Stack alignItems={'center'} sx={{px: .5}}>
+                        <Stack sx={{alignItems: 'center', py: 1}}>
+                            <Stack alignItems={'center'} width={'100%'} sx={{mb: .5}}>
+                                <Typography variant="body1" align='center' color='secondary' noWrap sx={{width: '80%', fontWeight: 'bold'}}>
+                                    {product.productName}
+                                </Typography>
+                            </Stack>
+                            <Typography variant='body2' align='center' color='secondary' height={40} overflow={'auto'}>
+                                {product.description}
+                            </Typography>
+                        </Stack>
+                        <Stack>
+                            <Button variant='contained' color='secondary' onClick={onNavigate} sx={{alignSelf: 'flex-end', py: .5, borderRadius: '999px', px: 4}}>
+                                Visit
+                            </Button>
+                        </Stack>
+                    </Stack>
+                </CardContent>
+                
+            </Card>
+        </SectionTransition>
     );
 }

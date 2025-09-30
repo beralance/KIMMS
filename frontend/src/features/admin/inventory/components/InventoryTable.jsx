@@ -12,7 +12,7 @@ import {
     Typography,
     Paper,
     Grid,
-    Button
+    Button,
 } from "@mui/material";
 import {AdjustRounded, EditRounded, KeyboardArrowDownRounded, KeyboardArrowUpRounded, QrCode, SortRounded} from "@mui/icons-material";
 import { InventoryContext } from "../../../../contexts/InventoryContext";
@@ -20,7 +20,7 @@ import {UPLOADS_URL} from '../../../../utils/constants'
 import CustomPopover from '../../../../components/CustomPopover'
 import dayjs from 'dayjs'
 import PhysicalCodeDisplayer from './PhysicalCodeDisplayer'
-import {Navigation} from 'swiper/modules'
+import {Navigation, Pagination} from 'swiper/modules'
 import {Swiper, SwiperSlide} from 'swiper/react'
 
 // Each row = 1 product
@@ -59,7 +59,7 @@ function Row({ product, open, onToggle }) {
                 <TableCell>PHP {product.price}</TableCell>
                 <TableCell>{dayjs(product.createdAt).format('MM-DD-YYYY HH:mm')}</TableCell>
                 
-                <TableCell>
+                <TableCell align="center">
                     <IconButton
                         aria-label="expand row"
                         size="small"
@@ -73,7 +73,7 @@ function Row({ product, open, onToggle }) {
             {/* Expandable details */}
             <TableRow sx={{ bgcolor: "#f8f8f8"}} >
                 <TableCell style={{ paddingBottom: 0, paddingTop: 0}} colSpan={12}>
-                    <Collapse in={open} timeout="auto" unmountOnExit>
+                    <Collapse in={open} timeout="auto" unmountOnExit sx={{pb: 2}}>
                         <Box>
                             <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 1, py: 2}}>
                                 <Typography variant="body1" fontWeight={'bold'}>
@@ -99,46 +99,53 @@ function Row({ product, open, onToggle }) {
                                 />
                             </Box>
                             <Grid container>
-                                <Grid size={{xs: 5, sm: 4}}>
-                                     <Swiper
-                                        slidesPerView={1}
-                                        spaceBetween={30}
-                                        loop={true}
-                                        navigation={true}
-                                        modules={[Navigation]}
-                                        style={{
-                                            display: 'flex',
-                                            justifyContent: 'center',
-                                            alignItems: 'center',
-                                            "--swiper-navigation-color": "#37353E", 
-                                            "--swiper-navigation-size": "30px",  
-                                        }}
-                                    >
-                                        {Array.isArray(product.images) && product.images.length > 0 && (
-                                            product.images.map((img) => (
-                                                <SwiperSlide key={product._id}>
-                                                    <Box sx={{height: 200, width: 200, justifySelf: 'center'}}>
-                                                        <img
-                                                            src={`${UPLOADS_URL}${img}`}
-                                                            alt={`${product.productName}`}
-                                                            style={{ width: "100%", height: "100%", borderRadius: 10, backgroundColor: 'white', objectFit: "cover", aspectRatio: '1/1' }}
-                                                        />
-                                                    </Box>
-                                                </SwiperSlide>
-                                            ))
-                                        )}
-                                    </Swiper>
+                                <Grid size={{xs: 4}}>
+                                    <Box sx={{width: '100%', maxWidth: {xs: 600, md: 700, lg: 800}}}>
+                                        <Swiper
+                                            slidesPerView={1}
+                                            spaceBetween={30}
+                                            loop={true}
+                                            navigation={true}
+                                            pagination={{clickable: true}}
+                                            modules={[Navigation, Pagination]}
+                                            style={{
+                                                display: 'flex',
+                                                justifyContent: 'center',
+                                                alignItems: 'center',
+                                                width: '100%',
+                                                "--swiper-navigation-color": "#37353E", 
+                                                "--swiper-navigation-size": "30px",  
+                                                "--swiper-pagination-color": "#37353e",
+                                                "--swiper-pagination-bullet-inactive-color": "#ccc",
+                                                "--swiper-pagination-bullet-size": "8px",
+                                            }}
+                                        >
+                                            {Array.isArray(product.images) && product.images.length > 0 && (
+                                                product.images.map((img, idx) => (
+                                                    <SwiperSlide key={idx}>
+                                                        <Box sx={{height: {xs: 200, md: 220}, width: {xs: 200, md: 220}, justifySelf: 'center'}}>
+                                                            <img
+                                                                src={`${UPLOADS_URL}${img}`}
+                                                                alt={`${product.productName}`}
+                                                                style={{ width: "100%", height: "100%", borderRadius: 10, boxShadow: '0px 0px 5px rgba(0, 0, 0, 0.6)', backgroundColor: 'white', objectFit: "cover", aspectRatio: '1/1' }}
+                                                            />
+                                                        </Box>
+                                                    </SwiperSlide>
+                                                ))
+                                            )}
+                                        </Swiper>
+                                    </Box>
                                 </Grid>
-                                <Grid size={{xs: 7, sm: 8}}>
+                                <Grid size={{xs: 8}}>
                                     <Box sx={{ margin: 1, display: 'flex', alignItems: 'center'}}>
                                         <Typography variant="subtitle2" color="white" sx={{bgcolor: '#37353E', mr: 2, px: 2, py: .5, borderRadius: 1}}>
                                             Tags:
                                         </Typography>
                                         <Box sx={{display: 'flex', gap: 1, alignItems: 'center'}}>
-                                            <Typography variant="subtitle2" gutterBottom color="secondary" sx={{border: 1, px: 2, py: .5, borderRadius: 1}}>
+                                            <Typography variant="subtitle2" gutterBottom color="secondary" sx={{border: 1, px: 2, py: .5, borderRadius: '999px'}}>
                                                 {product.condition}
                                             </Typography>
-                                            <Typography variant="subtitle2" gutterBottom color="secondary" sx={{border: 1, px: 2, py: .5, borderRadius: 1}}>
+                                            <Typography variant="subtitle2" gutterBottom color="secondary" sx={{border: 1, px: 2, py: .5, borderRadius: '999px'}}>
                                                 {product.isLocal ? 'Local' : 'International'}
                                             </Typography>
                                         </Box>
@@ -240,27 +247,27 @@ export default function InventoryTable({ searchTerm }) {
                         <TableRow sx={{bgcolor: '#37353E'}}>
                             <TableCell/>
                             <TableCell sx={{ cursor: 'pointer'}} onClick={() => handleSort('productName')}>
-                                <Typography fontWeight='bold' variant="subtitle2" color="white" nowrap width={120}>
+                                <Typography fontWeight='bold' variant="subtitle2" color="white" noWrap width={120}>
                                     Product {sortConfig.key === 'productName' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
                                 </Typography>
                             </TableCell>
                             <TableCell sx={{fontWeight: 'bold', cursor: 'pointer'}} onClick={() => handleSort('physicalCode')}>
-                                <Typography fontWeight='bold' variant="subtitle2" color="white" nowrap width={120}>
+                                <Typography fontWeight='bold' variant="subtitle2" color="white" noWrap width={120}>
                                     Physical Code {sortConfig.key === 'physicalCode' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
                                 </Typography>
                             </TableCell>
                             <TableCell sx={{fontWeight: 'bold', cursor: 'pointer'}} onClick={() => handleSort('category')}>
-                                <Typography fontWeight='bold' variant="subtitle2" color="white" nowrap width={120}>
+                                <Typography fontWeight='bold' variant="subtitle2" color="white" noWrap width={120}>
                                     Category {sortConfig.key === 'category' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
                                 </Typography>
                             </TableCell>
                             <TableCell sx={{fontWeight: 'bold', cursor: 'pointer'}} onClick={() => handleSort('price')}>
-                                <Typography fontWeight='bold' variant="subtitle2" color="white" nowrap width={120}>
+                                <Typography fontWeight='bold' variant="subtitle2" color="white" noWrap width={120}>
                                     Price {sortConfig.key === 'price' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
                                 </Typography>
                             </TableCell>
                             <TableCell sx={{fontWeight: 'bold', cursor: 'pointer'}} onClick={() => handleSort('createdAt')}>
-                                <Typography fontWeight='bold' variant="subtitle2" color="white" nowrap width={120}>
+                                <Typography fontWeight='bold' variant="subtitle2" color="white" noWrap width={120}>
                                     Created {sortConfig.key === 'createdAt' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
                                 </Typography>
                             </TableCell>

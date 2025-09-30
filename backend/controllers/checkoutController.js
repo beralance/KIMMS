@@ -13,9 +13,20 @@ export const handleCheckout = async (req, res) => {
         const cart = await Cart.findOne({ userId }).populate("items.productId");
 
         if (!cart || cart.items.length === 0) {
-        return res.status(400).json({ message: "Cart is empty" });
+            return res.status(400).json({ message: "Cart is empty" });
         }
 
+        // Backend restriction, block local only products for non local users
+        const invalidItems = cart.items.filter(
+            item => item.productId?.isLocal && !req.user.isLocal
+        );
+
+        if (invalidItems.length > 0) {
+            return res.status(403).json({
+                message: 'Your cart containes products not available in your region',
+                blockedProducts: invalidItems.map(i => i.productId?.productName)
+            })
+        }
         // Extract product IDs (as ObjectId) and total amount
         const productIds = cart.items
             .map((item) => item.productId?._id)

@@ -1,16 +1,31 @@
-#Env files
-.env 
+# --- Environment files ---
+.env
 .env.local
 .env.*.local
 
-# Dependency caches
+# --- Backend Uploads (admin product images) ---
+backend/uploads/
+
+# --- Dependency directories ---
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# --- Build outputs ---
+dist/
+dist-ssr/
+frontend/build/
+frontend/dist/
+backend/dist/
+
+# --- Dependency caches ---
 .npm
 .cache
 .parcel-cache
 .next
 out
 
-# Logs
+# --- Logs ---
 logs
 *.log
 npm-debug.log*
@@ -19,16 +34,12 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
+# --- Editor / OS files ---
 .vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj

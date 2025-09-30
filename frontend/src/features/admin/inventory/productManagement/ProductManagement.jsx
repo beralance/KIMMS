@@ -35,7 +35,12 @@ function ProductManagement() {
 
     // ✅ Filtered products
     const finalProducts = useMemo(() => {
-        return products.filter((p) => {
+        
+        
+        return products
+            .filter(p => p.visibility !== 'inactive')
+            .filter((p) => 
+            {
 
             // Search filter
             if (searchTerm) {

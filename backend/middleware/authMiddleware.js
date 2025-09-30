@@ -18,7 +18,32 @@ export const verifyToken = (req, res, next) => {
         }
         res.status(401).json({ error: 'Invalid token' });
     }
+};
 
+export const optionalAuth = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) {
+        req.user = null; // no token = guest
+        console.log("No auth header → guest");
+        return next();
+    }
+
+    const token = authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : authHeader;
+    if (!token) {
+        req.user = null;
+        console.log("No token → guest");
+        return next();
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded; // contains role, isLocal, id
+    } catch (err) {
+        console.warn("JWT Verify Error (optional):", err.message);
+        req.user = null; // invalid token treated as guest
+    }
+    console.log('')
+    next();
 };
 
 export const adminOnly = (req, res, next) => {

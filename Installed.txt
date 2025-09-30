@@ -9,6 +9,8 @@
 - jwtdecode
 - qrcode.react
 - lodash.debounce
+- framer-motion
+- react dragabble
 
 
 BACKEND

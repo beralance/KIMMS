@@ -5,9 +5,10 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { Badge, Box } from '@mui/material';
+import { Badge, Box, Stack } from '@mui/material';
+import {toTitleCase} from '../utils/stringUtils'
 
-export default function ProductCard({ image, name = 'Unknown', price = 0, description = '...', onNavigate, addToCart, condition}) {
+export default function ProductCard({ images, category, name = 'Unknown', price = 0, description = '...', onNavigate, addToCart, condition}) {
     return (
         <Card
             sx={{
@@ -15,17 +16,19 @@ export default function ProductCard({ image, name = 'Unknown', price = 0, descri
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                boxShadow: 'none',
+                p: 2,
+                borderRadius: 5,
+                boxShadow: 5,
             }}
         >
 
             {/* Clickable area for navigation */}
-            <Box onClick={onNavigate} sx={{ cursor: 'pointer' }}>
+            <Box onClick={onNavigate} sx={{ cursor: 'pointer', p: 1}}>
                 {/* Product Image */}
                 <Box sx={{position: 'relative'}}>
                     <CardMedia
                         component="img"
-                        image={image}
+                        image={images}
                         alt={name}
                         sx={{
                             aspectRatio: '9/12',
@@ -33,44 +36,53 @@ export default function ProductCard({ image, name = 'Unknown', price = 0, descri
                             borderRadius: 3
                     }}
                     />
-                    <Box sx={{position: 'absolute', top: 15, left: 10, bgcolor: '#37353E', p: .5, px: 2, borderRadius: 2}}>
-                        <Typography variant="body1" color="white">
-                            {condition}
+                    <Box sx={{position: 'absolute', top: 15, left: 10, bgcolor: '#37353E', p: .5, px: 2, borderRadius: '0px 5px 5px 0px'}}>
+                        <Typography variant="body2" color="white">
+                            {toTitleCase(condition)}
                         </Typography>
                     </Box>
                 </Box>
 
                 {/* Card Body */}
-                <CardContent sx={{px: .5, py: 2}}>
+                <CardContent sx={{px: .5, mb: 1, '&:last-child': {paddingBlock: 1}}}>
                     {/* Product Name */}
                     <Typography
-                        variant="h6"
+                        variant="body1"
                         component="div"
                         noWrap
                         sx={{ fontWeight: 600, mb: 1 }}
                     >
                         {name}
                     </Typography>
+                    
+                    <Stack direction={'row'} gap={2} alignItems={'center'} justifyContent={'space-between'} sx={{mb: 1}}>
+                        {/* Price */}
+                        <Typography
+                            variant="body2"
+                            color='white'
+                            sx={{py: .5, px: 2, width: '100%', display: 'flex', justifyContent: 'center', borderRadius: '999px', bgcolor: '#37353E', fontWeight: 'bold',}}
+                        >
+                            PHP {price.toLocaleString()}
+                        </Typography>
 
-                    {/* Price */}
-                    <Typography
-                        variant="body1"
-                        component="div"
-                        sx={{ color: 'secondary', fontWeight: 500, mb: 1 }}
-                    >
-                        PHP {price.toLocaleString()}
-                    </Typography>
-
+                        {/* Category */}
+                        <Typography
+                            variant="body2"
+                            sx={{border: 1, px: 1,py: .5, borderRadius: '999px'}}
+                        >
+                            {category}
+                        </Typography>
+                    </Stack>
                     {/* Description */}
                     <Typography
                         variant="body2"
                         sx={{
-                        color: 'text.secondary',
-                        display: '-webkit-box',
-                        height: 40,
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
+                            color: 'text.secondary',
+                            display: '-webkit-box',
+                            height: 20,
+                            WebkitLineClamp: 1,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
                         }}
                     >
                         {description}
@@ -89,6 +101,7 @@ export default function ProductCard({ image, name = 'Unknown', price = 0, descri
                     sx={{
                         textTransform: 'none',
                         fontWeight: 600,
+                        borderRadius: 3,
                     }}
                 >
                     Add to Cart

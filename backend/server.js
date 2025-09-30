@@ -86,21 +86,23 @@ const testPassword = async () => {
 // password hash comparing function
 // testPassword()
 
-// account creation for admin or stuff
+// One time admin account creation
 const createAdmin = async () => {
-    const existingAdmin = await User.findOne({ email: 'ad@gmail.com' });
+    const existingAdmin = await User.findOne({ email: process.env.ADMIN_EMAIL });
     if (!existingAdmin) {
         const admin = new User({
-            email: 'ad@gmail.com',
-            password: 'admin123',
-            fullName: 'Admin',
-            role: 'admin'
+            email: process.env.ADMIN_EMAIL,
+            password: process.env.ADMIN_PASS,
+            fullName: 'Kimms.Admin',
+            role: 'admin',
+            isVerified: true,
+            isLocal: true,
         });
 
         await admin.save();
-        console.log('Admin account created');
+        console.log('✅ Admin account created');
     } else {
-        console.log('Admin already exists');
+        console.log('⚠️ Admin already exists');
     }
 };
 
@@ -111,7 +113,8 @@ const createAdmin = async () => {
 const PORT = process.env.PORT || 5000
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(async () => {
-        console.log('MongoDB connected')
+        console.log('✅ MongoDB connected')
+        await createAdmin();
         server.listen(PORT, () => console.log(`Server running on ${PORT}`))
 
         // start auction lifescycle cron job
@@ -119,9 +122,6 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
 
         // start auction finalize cron, using io for real-time notificaiton
         auctionFinalizeCron(io)
-        
-        // Account creation function for admin or stuff
-        // await createAdmin();
     }
 )
 .catch(err => console.error(err))

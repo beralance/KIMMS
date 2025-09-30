@@ -13,7 +13,7 @@ export default function ProductCartRecommendation ({ product, onNavigate }) {
             <CardMedia
                 onClick={onNavigate}
                 sx={{ minHeight: 100, maxHeight: 500, height: '100%', aspectRatio: '9/10'}}
-                image={`${UPLOADS_URL}${product.image}`}
+                image={`${UPLOADS_URL}${product.images[0]}`}
                 title={product.name}
             />
             <CardContent sx={{ flexGrow: 1, px: 1, py: 2 }}>

@@ -28,6 +28,7 @@ export const signup = async (req, res) => {
             address,
             role: 'user',
             isVerified: false,
+            isLocal: address.region === '05',
             verificationCode: code,
             verificationExpiry: expiry,
         });
@@ -58,6 +59,8 @@ export const verifyEmail = async (req, res) => {
     try {
         const { email, code } = req.body;
         const user = await User.findOne({ email });
+        console.log('user', user, email)
+        const isLocal = user.address.region === '05'
 
         if (!user) return res.status(400).json({ error: 'User not found' });
         if (user.isVerified) return res.status(400).json({ error: 'Already verified' });
@@ -77,7 +80,7 @@ export const verifyEmail = async (req, res) => {
 
         // generate token after verification
         const token = jwt.sign(
-            { id: user._id, role: user.role },
+            { id: user._id, role: user.role, isLocal},
             process.env.JWT_SECRET,
             { expiresIn: '12h' }
         );
@@ -88,6 +91,7 @@ export const verifyEmail = async (req, res) => {
             userId: user._id,
             role: user.role,
             fullName: user.fullName,
+            isLocal,
         });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -133,6 +137,12 @@ export const login = async (req, res) => {
         const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ error: 'User not found' });
 
+        let isLocal = null;
+
+        if (user.role !== 'admin' && user.role !== 'staff') {
+            isLocal = user.address?.region === '05'
+        }
+
         // ensure verified
         if (!user.isVerified) {
             return res.status(400).json({ error: 'Please verify your email before logging in' });
@@ -143,7 +153,7 @@ export const login = async (req, res) => {
         if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
 
         const token = jwt.sign(
-            { id: user._id, role: user.role },
+            { id: user._id, role: user.role, isLocal: isLocal },
             process.env.JWT_SECRET,
             { expiresIn: '12h' }
         );
@@ -159,6 +169,7 @@ export const login = async (req, res) => {
             userId: user._id,
             role: user.role,
             fullName: user.fullName,
+            isLocal,
             allowedModules,
             token,
         });

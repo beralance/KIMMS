@@ -1,0 +1,72 @@
+import { ArrowCircleRightRounded, ArrowRightRounded } from '@mui/icons-material'
+import { Box, Button, Divider, Grid, IconButton, Stack, Typography } from '@mui/material'
+import { ProductContext } from '../../../contexts/ProductContext'
+import { useContext, useEffect } from 'react'
+import { UPLOADS_URL } from '../../../utils/constants'
+import {formatNumber, toTitleCase} from '../../../utils/stringUtils'
+import { useNavigate } from 'react-router-dom'
+import {ScrollSectionLeft} from '../../../components/SectionTransitionX' 
+
+const NewArrival = () => {
+    const { newProducts } = useContext(ProductContext)
+    const navigate = useNavigate()        
+
+    return (
+        <Box sx={{maxHeight: 480, overflowY: 'auto', px: 2}}>
+            {newProducts.map(product => (
+                <ScrollSectionLeft key={product._id}>
+                    <Grid container spacing={2} sx={{mb: .5, p: 1}}>
+                            <Grid size={{xs: 6}}>
+                                <img 
+                                    src={`${UPLOADS_URL}${product.images[0]}`} 
+                                    alt={product.productName} 
+                                    style={{
+                                        width: '100%',
+                                        display: 'block',
+                                        height: '100%',
+                                        aspectRatio: '1/1',
+                                        objectFit: 'cover',
+                                        boxShadow: '2px 2px 10px rgba(0, 0, 0, 0.3)',
+                                        borderRadius: 3,
+                                    }}
+                                />
+                            </Grid>
+                            <Grid size={{xs: 6}}>
+                                <Stack height={'100%'}>
+                                    <Stack sx={{pb: 1}}>
+                                        <Typography noWrap variant="body1" fontWeight={'bold'} color="secondary">
+                                            {product.productName}
+                                        </Typography>
+                                        <Stack direction={'row'}>
+                                            <Divider sx={{border: 1, color: 'black', mr: 1}}/>
+                                            <Typography variant="body2" color="secondary">
+                                                PHP {formatNumber(product.price)}
+                                            </Typography>
+                                        </Stack>
+                                    </Stack>
+                                    <Stack gap={1}>
+                                        <Typography variant="body2" color="secondary" noWrap sx={{border: 1, alignSelf: 'flex-start', py: .2, borderRadius: '999px', width: 'auto', px: 2,}}>
+                                            {product.category?.name}
+                                        </Typography>
+                                    </Stack>
+                                    <IconButton 
+                                        onClick={() => navigate(`/product/${product._id}`)}
+                                        sx={{
+                                            py: .5,
+                                            mt: 'auto', 
+                                            alignSelf: 'flex-end'
+                                        }} 
+                                    >
+                                        <ArrowCircleRightRounded fontSize='large'/>
+                                    </IconButton>
+                                </Stack>
+                            </Grid>
+                    </Grid>
+                </ScrollSectionLeft>
+
+            ))}     
+        </Box>
+    )
+}
+
+export default NewArrival

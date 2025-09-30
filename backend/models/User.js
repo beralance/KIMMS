@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
     password: {type: String, required: true},
     fullName: {type: String, required: true},
     role: { type: String, enum: ['user', 'admin', 'staff'], default: 'user'},
-
+    isLocal: {type: Boolean, default: false},
 
     // contact 
     phoneNumber: {type: String, required: false}, // optional, can be used on checkout

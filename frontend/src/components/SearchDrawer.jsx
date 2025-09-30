@@ -69,7 +69,7 @@ export default function SearchDrawer({ open, onClose, anchor = "top" }) {
                         </IconButton>
                     </Box>
                     <Stack>
-                        <Box sx={{ flex: 1, mb: results.length > 0 && 2 }}>
+                        <Box sx={{ flex: 1, mb: results.length > 0 ? 2 : 0 }}>
                             <SearchBar
                                 autoFocus
                                 fullWidth
@@ -79,7 +79,7 @@ export default function SearchDrawer({ open, onClose, anchor = "top" }) {
                             />
                         </Box>
                         {/* Search Results */}
-                        <Typography variant="body1" color="grey" sx={{m: results.length > 0 && 2}}>
+                        <Typography variant="body1" color="grey" sx={{m: results.length > 0 ? 1 : 0}}>
                             {results.length > 0 && 'Search Result'}
                         </Typography>
                         {results.length > 0 && (
@@ -89,6 +89,7 @@ export default function SearchDrawer({ open, onClose, anchor = "top" }) {
                                         <Grow timeout={800} in={results.length > 0} mountOnEnter unmountOnExit>
                                             <ListItem disablePadding>
                                                 <ListItemButton 
+                                                    sx={{ bgcolor: '#f8f8f8', py: 1}}
                                                     onClick={() => {
                                                         navigate(`/product/${product._id}`);
                                                         window.scrollTo({top: 0, behavior: 'smooth'})
@@ -96,19 +97,31 @@ export default function SearchDrawer({ open, onClose, anchor = "top" }) {
                                                     }}
                                                 >
                                                     <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', borderRadius: 1}}>
-                                                        <Box>
+                                                        <Box sx={{width: '70%'}}>
                                                             <Typography gutterBottom noWrap fontWeight='bold'>
                                                                 {product.productName} 
                                                             </Typography>
-                                                            <Typography noWrap color="secondary" variant="body2">
+                                                            <Typography noWrap color="secondary" variant="body2"
+                                                                sx={{
+                                                                    display: '-webkit-box',
+                                                                    WebkitLineClamp: 1,
+                                                                    WebkitBoxOrient: 'vertical',
+                                                                    overflow: 'hidden',
+                                                                }}
+                                                            >
                                                                 <span style={{color: 'black', fontWeight: 'bold'}}>PHP </span>{product.price}
                                                             </Typography>
-                                                            <Typography noWrap color="grey" variant="body2">
+                                                            <Typography color="grey" variant="body2" sx={{
+                                                                display: '-webkit-box',
+                                                                WebkitLineClamp: 1,
+                                                                WebkitBoxOrient: 'vertical',
+                                                                overflow: 'hidden',
+                                                            }}>
                                                                 {product.description}
                                                             </Typography>
                                                         </Box>
-                                                        <Box sx={{width: 100}}>
-                                                            <img src={`${UPLOADS_URL}${product.image}`} alt={product.productName} style={{objectFit: 'cover', aspectRatio: '1/1', width: '100%', borderRadius: 3}}/> 
+                                                        <Box sx={{width: 100, height: 100}}>
+                                                            <img src={`${UPLOADS_URL}${product.images[0]}`} alt={product.productName} style={{objectFit: 'cover', aspectRatio: '1/1', width: '100%', height: '100%', borderRadius: 3}}/> 
                                                         </Box>
                                                     </Box>
                                                 </ListItemButton>
@@ -121,7 +134,7 @@ export default function SearchDrawer({ open, onClose, anchor = "top" }) {
                                 ))}
                             </List>
                         )}
-                        <Box sx={{mt: results.length > 0 && 5}}>
+                        <Box sx={{mt: results.length > 0 ? 3 : 0}}>
                             <Typography variant="body1" color="grey" sx={{m: 2}}>
                                 Recommendation
                             </Typography>

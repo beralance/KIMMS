@@ -19,40 +19,57 @@ export default function Login() {
     };
 
     return (
-        <Box sx={{backgroundImage: 'url(/login-bg.jpg)', minHeight: '100vh'}}>
-            <Box  sx={{display: 'flex', justifyContent: {sm:'center'}, alignItems: 'center', backdropFilter: 'blur(10px)', WebkitBackdropFilter: "blur(10px)",}}>
-                <Box sx={{bgcolor: 'green', width: '60%', display: {xs: 'none', md: 'block'}}}>
+        <Box>
+            <Box 
+                sx={{
+                    backgroundImage: 'url(/minimalist-black-interior-with-black-sofa.jpg)',
+                    backgroundPosition: 'center',
+                    backgroundSize: '100%',
+                    minHeight: '100vh',
+                    position: 'fixed',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    zIndex: -1,
+                }}
+            />
+            <Box 
+                sx={{
+                    width: '100%',
+                    height: '100vh',
+                    backdropFilter: 'blur(10px)',
+                    bgcolor: 'transparent',
+                }}
+            >
+                <AuthLayout>
+                    <Container 
+                        sx={{
+                            borderRadius: 5,
+                            overflowY: 'auto',
+                            maxHeight: '100vh',
+                            bgcolor: 'rgba(0, 0, 0, 0.5)'
+                        }}
+                    >
+                        <Box sx={{display: 'flex', justifyContent: 'center', m: 4}}>
+                            <img src="/kimms-logo-full.svg" alt="" style={{width: '150px', filter: 'invert(1)'}}/>
+                        </Box>
+                        <Typography variant="h5" component="h1" color="white" sx={{fontWeight: 'bold'}}>
+                            Welcome Back!
+                        </Typography>
+                        <Typography variant="body2" color="white" component="h1" mb={3}>
+                            Enter your email and password to continue.
+                        </Typography>
                     
-                </Box>
-                <Box sx={{width:  {md: '40%',sm: '60%', xs: '100%'}}}>
-                    <Box sx={{width: '100%', height: 'auto', borderRadius: {sm: 5}, p: 4, bgcolor: 'white',  }}>
-                        <AuthLayout>
-                            <Container>
-                                <Box sx={{display: 'flex', justifyContent: 'center', m: 4}}>
-                                    <img src="/kimms-logo-full.svg" alt="" style={{width: '150px'}}/>
-                                </Box>
-                                <Typography variant="h4" component="h1" sx={{fontWeight: 'bold'}} mb={3}>
-                                    Welcome Back!
-                                </Typography>
-                                <Typography variant="body2" color="secondary" component="h1" mb={3}>
-                                    Enter your email and password to continue.
-                                </Typography>
-                            
-                                <LoginForm onSuccess={handleLoginSuccess} />
-                            </Container>
-                            <Box sx={{display: 'flex', justifyContent: 'center'}}>
-                                <Button
-                                    onClick={() => navigate("/auth/signup")}
-                                    sx={{textDecoration: 'underline', }}
-                                    variant="text"
-                                    color="secondary"
-                                >
-                                    Don’t have an account? Register
-                                </Button>
-                            </Box>
-                        </AuthLayout>
-                    </Box>
-                </Box>
+                        <LoginForm onSuccess={handleLoginSuccess} />
+                        <Box sx={{display: 'flex', justifyContent: 'center'}}>
+                            <Button
+                                onClick={() => navigate("/auth/signup")}
+                                sx={{textDecoration: 'underline', color: 'white'}}
+                                variant="text"
+                            >
+                                Don’t have an account? Register
+                            </Button>
+                        </Box>
+                    </Container>
+                </AuthLayout>
             </Box>
         </Box>
     );

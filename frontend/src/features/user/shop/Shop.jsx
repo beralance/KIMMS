@@ -7,6 +7,8 @@ import Container from "@mui/material/Container";
 import AutoSlideCarousel from "../../../components/AutoSlideCarousel";
 import { useCart } from "../../../contexts/CartContext";
 import { ProductContext } from "../../../contexts/ProductContext"; // import context
+import { ScrollOnTop } from "../../../utils/scrollOnTop";
+import { useLocation, useParams } from "react-router-dom";
 
 const PAGE_SIZE = 6;
 
@@ -14,10 +16,16 @@ function Shop() {
     const [page, setPage] = useState(1);
     const [sort, setSort] = useState("default");
     const [category, setCategory] = useState("all");
-
+    
     const { addToCart } = useCart();
     const { products, fetchProducts } = useContext(ProductContext); // get products from context
     const [filteredProducts, setFilteredProducts] = useState([]);
+    const [categoryName, setCategoryName] = useState('Remove')
+    const location = useLocation()
+    const queryParams = new URLSearchParams(location.search)
+    const categoryId = queryParams.get('category')
+
+    ScrollOnTop()
 
     // reset page when filters change
     useEffect(() => {
@@ -33,9 +41,12 @@ function Shop() {
     useEffect(() => {
         let tempProducts = [...products];
 
-        // filter by category
-        if (category !== "all") {
-            tempProducts = tempProducts.filter((p) => p.category === category);
+        if (categoryId) {
+             tempProducts = tempProducts.filter((p) => p.category?._id === categoryId);
+        }
+        // 🔹 Otherwise fall back to the dropdown/category filter
+        else if (category !== "all") {
+            tempProducts = tempProducts.filter((p) => p.category?._id === category);
         }
 
         // sort
@@ -45,8 +56,13 @@ function Shop() {
             tempProducts.sort((a, b) => b.price - a.price);
         }
 
+         if (categoryId) {
+            const matched = products.find((p) => p.category?._id === categoryId);
+            setCategoryName(matched ? matched.category.name : "All");
+         }
+
         setFilteredProducts(tempProducts);
-    }, [products, category, sort]);
+    }, [products, category, sort, categoryId]);
 
     // pagination
     const startIndex = (page - 1) * PAGE_SIZE;
@@ -85,7 +101,10 @@ function Shop() {
                             setSort={setSort}
                             category={category}
                             setCategory={setCategory}
+                            categoryName={categoryName}
+                            categoryId={categoryId}
                         />
+                        <Typography variant="body1" color="initial"></Typography>
                     </Box>
                     <Box>
                         <ShopGrid

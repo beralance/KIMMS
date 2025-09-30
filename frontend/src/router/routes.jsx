@@ -36,23 +36,32 @@ import StaffDashboard from '../features/staff/StaffDashboard'
 import NotFound from "../pages/NotFound";
 
 // Auth 
-import Login from '../features/auth/Login'
-import Signup from '../features/auth/Signup'
-import VerifyForm from "../features/auth/components/VerifyForm";
+import Auth from '../features/auth/Auth'
+import SignupForm from '../features/auth/components/SignupForm'
+import LoginForm from '../features/auth/components/LoginForm'
+import VerifyForm from '../features/auth/components/VerifyForm'
 
 // Layouts
 import AdminLayout from '../layout/AdminLayout'
 import UserLayout from '../layout/UserLayout'
 import CartLayout from "../layout/CartLayout";
 
+
 export default function AppRoutes() {
     return (
         <Routes>
             {/* User Layout */}
-            <Route path='/auth/login' element={<Login/>}/>
-            <Route path='/auth/signup' element={<Signup/>}/>
+            <Route path="/auth" element={<Auth/>}>
+                <Route path='login' element={<LoginForm/>}/>
+                <Route path='signup' element={<SignupForm/>}/>
+            </Route>
             <Route path="/auth/signup/verify" element={<VerifyForm/>}/>
-
+            
+            {/*
+            <Route path='/auth/login' element={<Auth/>}/>
+            <Route path='/auth/signup' element={<Auth/>}/>
+            <Route path="/auth/signup/verify" element={<VerifyForm/>}/>
+            */}
             <Route path="/product/:id" element={<ProductDetails/>}/>
 
             <Route path='/auction/bid/:id' element={

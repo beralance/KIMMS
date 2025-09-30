@@ -6,6 +6,12 @@ export async function fetchCategories() {
     return res.json()
 }
 
+export async function fetchPostedCategories() {
+    const res = await fetch(`${API_URL}/posted`);
+    if (!res.ok) throw new Error('Failed to fetch posted categories.')
+    return res.json()
+}
+
 export async function addCategory(name) {
     const res = await fetch(API_URL, {
         method: 'POST',
@@ -27,4 +33,17 @@ export async function deleteCategory(id) {
         console.error('Error deleting category', err)
         return {ok: false, data: {message: `This category cannot be removed because it is still assigned to existing products.`}}
     }
+}
+
+// ✅ New: fetch categories used in products
+export async function fetchCategoriesFromProducts() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}')
+    const token = user.token?.trim()
+    const res = await fetch(`${API_URL}/from-products`, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+    if (!res.ok) throw new Error('Failed to fetch categories from products.');
+    return res.json();
 }
