@@ -10,7 +10,7 @@ import BottomActionBar from '../../../components/BottomActionBar';
 import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded';
 import { useCheckout } from "../../../contexts/CheckoutContext";
 import { UPLOADS_URL } from "../../../utils/constants";
-import { ScrollOnTop } from "../../../utils/scrollOnTop";
+import { ScrollOnTop } from "../../../utils/ScrollOnTop";
 import { toTitleCase, formatNumber } from "../../../utils/stringUtils";
 import {Navigation, Pagination} from 'swiper/modules'
 import {Swiper, SwiperSlide} from 'swiper/react'

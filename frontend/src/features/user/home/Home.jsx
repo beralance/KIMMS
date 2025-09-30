@@ -7,7 +7,7 @@ import {ScrollSectionRight} from '../../../components/SectionTransitionX'
 import { LocalOfferRounded, ShoppingBagRounded, TagRounded } from '@mui/icons-material'
 import HomeHero from './HomeHero'
 import HomeAuctionSection from './HomeAuctionSection'
-import { ScrollOnTop } from '../../../utils/scrollOnTop'
+import { ScrollOnTop } from '../../../utils/ScrollOnTop'
 import CategoriesList from './CategoriesList'
 import NewArrival from './NewArrival'
 
