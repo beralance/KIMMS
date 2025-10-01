@@ -42,12 +42,20 @@ const io = new Server(server, {
 })
 
 
+app.use((req, res, next) => {
+  console.log("Incoming request:", req.method, req.url, "Origin:", req.headers.origin);
+  next();
+});
 
 // Middleware
 app.use(cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    origin: [
+        "http://localhost:5173",
+        "https://kimms-furniture-and-merchandise-mai-seven.vercel.app/"
+    ],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true
 }))
 app.use(express.json())
 app.use("/uploads", express.static(path.join(process.cwd(), "/uploads"))); // serve image
