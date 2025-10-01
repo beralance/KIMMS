@@ -19,7 +19,7 @@ export default function PhysicalCodeDisplayer({id, name, category, status, image
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
     const printRef = useRef();
-    const API_URL = import.meta.env.FRONTEND_URL;
+    const API_URL = import.meta.env.VITE_FRONTEND_URL;
     const handlePrint = () => {
         const printContents = printRef.current.innerHTML;
         const printWindow = window.open("", "_blank");
