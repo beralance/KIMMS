@@ -62,7 +62,7 @@ app.use(cors({
     credentials: true
 }))
 
-app.options("*", cors());
+app.options("*");
 
 
 app.use(express.json())
