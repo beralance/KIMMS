@@ -62,7 +62,7 @@ app.use(cors({
     credentials: true
 }))
 
-app.options("*");
+app.options("/api/inventory");
 
 
 app.use(express.json())
