@@ -52,6 +52,8 @@ app.use((req, res, next) => {
 });
 
 // Middleware
+app.use(cors())
+/*
 app.use(cors({
     origin: [
         "http://localhost:5173",
@@ -61,7 +63,7 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
 }))
-
+*/
 app.use(express.json())
 app.use("/uploads", express.static(path.join(process.cwd(), "/uploads"))); // serve image
 
