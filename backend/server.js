@@ -36,10 +36,7 @@ const app = express()
 const server = http.createServer(app)
 const io = new Server(server, {
     cors: {
-        origin: [
-            'http://localhost:5173', 
-            'https://kimms-furniture-and-merchandise-mai-seven.vercel.app'
-        ],
+        origin: '*',
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
     }
 })
@@ -48,11 +45,7 @@ const io = new Server(server, {
 
 // Middleware
 app.use(cors({
-    origin: [
-        'http://localhost:5173',
-        'https://kimms-furniture-and-merchandise-mai-seven.vercel.app'
-    ],
-    credentials: true,
+    origin: '*',
     methods: ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }))
