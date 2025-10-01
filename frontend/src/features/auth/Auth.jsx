@@ -20,8 +20,9 @@ export default function Auth() {
 
     const handleRegisterSuccess = (user) => {
         // redirect to VerifyPage with email
-        //navigate(`/auth/signup/verify?email=${encodeURIComponent(user.email)}`);
-        navigate(`/auth/signup/verify`);
+        
+        navigate(`/auth/signup/verify?email=${encodeURIComponent(user.email)}`);
+        
     };
     return (
         <Box>
