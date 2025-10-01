@@ -49,7 +49,7 @@ export default function ProductCard({ images, category, name = 'Unknown', price 
                 <CardContent sx={{px: .5, mb: 1, '&:last-child': {paddingBlock: 1}}}>
                     {/* Product Name */}
                     <Typography
-                        variant="body1"
+                        variant='body1'
                         component="div"
                         noWrap
                         sx={{ fontWeight: 600, mb: 1 }}
