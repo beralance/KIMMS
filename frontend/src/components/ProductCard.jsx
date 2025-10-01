@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { Badge, Box, Stack } from '@mui/material';
 import {toTitleCase} from '../utils/stringUtils'
+import { ShoppingCartRounded } from '@mui/icons-material';
 
 export default function ProductCard({ images, category, name = 'Unknown', price = 0, description = '...', onNavigate, addToCart, condition}) {
     return (
@@ -36,21 +37,12 @@ export default function ProductCard({ images, category, name = 'Unknown', price 
                             borderRadius: 3
                     }}
                     />
-                    <Box sx={{position: 'absolute', top: 15, left: 10, bgcolor: '#37353E', p: .5, px: 2, borderRadius: '0px 5px 5px 0px'}}>
+                    <Box sx={{position: 'absolute', top: 15, left: 0, bgcolor: '#37353E', p: .5, px: 2, borderRadius: '0px 5px 5px 0px'}}>
                         <Typography variant="body2" color="white">
                             {toTitleCase(condition)}
                         </Typography>
                     </Box>
-                    <Box sx={{position: 'absolute', boxShadow: 5, bottom: 15, right: 10, borderRadius: '0px 5px 5px 0px'}}>
-                        {/* Category */}
-                        <Typography
-                            variant="body2"
-                            fontWeight={'bold'}
-                            sx={{border: '1px solid black', px: 1,py: .5, color: 'black', backdropFilter: 'blur(10px)', bgcolor: 'rgba(255, 255, 255, 255)', borderRadius: '999px'}}
-                        >
-                            {category}
-                        </Typography>
-                    </Box>
+                    
                 </Box>
 
                 {/* Card Body */}
@@ -66,13 +58,14 @@ export default function ProductCard({ images, category, name = 'Unknown', price 
                     </Typography>
                     
                     <Stack direction={'row'} gap={2} alignItems={'center'} justifyContent={'space-between'} sx={{mb: 1}}>
-                        {/* Price */}
                         <Typography
                             variant="body2"
-                            sx={{py: .5, px: 2, width: '100%', border: '1px solid black', display: 'flex', justifyContent: 'center', borderRadius: '999px', bgcolor: 'white', fontWeight: 'bold',}}
+                            color='white'
+                            sx={{py: .5, px: 2, width: '100%', bgcolor: '#37353E', display: 'flex', justifyContent: 'center', borderRadius: '999px', fontWeight: 'bold',}}
                         >
                             PHP {price.toLocaleString()}
                         </Typography>
+                        
                     </Stack>
                     {/* Description */}
                     <Typography
@@ -92,22 +85,33 @@ export default function ProductCard({ images, category, name = 'Unknown', price 
             </Box>
 
             {/* Add to Cart Button (separate from navigation click) */}
-            <CardActions sx={{ p: 0, pt: 0 }}>
-                <Button
-                    variant="contained"
-                    size="medium"
-                    fullWidth
-                    color='secondary'
-                    onClick={addToCart}
-                    sx={{
-                        textTransform: 'none',
-                        fontWeight: 600,
-                        borderRadius: 3,
-                    }}
+            {/* Price */}
+            <Stack direction={'row'} gap={1}>
+                {/* Category */}
+                <Typography
+                    variant="body2"
+                    fontWeight={'bold'}
+                    sx={{ width: '100%', px: 1,py: .5, color: 'black', backdropFilter: 'blur(10px)', bgcolor: 'rgba(255, 255, 255, 255)', borderRadius: '999px'}}
                 >
-                    Add to Cart
-                </Button>
-            </CardActions>
+                    {category}
+                </Typography>
+                <CardActions sx={{ p: 0, pt: 0 }}>
+                    <Button
+                        variant="contained"
+                        size="medium"
+                        fullWidth
+                        color='secondary'
+                        onClick={addToCart}
+                        sx={{
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            borderRadius: 3,
+                        }}
+                    >
+                        <ShoppingCartRounded/>
+                    </Button>
+                </CardActions>
+            </Stack>
         </Card>
     );
 }
