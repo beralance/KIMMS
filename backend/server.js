@@ -51,7 +51,7 @@ app.use((req, res, next) => {
 app.use(cors({
     origin: [
         "http://localhost:5173",
-        "https://kimms-furniture-and-merchandise-mai-seven.vercel.app/"
+        "https://kimms-furniture-and-merchandise-mai-seven.vercel.app"
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
