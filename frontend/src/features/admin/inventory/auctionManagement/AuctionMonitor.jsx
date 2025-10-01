@@ -32,11 +32,12 @@ const AdminAuctionMonitor = ({searchTerm}) => {
 
     const fetchAuctions = async () => {
         try {
-        const res = await axios.get(`${API_URL}/api/auctions`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        setAuctions(res.data);
-        } catch (err) {
+            const res = await axios.get(`${API_URL}/api/auctions`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            setAuctions(res.data);
+        } 
+        catch (err) {
             console.error("Failed to fetch auctions:", err);
         }
     };
@@ -55,7 +56,7 @@ const AdminAuctionMonitor = ({searchTerm}) => {
 
     useEffect(() => {
         fetchAuctions();
-    }, []);
+    }, [auctions]);
 
 
     return (
@@ -99,7 +100,7 @@ const AdminAuctionMonitor = ({searchTerm}) => {
                                                 width: '100%',
                                                 height: '100%',
                                                 objectFit: 'cover',
-                                                borderRadius: '5px',
+                                                borderRadius: 3,
                                                 boxShadow: '0px 0px 3px rgba(0, 0, 0, 0.5)'
                                             }} 
                                         />

@@ -14,7 +14,7 @@ import {
     Grid,
     Button,
 } from "@mui/material";
-import {AdjustRounded, EditRounded, KeyboardArrowDownRounded, KeyboardArrowUpRounded, QrCode, SortRounded} from "@mui/icons-material";
+import {AdjustRounded, RefreshRounded, EditRounded, KeyboardArrowDownRounded, KeyboardArrowUpRounded, QrCode, SortRounded} from "@mui/icons-material";
 import { InventoryContext } from "../../../../contexts/InventoryContext";
 import CustomPopover from '../../../../components/CustomPopover'
 import dayjs from 'dayjs'
@@ -175,7 +175,9 @@ export default function InventoryTable({ searchTerm }) {
     const { inventoryItems, fetchInventoryItems } = useContext(InventoryContext);
     const [sortConfig, setSortConfig] = React.useState({key: null, direction: 'asc'})
     const [open, setOpen] = React.useState(null);
-    
+    const [loading, setLoading] = React.useState(false);
+
+
     // filter here before rendering
     const filteredItems = inventoryItems.filter((product) => {
         if (!searchTerm) return true; // no search, return all
@@ -238,6 +240,10 @@ export default function InventoryTable({ searchTerm }) {
         return 0;
     });
 
+    useEffect(() => {
+        fetchInventoryItems();
+    }, [inventoryItems])
+
     return (
         <>
             <TableContainer component={Paper} sx={{borderRadius: 2, boxShadow: 5}}>
@@ -271,7 +277,13 @@ export default function InventoryTable({ searchTerm }) {
                                 </Typography>
                             </TableCell>
                             <TableCell align="center">
-                                <AdjustRounded sx={{color: 'white'}}/>
+                                {/*refresh button*/}
+                                <IconButton
+                                    sx={{ mt: 1 }}
+                                    onClick={fetchInventoryItems} // refresh list
+                                >
+                                    <RefreshRounded sx={{color: 'white'}}/>
+                                </IconButton>
                             </TableCell>
                         </TableRow>
                     </TableHead>

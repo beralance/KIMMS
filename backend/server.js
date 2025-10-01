@@ -36,7 +36,10 @@ const app = express()
 const server = http.createServer(app)
 const io = new Server(server, {
     cors: {
-        origin: ['http://localhost:5173', 'https://kimms-furniture-and-merchandise-mai-chi.vercel.app'],
+        origin: [
+            'http://localhost:5173', 
+            'https://kimms-furniture-and-merchandise-mai-seven.vercel.app'
+        ],
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
     }
 })
@@ -47,7 +50,7 @@ const io = new Server(server, {
 app.use(cors({
     origin: [
         'http://localhost:5173',
-        'https://kimms-furniture-and-merchandise-mai-chi.vercel.app'
+        'https://kimms-furniture-and-merchandise-mai-seven.vercel.app'
     ],
     credentials: true,
     methods: ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'],

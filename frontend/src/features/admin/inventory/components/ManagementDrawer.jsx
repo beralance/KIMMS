@@ -64,7 +64,7 @@ export default function AddItemDrawer({ open, onClose, activeTab }) {
                     <CloseIcon sx={{color: 'white'}}/>
                 </IconButton>
             </Box>
-            <Box sx={{ p: 2, py: 1 }}>
+            <Box sx={{ p: 2, py: 1, pb: 5, }}>
                 {renderForm()}
             </Box>
         </Drawer>

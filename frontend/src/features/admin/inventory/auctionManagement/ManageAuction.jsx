@@ -256,14 +256,16 @@ const ManageAuction = () => {
                     multiline
                     rows={3}
                 />
-                <Typography variant="body2" color="grey">
-                    <b>Note: </b> Make sure everything is correct before finalizing the auction entry.
-                </Typography>
-                <Box sx={{display: 'flex', justifyContent: 'flex-end', py: 2}}>
-                    <Button type="submit" variant="contained" color="secondary" sx={{ mt: 2 }} disabled={loading}>
-                        {loading ? 'Creating...' : 'Create Auction'}
-                    </Button>
-                </Box>
+                <Stack direction={'row'} alignItems={'center'}>
+                    <Typography variant="body2" color="grey">
+                        <b>Note: </b> Make sure everything is correct before finalizing the auction entry.
+                    </Typography>
+                    <Box sx={{ py: 2}}>
+                        <Button type="submit" variant="contained" color="secondary" sx={{width: 150 }} disabled={loading}>
+                            {loading ? 'Creating...' : 'Create Auction'}
+                        </Button>
+                    </Box>
+                </Stack>
             </form>
         </Box>
     );

@@ -46,7 +46,7 @@ export default function AddItemDialog({ open, onClose, activeTab }) {
                     height: 60,
                     backgroundColor: '#37353E',
                     zIndex: 500,
-                    boxShadow: '0px 1px 5px rgba(0,0,0,0.2)'
+                    boxShadow: '0px 1px 5px rgba(0,0,0,0.2)',
                 }}
             >
                 <Typography pl={2} variant="subtitle1" color="white" fontWeight='bold'>{getTitle()}</Typography>
@@ -54,7 +54,7 @@ export default function AddItemDialog({ open, onClose, activeTab }) {
                     <CloseRounded sx={{color: 'white'}}/>
                 </IconButton>
             </Box>
-            <DialogContent sx={{p: 2, py: 1 }}>
+            <DialogContent sx={{p: 2, py: 1, pb: 5}}>
                 {renderForm()}
             </DialogContent>
         </Dialog>

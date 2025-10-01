@@ -9,7 +9,7 @@ import CustomPopover from '../../../../components/CustomPopover'
 import {toTitleCase} from '../../../../utils/stringUtils'
 import dayjs from "dayjs";
 import { formatNumber } from "../../../../utils/stringUtils";
-
+import { handleImageError } from "../../../../utils/imageErrorHandler";
 
 export default function ProductCard({ product, onEdit, onDelete }) {
     const { updateProductHighlight, updateProductStatus } = useContext(ProductContext);
@@ -69,8 +69,9 @@ export default function ProductCard({ product, onEdit, onDelete }) {
                 <Box sx={{position: 'relative'}}>
                     <Box>
                         <img 
-                            src={product.images ? `${product.images[1]}` : "/placeholder-image.png"} 
+                            src={`${product.images[1]}`} 
                             alt={product.productName}
+                            onError={(e) => (handleImageError(e))}
                             style={{
                                 objectFit: 'cover',
                                 aspectRatio: '9/10',
