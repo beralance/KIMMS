@@ -46,6 +46,7 @@ export default function LoginForm({ onSuccess }) {
                 fullName: data.fullName,
                 userId: data.userId,
                 isLocal: data.isLocal,
+                address: data.address,
             });
 
             // Optional callback

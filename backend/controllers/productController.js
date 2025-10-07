@@ -27,7 +27,9 @@ export const postProduct = async (req, res) => {
             images: inventoryItem.images,
             tags: inventoryItem.tags,
             isLocal: inventoryItem.isLocal,
+            physicalCode: inventoryItem.physicalCode,
             visibility: "active",
+            // add physical code here
         });
 
         await product.save();
@@ -113,7 +115,20 @@ export const updateProduct = async (req, res) => {
         const updates = req.body;
         const product = await Product.findByIdAndUpdate(req.params.id, updates, { new: true }).populate('category', 'name');
 
+        console.log('UPDATES', updates)
+        console.log('PRODUCT', product)
         if (!product) return res.status(404).json({ message: "Product not found" });
+        
+        // Sync critical fields back to inventory
+        const syncFields = {};
+
+        if (updates.price !== undefined) syncFields.price = updates.price;
+        if (updates.condition !== undefined) syncFields.condition = updates.condition;
+        if (updates.details != undefined) syncFields.details = updates.details
+
+        if (Object.keys(syncFields).length > 0) {
+            await Inventory.findByIdAndUpdate(product.inventoryId, syncFields)
+        }
         res.json(product);
     } catch (err) {
         res.status(500).json({ error: err.message });

@@ -1,15 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Box, TextField, Container, Button, MenuItem, Select, InputLabel, FormControl, Typography, CircularProgress, Collapse, ListItem, ListItemText, Stack, IconButton, FormControlLabel, Switch } from "@mui/material";
+import { Box, TextField, Container, Button, MenuItem, Select, InputLabel, FormControl, Typography, CircularProgress, Collapse, ListItem, ListItemText, Stack, IconButton, FormControlLabel, Switch, Divider } from "@mui/material";
 import { InventoryContext } from '../../../../contexts/InventoryContext';
 import PhysicalCodeDisplayer from '../components/PhysicalCodeDisplayer';
 import { useSnackbar } from '../../../../contexts/SnackbarContext'
 import ConfirmDialog from '../../../../components/ConfirmDialog'
 import FullScreenLoader from '../../../../components/FullScreenLoader';
-import {CheckBox, CheckRounded, CloseRounded, DeleteForeverRounded, EditOffRounded, EditRounded, FrontHand} from '@mui/icons-material'
+import {CheckBox, CheckRounded, CloseRounded, CompareSharp, DeleteForeverRounded, EditOffRounded, EditRounded, FrontHand} from '@mui/icons-material'
 import {deleteCategory, addCategory, fetchCategories} from '../../../../utils/categoryApi'
+import { toTitleCase } from '../../../../utils/stringUtils';
 
-
-export default function ProductForm() { // <-- accept callback
+export default function ProductForm({productId, onClose}) { // <-- accept callback
     // Product Data
     const [productName, setProductName] = useState("");
     const [description, setDescription] = useState("");
@@ -23,27 +23,74 @@ export default function ProductForm() { // <-- accept callback
     const [images, setImages] = useState([]);
     const [tags, setTags] = useState('')
     const [isLocal, setIsLocal] = useState(true)
+    const [existingImages, setExistingImages] = useState([])
 
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [lastAddedItem, setLastAddedItem] = useState(null)
     const [open, setOpen] = useState(false);
-    const { addInventoryItem, error } = useContext(InventoryContext)
+    const { addInventoryItem, getInventoryById, updateInventoryItem, error } = useContext(InventoryContext)
     const { showSnackbar } = useSnackbar()
     const [openAddCategory, setOpenAddCategory] = useState(false)
     const [isEnabled, setIsEnabled] = useState(false)
+    const [mode, setMode] = useState(productId ? 'edit' : 'create')
 
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     
+    useEffect(() => {
+        const loadItem = async () => {
+            setLoading(true)
+            try {
+                if (!productId) return;
+                const item = await getInventoryById(productId);
+                if (!item) {
+                    showSnackbar('Item was not found', 'warning')
+                    return
+                }
+                setProductName(item.productName  || '');
+                setDescription(item.description  || '');
+                setDetails(item.details  || '');
+                setPrice(item.price?.toString()  || '');
+                setCategory(item.category || '');
+                setCondition(item.condition  || '');
+                setTags(item.tags  || '');
+                setIsLocal(item.isLocal ?? true);
+                setExistingImages(item.images  || []);
 
-    // load categoried on mount
+                console.log('Loaded item:', item)
+            }
+            catch (err) {
+                console.error('Failed to load item: ', err)
+                showSnackbar(`Failed to get item ${productName}`, 'error')
+            }
+            finally {
+                setLoading(false)
+            }
+        }
+        if (productId) {
+            setMode('edit')
+            loadItem()
+        }
+        else {
+            setMode('create')
+            resetForm()
+        }
+    }, [productId])
+
+    
     useEffect(() => {
         (async () => {
-            const data = await fetchCategories()
-            setCategories(data)
+            try {
+                const data = await fetchCategories()
+                setCategories(data || [])
+            }
+            catch (err) {
+                console.log('Failed to fetch categories', err)
+                showSnackbar('Failed to load categories', 'error')
+            }
         })();
-    }, [])
+    }, [categories])
 
     const formatNumber = (value) => {
         if (!value) return "";
@@ -71,6 +118,7 @@ export default function ProductForm() { // <-- accept callback
             setCategory(added._id)
             setNewCategory('')
             showSnackbar('Category added!', 'success')
+            fetchCategories()
         }
         catch(err) {
             console.error(err.message)
@@ -107,7 +155,7 @@ export default function ProductForm() { // <-- accept callback
             if (failed.length > 0) {
                 failed.forEach(f => showSnackbar(`${f.cat.name}: ${f.message}`, 'error'));
             }
-
+            fetchCategories()
             // Clear selection
             setSelectedCategories([]);
         } catch (err) {
@@ -133,51 +181,65 @@ export default function ProductForm() { // <-- accept callback
         setPrice(formatNumber(value))
     };
 
+    const resetForm = () => {
+        setProductName('')
+        setDescription('')
+        setDetails('')
+        setPrice('')
+        setCategory('')
+        setCondition('')
+        setTags('')
+        setImages([])
+        setExistingImages([])
+        setNewCategory('')
+    }
+
     const handleSubmit = async () => {
         if (error) {
             showSnackbar(error, 'error')
             return
         }
-        if (!productName || !description || !details || !price || !category || !condition || images.length === 0) {
-            showSnackbar("Please fill in all fields and upload an image.", 'warning');
+        if ( !productName || !description || !details || !price || !category || !condition) {
+            showSnackbar("Please fill in all fields.", 'warning');
+            return;
+        }
+        // Image check
+        if ((mode === 'create' && images.length === 0) || 
+            (mode === 'edit' && existingImages.length + images.length === 0)) {
+            showSnackbar("Please upload at least one image.", 'warning');
             return;
         }
         
         const numericPrice = Number(price.replace(/,/g, ''))
-        setLoading(true);
-        setSuccess(false);
 
         const formData = new FormData();
-        formData.append("productName", productName);
+        formData.append("productName", toTitleCase(productName));
         formData.append("description", description);
         formData.append('details', details);
         formData.append("price", numericPrice);
-        formData.append("category", category);
+        formData.append("category", toTitleCase(category));
         formData.append('condition', condition);
-        formData.append('tags', tags);
+        formData.append('tags', toTitleCase(tags));
         formData.append('isLocal', isLocal);
-        images.forEach((file) => formData.append('images', file))
+        formData.append('existingImages', JSON.stringify(existingImages || []))
+        images.filter(Boolean).forEach((file) => formData.append('images', file))
 
 
 
         try {
-            const newItem = await addInventoryItem(formData);
-            console.log(newItem)
-            setSuccess(true)
-            handleOpen()
-
-            // Reset form
-            setProductName("");
-            setDescription("");
-            setDetails('');
-            setPrice("");
-            setCategory("");
-            setImages([]);
-            setCondition('')
-            setNewCategory('')
-            setTags('');
-
-            setLastAddedItem(newItem)
+            setLoading(true)
+            if (mode === 'edit') {
+                await updateInventoryItem(productId, formData)
+                showSnackbar('Item updated successfully!', 'success')
+                onClose()
+            }
+            else {
+                const newItem = await addInventoryItem(formData)
+                setLastAddedItem(newItem)
+                showSnackbar('Item added successfully!', 'success')
+                handleOpen()
+                resetForm()
+            }
         } 
         catch (err) {
             console.error(err);
@@ -194,11 +256,64 @@ export default function ProductForm() { // <-- accept callback
             </Typography>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2, width: '100%' }}>
                 <Box sx={{display: 'flex', overflowX: 'auto', py: images?.length > 0 ? 2 : 0}}>
-                    {images?.length > 0 ? (
+                    {(existingImages?.length > 0 || images?.length > 0) ? (
                         <Box sx={{ display: 'flex', gap: 2, mt: 1, }} >
+                            
+                            {/* Show existing images from DB*/}
+                            {existingImages.map((img, index) => (
+                                <Box
+                                    key={`existing-${index}`}
+                                    sx={{
+                                        width: 120,
+                                        height: 120,
+                                        position: 'relative',
+                                        borderRadius: 2,
+                                        overflow: 'hidden',
+                                        boxShadow: 1,
+                                    }}    
+                                >
+                                    <img
+                                        src={img}
+                                        alt={`existing-${index}`}
+                                        style={{
+                                            width: 200,
+                                            aspectRatio: '1/1',
+                                            height: 200,
+                                            objectFit: 'cover',
+                                        }}
+                                    />
+                                    <IconButton
+                                        onClick={() => {
+                                            setExistingImages(prev => prev.filter((_, i) => i !== index))
+                                        }}
+                                        size='small'
+                                        sx={{position: 'absolute', top: 0, right: 0}}
+                                    >
+                                        <CloseRounded/>
+                                    </IconButton>
+                                    <Typography 
+                                        variant="caption" 
+                                        noWrap
+                                        sx={{
+                                            position: 'absolute',
+                                            bottom: 0,
+                                            width: '100%',
+                                            bgcolor: 'rgba(0, 0, 0, 0.5)',
+                                            color: '#fff',
+                                            textAlign: 'center',
+                                            fontSize: '0.7rem',
+                                            p: '2px 0',
+                                        }}
+                                    >
+                                        {`Existing Image ${index}`} 
+                                    </Typography>
+                                </Box>
+                            ))}
+
+                            {/*Show newly uploaded images*/}
                             {images.map((img, index) => (
                                 <Box
-                                    key={index}
+                                    key={`new-${index}`}
                                     sx={{
                                         width: 120,
                                         height: 120,
@@ -210,25 +325,25 @@ export default function ProductForm() { // <-- accept callback
                                 >
                                     {img instanceof File && (
                                         <Box sx={{position: 'relative'}}>
-                                        <img
-                                            src={URL.createObjectURL(img)}
-                                            alt={`preview-${index}`}
-                                            style={{
-                                            width: 200,
-                                            aspectRatio: '1/1',
-                                            height: 200,
-                                            objectFit: 'cover',
-                                            }}
-                                        />
-                                        <IconButton 
-                                            onClick={() => {
-                                                setImages((prev) => prev.filter((_, i) => i !== index))
-                                            }}
-                                            size='small' 
-                                            sx={{position: 'absolute', top: 0, right: 0}}
-                                        >
-                                            <CloseRounded/>
-                                        </IconButton>
+                                            <img
+                                                src={URL.createObjectURL(img)}
+                                                alt={`preview-${index}`}
+                                                style={{
+                                                    width: 200,
+                                                    aspectRatio: '1/1',
+                                                    height: 200,
+                                                    objectFit: 'cover',
+                                                }}
+                                            />
+                                            <IconButton 
+                                                onClick={() => {
+                                                    setImages((prev) => prev.filter((_, i) => i !== index))
+                                                }}
+                                                size='small' 
+                                                sx={{position: 'absolute', top: 0, right: 0}}
+                                            >
+                                                <CloseRounded/>
+                                            </IconButton>
                                         </Box>
                                     )}
                                     <Typography
@@ -386,19 +501,23 @@ export default function ProductForm() { // <-- accept callback
                                             .join(', ')
                                     }
                                 >
+                                    <Typography variant='body2' color='grey' sx={{maxWidth: 300, p: 1, mb: .5, textWrap: 'wrap'}}>
+                                        <b>Note:</b> Grey categories are not used by any products and can be safely deleted
+                                    </Typography>
+                                    <Divider/>
                                     {categories.map((cat) => (
                                         <MenuItem 
                                             key={cat._id} 
                                             value={cat._id}
                                             sx={{
-                                                color: selectedCategories.some(sel => sel._id === cat._id) ? 'secondary' : 'grey',
+                                                color: selectedCategories.some(sel => sel._id >= cat._id || null) ? 'secondary' : 'grey',
                                             }}
                                         >
                                             <Box sx={{display: 'flex', gap: 1}}>
                                                 {selectedCategories.some(sel => sel._id === cat._id) &&
                                                     <CheckRounded fontSize='small'/>
                                                 }
-                                                <ListItemText primary={cat.name}/>
+                                                <ListItemText primary={cat.name} primaryTypographyProps={{color: cat.productCount === 0 ? 'grey' : 'black'}}/>
                                             </Box>
                                         </MenuItem>
                                     ))}
@@ -491,20 +610,18 @@ export default function ProductForm() { // <-- accept callback
                         View Previos Code
                     </Button>
                 }
-
-                {success && <Typography sx={{ color: "green", mt: 1 }}>Product submitted successfully!</Typography>}
-
                 {lastAddedItem && (
                     <PhysicalCodeDisplayer 
                         id={lastAddedItem._id}
                         name={lastAddedItem.productName} 
                         category={lastAddedItem.category}
                         physicalCode={lastAddedItem.physicalCode}
+                        image={lastAddedItem.images[0]}
                         status={lastAddedItem.status}
                         open={open} 
                         onClose={handleClose}/>
                 )}
-                <FullScreenLoader open={loading} message='Adding product...'/>
+                <FullScreenLoader open={loading} message={mode === 'create' ? 'Adding product...' : 'Updating product...'}/>
             </Box>
         </Container>
     );

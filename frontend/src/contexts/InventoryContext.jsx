@@ -5,13 +5,11 @@ import {useAuth} from '../contexts/AuthContext'
 export const InventoryContext = createContext();
 
 export function InventoryProvider({ children }) {
-    
     const [inventoryItems, setInventoryItems] = useState([]);
     const API_URL = import.meta.env.VITE_API_URL;
     const [error, setError] = useState(null)
-    //const API_URL = "http://localhost:5000/api/inventory";
     const {token} = useAuth()
-    console.log("VITE_API_URL:", import.meta.env.VITE_API_URL);
+
     // Fetch all inventory items (filter out reserved/inactive items)
     const fetchInventoryItems = async () => {
         try {
@@ -59,7 +57,9 @@ export function InventoryProvider({ children }) {
                 body: updatedData, // FormData if updating image
             });
             const updatedItem = await res.json();
-            setInventoryItems(inventoryItems.map((i) => (i._id === id ? updatedItem : i)));
+            setInventoryItems((prevItems) => 
+                prevItems.map((i) => (i._id === id ? updatedItem : i))
+            );
         } catch (err) {
             console.error("Error updating inventory item:", err);
         }
@@ -67,11 +67,23 @@ export function InventoryProvider({ children }) {
 
     const deleteInventoryItem = async (id) => {
         try {
-            await fetch(`${API_URL}/api/inventory/${id}`, { 
+            const res = await fetch(`${API_URL}/api/inventory/${id}`, { 
                 method: "DELETE",
-                headers: {'Authorization' : `Bearer ${token}`,},
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json' 
+                },
             });
-            setInventoryItems(inventoryItems.filter((i) => i._id !== id));
+
+            if (!res.ok) {
+                const errData = await res.json()
+                throw new Error(errData.message || 'Failed to delete inventory item')
+            }
+
+            const data = await res.json();
+            console.log(data.message)
+
+            setInventoryItems((prev) => prev.filter((i) => i._id !== id));
         } catch (err) {
             console.error("Error deleting inventory item:", err);
         }

@@ -1,186 +1,153 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Box, Typography, Button, Container, Dialog, DialogContent, IconButton } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import CloseIcon from "@mui/icons-material/Close";
-import auctionProducts from "../../../data/auctionProducts";
-import BidDrawer from "./BidDrawer";
-import CancelBidDialog from "./CancelBidDialog";
+import { Box, Typography, TextField, Button, Card, CardContent, Stack } from "@mui/material";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { useAuth } from "../../../contexts/AuthContext";
 
-export default function AuctionProductDetails() {
+const AuctionProductDetails = () => {
     const { id } = useParams();
-    const navigate = useNavigate();
-    const product = auctionProducts.find((p) => p.id === parseInt(id));
+    const [auction, setAuction] = useState(null);
+    const [highestBid, setHighestBid] = useState(0);
+    const [bidAmount, setBidAmount] = useState("");
+    const [message, setMessage] = useState("");
+    const [timeRemaining, setTimeRemaining] = useState("");
+    const { token } = useAuth()
+    const API_URL = import.meta.env.VITE_API_URL;
+    // Fetch auction and current highest bid
+    const fetchAuction = async () => {
+        try {
+            const auctionRes = await axios.get(`${API_URL}/api/auctions/${id}`);
+            console.log('!!!!THIS IS THE AUCITON RES', auctionRes)
+            console.log('@@@@THIS IS THE ID', id)
+            console.log('@@@@THIS IS THE DATA INVENTORY', auctionRes.data)
 
-    const [imageOpen, setImageOpen] = useState(false);
-    const [drawerOpen, setDrawerOpen] = useState(false);
-    const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
+            const bidRes = await axios.get(`${API_URL}/api/bids/${id}`, {
+                headers: {
+                    'Content-Type' : 'application/json',
+                    Authorization: `Bearer ${token}`,
+                }
+            })
+            console.log('####THIS IS THE BID RES', bidRes)
+            setAuction(auctionRes.data);
+            console.log('#########################', auction)
 
-    const [userBid, setUserBid] = useState(0);
-    const [currentBid, setCurrentBid] = useState(0);
-    const [bidStatus, setBidStatus] = useState("none"); // none | submitted | edited
-    const [timeLeft, setTimeLeft] = useState(0);
 
-    const increments = [500, 1000, 2000, 3000, 4000, 5000];
-
-    // Timer for auction
-    useEffect(() => {
-        if (!product) return;
-        const calculateTimeLeft = () => {
-            const now = new Date().getTime();
-            const start = new Date(product.startTime).getTime();
-            const end = start + product.duration;
-            const remaining = Math.max(Math.floor((end - now) / 1000), 0);
-            setTimeLeft(remaining);
-            if (remaining === 0) {
-                alert("Auction ended for this product!");
-                navigate("/auction");
-            }
-        };
-        calculateTimeLeft();
-        const timer = setInterval(calculateTimeLeft, 1000);
-        return () => clearInterval(timer);
-    }, [product, navigate]);
-
-    if (!product) return <Typography variant="h5">Product not found</Typography>;
-
-    const formatTime = (seconds) => {
-        const m = Math.floor(seconds / 60);
-        const s = seconds % 60;
-        return `${m}m ${s}s`;
-    };
-
-    const handleBidConfirm = () => {
-        if (currentBid === 0) return alert("Please select an amount to bid.");
-        const total = (userBid > 0 ? userBid : product.price) + currentBid;
-        setUserBid(total);
-        setBidStatus(bidStatus === "none" ? "submitted" : "edited");
-        setCurrentBid(0);
-        setDrawerOpen(false);
-        alert(`Your bid is now PHP ${total}`);
-    };
-
-    const handleCancelBid = () => {
-        setUserBid(0);
-        setCurrentBid(0);
-        setBidStatus("edited"); // lock bid
-        setDrawerOpen(false);
-        alert("Your bid has been canceled. You cannot bid anymore.");
-    };
-
-    const totalPrice = userBid + currentBid;
-    const isDrawerDisabled = bidStatus === "edited";
-
-    const getActionButtonText = () => {
-        switch (bidStatus) {
-            case "none":
-                return "Bid Now";
-            case "submitted":
-                return "Edit Bid";
-            case "edited":
-                return "Bid Locked";
-            default:
-                return "Bid Now";
+            const topBid = bidRes.data.length > 0 ? bidRes.data[0].amount : auctionRes.data.startPrice;
+            setHighestBid(topBid);
+        } catch (err) {
+            console.error(err);
         }
     };
 
+    useEffect(() => {
+        fetchAuction();
+        const interval = setInterval(fetchAuction, 15000); // poll every 15s
+        return () => clearInterval(interval);
+    }, [id]);
+
+    // Timer for countdown
+    useEffect(() => {
+        const timer = setInterval(() => {
+            if (auction) {
+                const total = new Date(auction.endTime) - new Date();
+                if (total <= 0) {
+                    setTimeRemaining("Auction ended");
+                    clearInterval(timer);
+                } else {
+                    const hours = Math.floor(total / (1000 * 60 * 60));
+                    const minutes = Math.floor((total % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((total % (1000 * 60)) / 1000);
+                    setTimeRemaining(`${hours}h ${minutes}m ${seconds}s`);
+                }
+            }
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [auction]);
+
+    const handleBidSubmit = async (e) => {
+        e.preventDefault();
+        if (!auction || auction.status !== "LIVE") {
+            setMessage("Auction is not active");
+            return;
+        }
+
+        const minAllowed = highestBid + auction.minIncrement;
+        if (!bidAmount || Number(bidAmount) < minAllowed) {
+            setMessage(`Bid must be at least ₱${minAllowed}`);
+            return;
+        }
+
+        
+        try {
+            await axios.post(
+                `${API_URL}/api/bids`,
+                { auctionId: id, amount: Number(bidAmount) },
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+
+            setMessage("Bid placed successfully!");
+            setBidAmount("");
+            fetchAuction(); // refresh highest bid
+        } catch (err) {
+            console.error(err);
+            setMessage(err.response?.data?.message || "Failed to place bid");
+        }
+    };
+
+    if (!auction) return <Typography>Loading auction...</Typography>;
+    
+
     return (
-        <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: { xs: 0, md: 4 }, pb: 10 }}>
-            {/* Back button */}
-            <Box sx={{ position: "fixed", top: 0, m: 2 }}>
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={() => navigate(-1)}
-                    sx={{ color: "white", borderRadius: "999px" }}
-                >
-                    <ArrowBackIcon sx={{ fontSize: 25 }} />
-                </Button>
-            </Box>
+        <Box sx={{ maxWidth: 600, mx: "auto", mt: 5 }}>
+            <Stack>
+                <Stack>
+                    <Box>
+                        <img 
+                            src={`${auction.inventoryId?.image}`} 
+                            alt={auction.inventoryId?.productName}
+                            style={{
+                                objectFit: 'cover',
+                                width: '100%',
+                                aspectRatio: '1/1'
+                            }}    
+                        />
+                    </Box>
+                    <Typography variant="h5">{auction.inventoryId?.productName || "Unnamed Item"}</Typography>
+                    <Typography variant="body2" color="textSecondary" gutterBottom>
+                        {auction.description || auction.inventoryId?.description || "No description"}
+                    </Typography>
+                    <Typography variant="body1">Current Bid: ₱{highestBid}</Typography> {/* change highest bid to user bid*/}
+                    <Typography variant="body2" color="textSecondary">
+                        Time Remaining: {timeRemaining}
+                    </Typography>
 
-            {/* Product Image */}
-            <Box sx={{ flex: 1, textAlign: "center", mb: 2 }}>
-                <img
-                    src={product.image}
-                    alt={product.name}
-                    style={{ maxWidth: "100%", aspectRatio: "1/1", cursor: "pointer", objectFit: "cover" }}
-                    onClick={() => setImageOpen(true)}
-                />
-                <Dialog open={imageOpen} onClose={() => setImageOpen(false)} maxWidth="lg">
-                    <IconButton
-                        onClick={() => setImageOpen(false)}
-                        sx={{ position: "absolute", top: 8, right: 8, color: "white", zIndex: 10 }}
-                    >
-                        <CloseIcon />
-                    </IconButton>
-                    <DialogContent sx={{ p: 0 }}>
-                        <img src={product.image} alt={product.name} style={{ width: "100%", height: "auto", objectFit: "contain" }} />
-                    </DialogContent>
-                </Dialog>
-            </Box>
+                    <form onSubmit={handleBidSubmit} style={{ marginTop: 16 }}>
+                        <TextField
+                            label="Your Bid"
+                            type="number"
+                            value={bidAmount}
+                            onChange={(e) => setBidAmount(e.target.value)}
+                            fullWidth
+                            margin="normal"
+                            required
+                        />
+                        <Button type="submit" variant="contained" color="primary">
+                            Place Bid
+                        </Button>
+                    </form>
 
-            {/* Product Details */}
-            <Container sx={{ flex: { xs: 0, md: 1 } }}>
-                <Box sx={{ mb: 3 }}>
-                    <Typography variant="h5" gutterBottom>
-                        {product.name}
-                    </Typography>
-                    <Typography variant="h6" color="secondary" gutterBottom>
-                        Starting Price: PHP {product.price.toLocaleString()}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        Status: {product.status.toUpperCase()}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        Condition: {product.condition.toUpperCase()}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        Time Left: {formatTime(timeLeft)}
-                    </Typography>
-                    {userBid > 0 && (
-                        <Typography variant="body1" color="green">
-                            Your Bid: PHP {userBid.toLocaleString()}
+                    {message && (
+                        <Typography sx={{ mt: 2 }} color={message.includes("success") ? "green" : "red"}>
+                            {message}
                         </Typography>
                     )}
-                </Box>
-                <Typography variant="body1" paragraph>
-                    {product.description}
-                </Typography>
-            </Container>
-
-            {/* Bottom Action */}
-            <Box sx={{ position: "fixed", bottom: 0, width: "100%", px: 2, py: 1, bgcolor: "#fff" }}>
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={() => setDrawerOpen(true)}
-                    disabled={isDrawerDisabled}
-                    sx={{ width: "100%" }}
-                >
-                    {getActionButtonText()}
-                </Button>
-            </Box>
-
-            {/* Bid Drawer */}
-            <BidDrawer
-                open={drawerOpen}
-                onClose={() => setDrawerOpen(false)}
-                increments={increments}
-                currentBid={currentBid}
-                totalPrice={totalPrice}
-                bidStatus={bidStatus}
-                onBidIncrement={(val) => setCurrentBid((prev) => prev + val)}
-                onResetBid={() => setCurrentBid(0)}
-                onConfirmBid={handleBidConfirm}
-                onCancelClick={() => setConfirmCancelOpen(true)}
-            />
-
-            {/* Cancel Bid Dialog */}
-            <CancelBidDialog
-                open={confirmCancelOpen}
-                onClose={() => setConfirmCancelOpen(false)}
-                onConfirm={handleCancelBid}
-            />
+                </Stack>
+            </Stack>
         </Box>
     );
-}
+};
+
+export default AuctionProductDetails;

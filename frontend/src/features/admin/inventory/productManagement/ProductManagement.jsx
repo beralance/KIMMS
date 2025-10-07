@@ -17,7 +17,7 @@ import ProductCard from "../components/PostedProductCard";
 import { useOutletContext } from "react-router-dom"; 
 
 function ProductManagement() {
-    const { products, fetchProducts, deleteProduct } = useContext(ProductContext);
+    const { products, fetchProducts } = useContext(ProductContext);
     const [category, setCategory] = useState("all");
     const [highlight, setHighlight] = useState("all");
     const {searchTerm, setSearchTerm} = useOutletContext()
@@ -25,10 +25,6 @@ function ProductManagement() {
     useEffect(() => {
         fetchProducts();
     }, []);
-
-    const handleDelete = async (id) => {
-        await deleteProduct(id);
-    };
 
     // 🏷️ Extract categories dynamically
     const categories = useMemo(() => [...new Set(products.map((p) => p.category?.name))], [products]);
@@ -119,7 +115,6 @@ function ProductManagement() {
                             <ProductCard
                                 product={product}
                                 onEdit={(id) => console.log("Edit product:", id)}
-                                onDelete={handleDelete}
                             />
                         </Grid>
                     ))

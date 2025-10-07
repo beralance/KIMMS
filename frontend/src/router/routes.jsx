@@ -18,8 +18,9 @@ import Success from '../features/user/checkout/Success'
 import Cancel from '../features/user/checkout/Cancel'
 import AuctionProductDetails from '../features/user/auction/AuctionProductDetails'
 import AuctionListing from "../features/user/auction/AuctionListing";
-import AuctionBidding from '../features/user/auction/AuctionBidding'
-
+import AuctionHistory from '../features/user/auction/AuctionHistory'
+import AuctionHistoryDetails from '../features/user/auction/AuctionHistoryDetails'
+import AuctionProductPreview from '../features/user/auction/AuctionProductPreview'
 // Admin Pages
 import Dashboard from '../features/admin/dashboard/Dashboard'
 import Inventory from '../features/admin/inventory/Inventory' // change Inventory to inventory  soon
@@ -45,6 +46,7 @@ import VerifyForm from '../features/auth/components/VerifyForm'
 import AdminLayout from '../layout/AdminLayout'
 import UserLayout from '../layout/UserLayout'
 import CartLayout from "../layout/CartLayout";
+import AuctionLayout from "../layout/AuctionLayout";
 
 
 export default function AppRoutes() {
@@ -63,14 +65,7 @@ export default function AppRoutes() {
             <Route path="/auth/signup/verify" element={<VerifyForm/>}/>
             */}
             <Route path="/product/:id" element={<ProductDetails/>}/>
-
-            <Route path='/auction/bid/:id' element={
-                <UserProtectedRoute>
-                    <AuctionBidding/> {/* can be removed or modified later, not right now if the auction is replaced with auctionlisting */}
-                </UserProtectedRoute>
-                }
-            />
-            
+                
             <Route path='/checkout' element={
                 <UserProtectedRoute>
                     <Checkout/>
@@ -103,13 +98,24 @@ export default function AppRoutes() {
                 <Route path='/shop' element={<Shop/>}/>
 
                 {/* User Protected Routes*/}
+                {/* Auction */}
                 <Route path="/auction" element={
                     <UserProtectedRoute>
-                        <AuctionListing/> {/* changed from auctin to auctionList */}
+                        <Auction/>
                     </UserProtectedRoute>
                     }
-                />
+                >
+                    <Route index path="listing" element={<AuctionListing/>}/>
+                    <Route path="history" element={<AuctionHistory/>}/>
+                </Route>
             </Route>
+            
+            {/* Auction Details */}
+            <Route element={<AuctionLayout/>}>
+                <Route path="/auction/listing/details/:id" element={<AuctionProductDetails/>}/>
+                <Route path="/auction/history/history-details/:id" element={<AuctionHistoryDetails/>}/>
+            </Route>
+            <Route path="/auction/listing/product-preview/:id" element={<AuctionProductPreview/>}/>
 
             {/* ADMIN ROUTES */}
             <Route path="admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>

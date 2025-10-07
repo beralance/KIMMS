@@ -92,10 +92,14 @@ export const getAuctions = async (req, res) => {
 export const getAuctionById = async (req, res) => {
     try {
         const auction = await Auction.findById(req.params.id)
-            .populate(
-                "inventoryId",
-                "productName images price status createdAt description"
-            )
+            .populate({
+                path: "inventoryId",
+                select: "productName category condition details images status createdAt description",
+                populate: {
+                    path: 'category',
+                    select: 'name',
+                }
+            })
 
         if (!auction) {
             return res.status(404).json({ message: "Auction not found" });
@@ -147,7 +151,14 @@ export const finalizeAuction = async (req, res) => {
 export const getPastAuctions = async (req, res) => {
     try {
         const auctions = await Auction.find({ status: "CLOSED" })
-            .populate("inventoryId", "name description")
+            .populate({
+                path: "inventoryId",
+                select: "productName images condition category details description",
+                populate: {
+                    path: 'category',
+                    select: 'name'
+                }
+            })
             .sort({ endTime: -1 })
             .lean(); // convert to plain JS object
 

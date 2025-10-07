@@ -19,9 +19,6 @@ const UserLayout = () => {
             </header>
 
             <main>
-                <Box sx={{m: 0, mt: {xs: '56px', sm: '64px'}}}>
-                    <Outlet/>
-                </Box>
                 {user === 'admin' || user === 'staff' &&
                     <Box 
                         sx={{
@@ -35,6 +32,9 @@ const UserLayout = () => {
                         </Button>
                     </Box>
                 }
+                <Box sx={{m: 0, mt: {xs: '56px', sm: '64px'}}}>
+                    <Outlet/>
+                </Box>
             </main>
 
             <footer>

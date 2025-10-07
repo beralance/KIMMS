@@ -2,11 +2,16 @@ import React, { useEffect, useState } from "react";
 import { Box, Card, CardContent, Typography, Button, Grid } from "@mui/material";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import AuctionPreviewCard from "./components/AuctionPreviewCard";
+import {ScrollOnTop} from '../../../utils/ScrollOnTop'
 
 const AuctionListing = () => {
     const [auctions, setAuctions] = useState([]);
     const [tick, setTick] = useState(0)
     const API_URL = import.meta.env.VITE_API_URL;
+
+    ScrollOnTop()
+
     useEffect(() => {
         const fetchAuctions = async () => {
             try {
@@ -46,40 +51,7 @@ const AuctionListing = () => {
             <Grid container spacing={2}>
                 {auctions.map((auction) => (
                     <Grid item xs={12} sm={6} md={4} key={auction._id}>
-                        <Card>
-                            <CardContent>
-                                <Box>
-                                    <img 
-                                        src={`${auction.inventoryId?.image}`} 
-                                        alt={auction.inventoryId?.productName}
-                                        style={{
-                                            objectFit: 'cover',
-                                            width: '100%',
-                                            aspectRatio: '1/1'
-                                        }}    
-                                    />
-                                </Box>
-                                <Typography variant="h6">{auction.inventoryId?.productName || "Unnamed Item"}</Typography>
-                                <Typography variant="body2" color="textSecondary" gutterBottom>
-                                    {auction.inventoryId?.description || auction.description || "No description"}
-                                </Typography>
-                                <Typography variant="body1">
-                                    Current Bid: ₱{auction.reservePrice} {/* replace with top bid if needed */}
-                                </Typography>
-                                <Typography variant="body2" color="textSecondary">
-                                    Ends in: {getTimeRemaining(auction.endTime)}
-                                </Typography>
-                                <Button
-                                    component={Link}
-                                    to={`/auction/bid/${auction._id}`} 
-                                    variant="contained"
-                                    color="primary"
-                                    sx={{ mt: 2 }}
-                                >
-                                    Place Bid
-                                </Button>
-                            </CardContent>
-                        </Card>
+                        <AuctionPreviewCard product={auction} getTimeRemaining={getTimeRemaining}/>
                     </Grid>
                 ))}
             </Grid>

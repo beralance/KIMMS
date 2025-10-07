@@ -125,3 +125,24 @@ export const updateCategoryCounts = async () => {
     }
 };
 
+export const incrementProductCount = async (categoryId, increment = 1) => {
+    if (!categoryId)return;
+    try {
+        await Category.findByIdAndUpdate(categoryId, {$inc: {productCount: increment}})
+    }
+    catch (err) {
+        console.error(`Faile to update productCount for category ${categoryId}:`, err)
+    }
+}
+
+export const decrementProductCount = async(categoryId, decrement = 1) => {
+    if (!categoryId) return;
+    try {
+        await Category.findByIdAndUpdate(categoryId, [
+            {$set: {productCount: {$max: [{$subtract: ['$productCount', decrement]}, 0]}}}
+        ])
+    }
+    catch (err) {
+        console.error(`Failed to decrement productCount for ${categoryId}:`, err)
+    }
+}

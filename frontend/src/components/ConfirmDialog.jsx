@@ -17,6 +17,7 @@ export default function ConfirmDialog({
     onCancel,
     confirmText = "Yes",
     cancelText = "Cancel",
+    color = 'error'
 }) {
     return (
         <Dialog open={open} onClose={onCancel}>
@@ -30,7 +31,7 @@ export default function ConfirmDialog({
                 </Button>
                 <Button
                     onClick={onConfirm}
-                    color="error"
+                    color={color}
                     variant="contained"
                     autoFocus
                 >

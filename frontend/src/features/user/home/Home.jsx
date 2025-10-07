@@ -10,9 +10,11 @@ import HomeAuctionSection from './HomeAuctionSection'
 import { ScrollOnTop } from '../../../utils/ScrollOnTop'
 import CategoriesList from './CategoriesList'
 import NewArrival from './NewArrival'
+import { useNavigate } from 'react-router-dom'
 
 
 export default function Home () {
+    const navigate = useNavigate()
     ScrollOnTop()
 
     return (
@@ -28,7 +30,7 @@ export default function Home () {
                                 </Typography>
                                 <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'} width={'100%'}>
                                     <ScrollSectionRight>
-                                        <Button variant='outlined' color='secondary' sx={{width: 50, boxShadow: 5, border: 0, p: 4, borderRadius: '999px', height: 50}}>
+                                        <Button variant='outlined' onClick={() => navigate('/shop')} color='secondary' sx={{width: 50, boxShadow: 5, border: 0, p: 4, borderRadius: '999px', height: 50}}>
                                             <ShoppingBagRounded fontSize='medium'/>
                                         </Button>
                                     </ScrollSectionRight>
@@ -44,7 +46,7 @@ export default function Home () {
                                 </Typography>
                                 <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'} width={'100%'}>
                                     <ScrollSectionRight>
-                                        <Button variant='outlined' color='secondary' sx={{width: 50, boxShadow: 5, border: 0, p: 4, borderRadius: '999px', height: 50}}>
+                                        <Button variant='outlined' onClick={() => navigate('/auction')} color='secondary' sx={{width: 50, boxShadow: 5, border: 0, p: 4, borderRadius: '999px', height: 50}}>
                                             <LocalOfferRounded fontSize='medium'/>
                                         </Button>
                                     </ScrollSectionRight>

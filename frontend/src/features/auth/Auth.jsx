@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {Tabs, Button, IconButton, Tab, Box, Typography, Fade, Grow} from '@mui/material';
-import Login from './Login'
-import Signup from './Signup'
 import { Stack } from '@mui/material';
 import { ScrollSectionLeft, ScrollSectionRight } from '../../components/SectionTransitionX';
 import { AuthProvider } from '../../contexts/AuthContext';
@@ -28,7 +26,7 @@ export default function Auth() {
         <Box>
             <Box 
                 sx={{
-                    backgroundImage: 'url(/minimalist-black-interior-with-black-sofa.jpg)',
+                    backgroundImage: 'url(/modern-styled-entryway.jpg)',
                     backgroundPosition: 'cover',
                     backgroundSize: '100%',
                     minHeight: '100vh',
@@ -40,7 +38,7 @@ export default function Auth() {
             <Box 
                 sx={{
                     width: '100%',
-                    height: '100vh',
+                    height: '100%',
                     backdropFilter: 'blur(10px)',
                     bgcolor: 'rgba(0, 0, 0, 0.5)'
                 }}

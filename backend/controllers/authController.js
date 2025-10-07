@@ -169,6 +169,7 @@ export const login = async (req, res) => {
             userId: user._id,
             role: user.role,
             fullName: user.fullName,
+            address: user.address,
             isLocal,
             allowedModules,
             token,

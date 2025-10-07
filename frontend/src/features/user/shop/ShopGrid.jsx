@@ -11,7 +11,7 @@ const ShopGrid = ({ products, handleAddToCart }) => {
         <Container sx={{ p: {xs: 2, md: 0 } }}>
             <Grid
                 container
-                rowSpacing={{ xs: 6, sm: 6 }}
+                rowSpacing={{ xs: 4, sm: 4 }}
                 columnSpacing={{ xs: 1, sm: 4, md: 3 }}
                 sx={{ display: 'flex', justifyContent: 'center' }}
             >

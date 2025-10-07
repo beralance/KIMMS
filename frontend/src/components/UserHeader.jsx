@@ -1,8 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { 
   Box, Toolbar, Typography, Button, AppBar, 
   Slide, IconButton, Fade,
-  Badge
+  Badge,
+  Collapse,
+  Stack,
+  List,
+  Grow,
+  ListItem,
+  ListItemButton,
+  Divider,
+  Container
 } from "@mui/material";
 import { NavLink, useLocation } from "react-router-dom";
 import SearchBar from "./SearchBar";
@@ -12,6 +20,7 @@ import useScrollTrigger from "@mui/material/useScrollTrigger";
 import { useCart } from "../contexts/CartContext"; 
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from "../contexts/AuthContext";
+import { ProductContext } from "../contexts/ProductContext"; // adjust path
 
 // Icons
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
@@ -28,17 +37,17 @@ import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined
  
 function HideOnScroll ({children}) {
     const trigger = useScrollTrigger();
-    return (
-        <Slide appear={false} direction="down" in={!trigger}>
-            {children}
-        </Slide>
-    )
+        return (
+            <Slide appear={false} direction="down" in={!trigger}>
+                {children}
+            </Slide>
+        )
     }
 
     const navLinks = [
         { label: "Home", to: "/", icon: <HomeRoudedIcon /> },
         { label: "Shop", to: "/shop", icon: <ShoppingBagRoundedIcon /> },
-        { label: "Auction", to: "/auction", icon: <SellRoundedIcon /> },
+        { label: "Auction", to: "/auction/listing", icon: <SellRoundedIcon /> },
     ];
 
     const userLinks = [
@@ -51,28 +60,31 @@ export default function UserHeader() {
     const [userDrawerOpen, setUserDrawerOpen] = useState(false);
     const [searchDrawerOpen, setSearchDrawerOpen] = useState(false);
     const [navOpen, setNavOpen] = useState(false);    
+    const [searchCollapseOpen, setSearchCollapseOpen] = useState(false);
     const {cartItems} = useCart();
     const isLoggedIn = !!localStorage.getItem('user')
     const navigate = useNavigate()
     const { user } = useAuth()
     const [showBg, setShowBg] = useState(false);
     const location = useLocation()
-
+    const { searchProducts, products } = useContext(ProductContext);
+    const [results, setResults] = useState([]);
+    const [query, setQuery] = useState("");
+    
      useEffect(() => {
-    const handleScroll = () => {
-      // Show background only on home page after scrolling past 100vh
-      if (location.pathname === "/") {
-        setShowBg(false);
-      } else {
-        setShowBg(true);
-      }
-    };
+        const handleScroll = () => {
+            if (location.pathname === "/") {
+                setShowBg(false);
+            } else {
+                setShowBg(true);
+            }
+        };
 
-    window.addEventListener("scroll", handleScroll);
-    handleScroll(); // check immediately in case page loads scrolled down
+        window.addEventListener("scroll", handleScroll);
+        handleScroll(); // check immediately in case page loads scrolled down
 
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [location.pathname]);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [location.pathname]);
 
     const handleUserDrawerClick = () => {
         if (!user) {
@@ -81,6 +93,19 @@ export default function UserHeader() {
             setUserDrawerOpen(true)
         }
     }
+
+    const handleSearch = async (e) => {
+        const value = e.target.value;
+        setSearchCollapseOpen(value)
+        setQuery(value);
+
+        if (value.trim() === "") {
+            setResults([]);
+            return;
+        }
+        const data = await searchProducts(value); // fetch from context
+        setResults(data || []);
+    };
     return (
         <HideOnScroll>
             <AppBar 
@@ -101,7 +126,6 @@ export default function UserHeader() {
                     backdropFilter: showBg ? '' : 'blur(10px)',
                     WebkitMaskRepeat: "no-repeat",
                     zIndex: 0,
-                    transition: 'all .5s ease',
                     boxShadow: '0px 1px 2px rgba(0,0,0,0.2)', 
                     overflow: "hidden",
                     WebkitMaskImage: navOpen ? (!showBg ? "linear-gradient(to bottom, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%)" : '') : '',
@@ -133,7 +157,7 @@ export default function UserHeader() {
                             <Typography variant="body1" color="initial" sx={{ fontWeight: 'thin', color: showBg ? 'black' : 'white', fontSize: { xs: 20, md: 22, lg: 24 }, display: {xs: 'flex', sm: 'none', md: 'flex'}}}>
                                 K I M M S
                             </Typography>
-                            <Box sx={{display: {xs: 'none', sm: 'block', md: 'none', width: 35}}}>
+                            <Box sx={{display: {xs: 'none', sm: 'block', md: 'none'}, width: 35, filter: showBg ? '0' : 'invert(1)' }}>
                                 <img src="/kimms-logo.svg" alt="" style={{objectFit: 'cover', aspectRatio: '1/1', height: '100%', width: '100%'}}/>
                             </Box>
                         </Button>
@@ -144,7 +168,7 @@ export default function UserHeader() {
                         <IconButton onClick={handleUserDrawerClick} sx={{ p: 0 }}>
                             <PersonOutlinedIcon color="secondary" sx={{ fontSize: 22, color: showBg ? 'black' : 'white' }} />
                         </IconButton>
-                        <Badge badgeContent={isLoggedIn ? cartItems.length : 0} color="secondary">
+                        <Badge badgeContent={isLoggedIn ? cartItems.length : 0} color="error">
                             <IconButton component={NavLink} to='/cart' sx={{ p: 0 }}>
                                 <ShoppingCartOutlinedIcon color="secondary" sx={{ fontSize: 22, color: showBg ? 'black' : 'white' }} />
                             </IconButton>
@@ -153,11 +177,33 @@ export default function UserHeader() {
 
                     {/* Desktop Search */}
                     <Box sx={{ flexGrow: {sm: 10, md: 4}, p: 0.5, display: { sm: "block", xs: "none" } }}>
-                        <SearchBar height="2.5rem"/>
+                        <SearchBar 
+                            height="2rem" 
+                            onChange={handleSearch}
+                            onResults={setResults}
+                            sx={{
+                                "& .MuiOutlinedInput-root": {
+                                    color: showBg ? "grey" : 'white',
+                                    bgcolor: 'rgba(255, 255, 255, 0.1)',
+                                    height: {sm: 35, md: 40},
+                                    "& fieldset": {
+                                        borderColor: showBg ? "grey" : 'rgba(255, 255, 255, 0.5)',
+                                        color: 'white',
+                                    },
+                                    "&:hover fieldset": {
+                                        borderColor: showBg ? "grey" : 'white',
+                                    },
+                                    "&.Mui-focused fieldset": {
+                                        borderColor: "transparent",
+                                        boxShadow: showBg ?  "0px 1px 3px rgba(0, 0, 0, 0.5)" : "0px 1px 3px rgba(255, 255, 255, 0.5)",
+                                    },
+                                },
+                            }}
+                        />
                     </Box>
 
                     {/* Desktop Navigation */}
-                    <Box sx={{ flexGrow: {md: 1}, display: { sm: "flex", xs: "none" }, justifyContent: "end" }}>
+                    <Box sx={{ flexGrow: {md: 1}, display: { sm: "flex", xs: "none" }, color: showBg ? 'black' : 'white', justifyContent: "end" }}>
                         {navLinks.map(({ label, to }) => (
                             <Button key={label} component={NavLink} to={to} color="inherit">
                                 {label}
@@ -166,13 +212,13 @@ export default function UserHeader() {
                     </Box>
 
                     {/* Desktop icons */}
-                    <Box sx={{ display: { sm: "flex", xs: "none" }, mx: 2, gap: 2, flexGrow: {md: 1}, justifyContent: "end" }}>
+                    <Box sx={{ display: { sm: "flex", xs: "none" },  mx: 2, gap: 2, flexGrow: {md: 1}, justifyContent: "end" }}>
                         <IconButton onClick={handleUserDrawerClick} sx={{ p: 0 }}>
-                            <PersonOutlinedIcon color="secondary" sx={{ fontSize: 22 }} />
+                            <PersonOutlinedIcon color="secondary" sx={{ fontSize: 22, color: showBg ? 'black' : 'white', }} />
                         </IconButton>
-                        <Badge badgeContent={isLoggedIn ? cartItems.length : 0} color="secondary">
+                        <Badge badgeContent={isLoggedIn ? cartItems.length : 0} color="error">
                             <IconButton component={NavLink} to='/cart' sx={{ p: 0 }}>
-                                <ShoppingCartOutlinedIcon color="secondary" sx={{ fontSize: 22 }} />
+                                <ShoppingCartOutlinedIcon color="secondary" sx={{ fontSize: 22, color: showBg ? 'black' : 'white', }} />
                             </IconButton>
                         </Badge>
                     </Box>
@@ -215,6 +261,80 @@ export default function UserHeader() {
 
                 {/* User Drawer */}
                 <UserDrawer open={userDrawerOpen} onClose={() => setUserDrawerOpen(false)} links={userLinks} />
+                <Box sx={{bgcolor: showBg ? 'white' : 'rgba(0, 0, 0, 0.5)', backdropFilter: {xs: '', md: 'blur(10px)'}, borderRadius: 5, mt: {sx: 0, md: 2}, boxShadow: 5}}>
+                    <Collapse in={searchCollapseOpen}>
+                        <Container maxWidth={'md'} sx={{p: 2}}>
+                            {results.length > 0 && (
+                                <List sx={{maxHeight: 400, minHeight: 'auto', overflowY: 'auto', borderRadius: 2, p: 0}}>
+                                    <Fade in={true} mountOnEnter unmountOnExit timeout={800}>
+                                        <Box>
+                                            <Stack direction={'row'} justifyContent={'space-between'} sx={{px: 2}}>
+                                                <Typography variant="body1" sx={{fontWeight: 'bold', color: showBg ? 'black' : 'white'}}>
+                                                    Products
+                                                </Typography>
+                                                <IconButton onClick={() => setSearchCollapseOpen(prev => !prev)}>
+                                                    <CloseRoundedIcon sx={{color: showBg ? '#37353E' : 'white'}}/>
+                                                </IconButton>
+                                            </Stack>
+                                            {results.map((product) => (
+                                                <Box key={product._id}>
+                                                    <Grow timeout={800} in={results.length > 0} mountOnEnter unmountOnExit>
+                                                        <ListItem disablePadding>
+                                                            <ListItemButton 
+                                                                sx={{ py: 1}}
+                                                                onClick={() => {
+                                                                    navigate(`/product/${product._id}`);
+                                                                    window.scrollTo({top: 0, behavior: 'smooth'})
+                                                                    onClose();
+                                                                }}
+                                                            >
+                                                                <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', borderRadius: 1}}>
+                                                                    <Box sx={{width: '70%'}}>
+                                                                        <Typography noWrap fontWeight='bold' sx={{color: showBg ? '#37353E' : 'white'}}>
+                                                                            {product.productName} 
+                                                                        </Typography>
+                                                                        <Typography noWrap color="secondary" variant="body2"
+                                                                            sx={{
+                                                                                display: '-webkit-box',
+                                                                                WebkitLineClamp: 1,
+                                                                                WebkitBoxOrient: 'vertical',
+                                                                                overflow: 'hidden',
+                                                                                color: showBg ? '#37353E' : 'white',
+                                                                            }}
+                                                                        >
+                                                                            {`${product.category?.name} | ${product.condition}`}
+                                                                        </Typography>
+                                                                        <Typography color="grey" variant="body2" sx={{
+                                                                            display: '-webkit-box',
+                                                                            WebkitLineClamp: 1,
+                                                                            WebkitBoxOrient: 'vertical',
+                                                                            overflow: 'hidden',
+                                                                            color: showBg ? 'grey' : 'rgba(255, 255, 255, 0.8)',
+                                                                        }}>
+                                                                            {product.description}
+                                                                        </Typography>
+                                                                    </Box>
+                                                                    <Box sx={{width: 100, height: 100}}>
+                                                                        <img src={product.images[0]} alt={product.productName} style={{objectFit: 'cover', aspectRatio: '1/1', width: '100%', height: '100%', borderRadius: 3}}/> 
+                                                                    </Box>
+                                                                </Box>
+                                                            </ListItemButton>
+                                                        </ListItem>
+                                                    </Grow>
+                                                    <Container>
+                                                        {results.length > 1 &&
+                                                            <Divider sx={{bgcolor: 'grey'}}/>
+                                                        }
+                                                    </Container>
+                                                </Box>
+                                            ))}
+                                        </Box>
+                                    </Fade>
+                                </List>
+                            )}
+                        </Container>
+                    </Collapse>
+                </Box>
             </AppBar>
         </HideOnScroll>
     );

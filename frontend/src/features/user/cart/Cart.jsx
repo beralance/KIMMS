@@ -5,14 +5,17 @@ import { useCheckout } from "../../../contexts/CheckoutContext";
 import { NavLink, useNavigate } from "react-router-dom";
 import BottomActionBar from "../../../components/BottomActionBar";
 import {DeleteRounded, DoneAllRounded, KeyboardArrowDownRounded, KeyboardArrowUpRounded, RemoveDoneRounded } from '@mui/icons-material'
-
+import { toTitleCase } from '../../../utils/stringUtils'
 export default function Cart() {
     const { cartItems, removeFromCart } = useCart();
     const { setCheckoutItems } = useCheckout();
-    const navigate = useNavigate();
     const [selectedIds, setSelectedIds] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
     const [summaryOpen, setSummaryOpen] = useState(false)
+    const navigate = useNavigate();
+
+    const user = JSON.parse(localStorage.getItem('user') || '{}')
+    const address = user.address
 
     // Only consider valid products
     const validCartItems = cartItems.filter(item => item.productId);
@@ -27,7 +30,6 @@ export default function Cart() {
             0
         );
         setTotalPrice(total);
-        
     }, [selectedIds, validCartItems]);
 
     if (!validCartItems.length) {
@@ -88,7 +90,7 @@ export default function Cart() {
             name: item.productId.productName,
             price: item.productId.price,
         }))
-    
+    console.log('$$$$$$$$cart Items', validCartItems[0].productId.category.name)
     return (
         <Container sx={{ pb: {xs: "120px", md: 0 }}}>
 
@@ -118,8 +120,9 @@ export default function Cart() {
                     </Button>
                 </Box>
                 <Typography variant="body2" color="grey">
-                    {/* Add backend here, if user has no address, add fallback*/}
-                    Brgy 1, Mabini Street, Malilipot, Albay
+                    {Object.entries(user.address).map(([key, value]) => (
+                        <span key={key}>{toTitleCase(value)} </span>
+                    ))}
                 </Typography>
             </Box>
             <Box sx={{display: {xs: 'flex', md: 'none'}, width: 100, justifyContent: 'center', position: selectedIds.length && 'sticky', top: 70, backdropFilter: 'blur(10px)', WebkitBackdropFilter: "blur(10px)", zIndex: 1000, p: 2, py: 1, borderRadius: '0px 5px 5px 0px'}}>
@@ -158,8 +161,8 @@ export default function Cart() {
                                             >
                                                 <Box>
                                                     <img
-                                                        src={`${product.image ?? ""}`}
-                                                        alt={product.productName ?? "Product"}
+                                                        src={product.images[0]}
+                                                        alt={product.productName}
                                                         style={{ width: "100%", display: 'block', height: '100%', aspectRatio: '1/1', objectFit: "cover" }}
                                                     />
                                                 </Box>
@@ -174,16 +177,29 @@ export default function Cart() {
                                                         onChange={() => toggleSelect(product._id)}
                                                     />
                                                 </Box>
-                                                <Box sx={{display: 'flex', justifyContent: 'center', pt: {xs: 2}, my: {xs: 2, md: 2}, mx: {xs: 1.5, sm: 2}, height: '100%', flexDirection: "column"}}>
-                                                    <Typography sx={{typography: {xs: 'body1', sm: 'h6'}}}>{product.productName ?? "Product not found"}</Typography>
-                                                    <Typography sx={{typography: {xs: 'body2'}}} gutterBottom>{product.category ?? "Product not found"}</Typography>
-                                                    <Typography variant="body2" color="grey">{product.description}</Typography>
-                                                    <Box sx={{bgcolor: '#37353E', display: 'flex', justifyContent: 'center', mt: 'auto', p: {xs: .5, md: 1}, px: {xs: 1, md: 2}, mx: 2, borderRadius: '999px'}}>
+                                                <Stack sx={{ justifyContent: {xs: 'flex', md: 'space-between'}, my: {xs: 2, md: 2}, pt: {xs: 0, sm: 2}, mx: {xs: 1.5, sm: 2}, height: '100%', flexDirection: "column"}}>
+                                                    <Box sx={{mb: {xs: 2, md: 0}}}>
+                                                        <Typography 
+                                                            sx={{
+                                                                typography: {xs: 'body1', sm: 'h6'}, 
+                                                                textWrap: {xs: 'nowrap', sm: 'none'}, 
+                                                                minWidth: 50,
+                                                                maxWidth: 200,
+                                                                scrollbarWidth: 'none', 
+                                                                overflowX: 'auto', 
+                                                            }}
+                                                        >
+                                                                {product.productName ?? "Product not found"}
+                                                        </Typography>
+                                                        <Typography noWrap sx={{typography: {xs: 'body2'}, width: 'fit-content', border: '1px solid black', borderRadius: '999px', px: 1}}>{product.category?.name}</Typography>
+                                                    </Box>
+                                                    <Typography variant="body2" color="grey" sx={{display: {xs: 'none', sm: 'block'}}}>{product.description}</Typography>
+                                                    <Box sx={{bgcolor: '#37353E', display: 'flex', mt: {xs: 'auto', md: 0}, justifyContent: 'center', p: {xs: .5, md: 1}, px: {xs: 1, md: 2}, mx: {xs: 0, md: 2} , borderRadius: '999px'}}>
                                                         <Typography  sx={{typography: {xs: 'body2'}, fontWeight: {xs: '', sm: 'bold',}}} color="white" >
                                                             PHP {(product.price ?? 0).toLocaleString('en-PH', {minimumFractionDigits: 2})}
                                                         </Typography>
                                                     </Box>
-                                                </Box>
+                                                </Stack>
                                             </Stack>
                                         </Grid>
                                     </Grid>
@@ -207,8 +223,9 @@ export default function Cart() {
                             </Button>
                         </Box>
                         <Typography variant="body2" color="grey">
-                            {/* Add backend here, if user has no address, add fallback*/}
-                            Brgy 1, Mabini Street, Malilipot, Albay
+                            {Object.entries(user.address).map(([key, value]) => (
+                                <span key={key}>{toTitleCase(value)} </span>
+                            ))}
                         </Typography>
                     </Box>
                     <Box sx={{boxShadow: 2, p: 2, borderRadius: 2}}>

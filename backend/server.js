@@ -47,7 +47,7 @@ const io = new Server(server, {
 
 
 app.use((req, res, next) => {
-  console.log("Incoming request:", req.method, req.url, "Origin:", req.headers.origin);
+  //console.log("Incoming request:", req.method, req.url, "Origin:", req.headers.origin);
   next();
 });
 

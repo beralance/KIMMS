@@ -14,6 +14,7 @@ const productSchema = new mongoose.Schema(
 
         // Product details
         productName: { type: String, required: true },
+        physicalCode: {type: String, required: true},
         description: { type: String, required: true },
         details: {type: String, required: true},
         price: { type: Number, required: true },

@@ -18,6 +18,7 @@ import {
 import { InventoryContext } from "../../../../contexts/InventoryContext";
 import { ProductContext } from "../../../../contexts/ProductContext";
 import { DoneAll, DoneAllRounded, RemoveDoneRounded } from "@mui/icons-material";
+import RefreshButton from '../RefreshButton'
 
 export default function ManageProducts() {
     const { inventoryItems, fetchInventoryItems } = useContext(InventoryContext);
@@ -72,6 +73,14 @@ export default function ManageProducts() {
         fetchInventoryItems(); // refresh inventory state
     };
 
+    const handleRefresh = async () => {
+        setLoading(true);
+        try {
+            await fetchInventoryItems();
+        } finally {
+            setLoading(false);
+        }
+    };
     return (
         <Box>
             <TextField
@@ -98,6 +107,7 @@ export default function ManageProducts() {
                         'Post Selected'
                     }
                 </Button>
+                <RefreshButton onRefresh={handleRefresh} tooltip="Reload products"/>
             </Box>
             <Box sx={{pb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                 <Box>

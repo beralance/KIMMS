@@ -2,8 +2,12 @@ import { Box, Button, Container, Fade, Grow, Stack, Typography } from '@mui/mate
 import React, {useEffect, useRef, useState} from 'react'
 import { motion } from 'framer-motion'
 import SectionTransition from '../../../components/SectionTransition'
+import {useNavigate} from 'react-router-dom'
 
 export default function UserHero() {
+    const navigate = useNavigate()
+
+
     return(
         <>
             <Box
@@ -34,7 +38,7 @@ export default function UserHero() {
                     </Box>
                 </Fade>
                 <Grow in={true} mountOnEnter unmountOnExit timeout={1000}>
-                    <Button variant='contained' sx={{zIndex: 2, bgcolor: 'rgba(0,0,0,.5)', my: 2, boxShadow: 5, borderRadius: '999px', px: 3}}>
+                    <Button variant='contained' onClick={() => navigate('/shop')} sx={{zIndex: 2, bgcolor: 'rgba(0,0,0,.5)', my: 2, boxShadow: 5, borderRadius: '999px', px: 3}}>
                         Shop Now
                     </Button>
                 </Grow>

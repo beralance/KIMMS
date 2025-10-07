@@ -16,7 +16,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import AdminBottomNav from './AdminBottomNav';
-import { Button, Fade, Grow, Slide } from '@mui/material';
+import { Button, Divider, Fade, Grow, Slide, Stack } from '@mui/material';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import InventoryIcon from "@mui/icons-material/Inventory2";
@@ -26,6 +26,7 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import { NavLink, useLocation } from 'react-router-dom';
 import {useAuth} from '../../contexts/AuthContext'
 import ConfirmDialog from '../../components/ConfirmDialog';
+import { color } from 'framer-motion';
 
 const drawerWidth = 240;
 
@@ -118,7 +119,10 @@ export default function AdminSidebar({ children }) {
     const { logout } = useAuth()
     const {user} = useAuth()
     const [openLogoutDialog, setOpenLogoutDialog ] = React.useState(false)
+    const currentPath = location.pathname;
 
+    const handleDrawerOpen = () => setOpen(true);
+    const handleDrawerClose = () => setOpen(false);
     const handleLogoutOpen = () => setLogoutOpen(true);
     const handleLogoutCancel= () => setLogoutOpen(false);
     const handleLogoutConfirm = () =>  {
@@ -129,38 +133,50 @@ export default function AdminSidebar({ children }) {
     const menuItemsByRole = {
         admin:
             [
-                { text: "Dashboard", icon: <DashboardIcon />, path: '/admin' },
-                { text: "Inventory", icon: <InventoryIcon />, path: '/admin/inventory/manage-inventory' },
-                { text: "Orders", icon: <ShoppingCartIcon />, path: '/admin/orders' },
-                { text: "Reports", icon: <BarChartIcon />, path: '/admin/reports' },
-                { text: "Staff", icon: <PersonAddAlt1Rounded />, path: '/admin/manage-staff' },
+                { text: "Dashboard", icon: <DashboardIcon />, value: 'dashboard', path: '/admin' },
+                { text: "Inventory", icon: <InventoryIcon />, value: 'inventory', path: '/admin/inventory/manage-inventory' },
+                { text: "Orders", icon: <ShoppingCartIcon />, value: 'orders', path: '/admin/orders' },
+                { text: "Reports", icon: <BarChartIcon />, value: 'reports', path: '/admin/reports' },
+                { text: "Staff", icon: <PersonAddAlt1Rounded />, value: 'staff', path: '/admin/manage-staff' },
                 
             ],
         staff:
             [
-                { text: "Dashboard", icon: <DashboardIcon />, path: '/staff' },
-                { text: "Inventory", icon: <InventoryIcon />, path: '/staff/inventory/manage-inventory' },
-                { text: "Orders", icon: <ShoppingCartIcon />, path: '/staff/orders' },
-                { text: "Reports", icon: <BarChartIcon />, path: '/staff/reports' },
+                { text: "Dashboard", icon: <DashboardIcon />, value: 'dashboard', path: '/staff' },
+                { text: "Inventory", icon: <InventoryIcon />, value: 'inventory', path: '/staff/inventory/manage-inventory' },
+                { text: "Orders", icon: <ShoppingCartIcon />, value: 'orders', path: '/staff/orders' },
+                { text: "Reports", icon: <BarChartIcon />, value: 'reports', path: '/staff/reports' },
             ]
     }
     const menuItems = menuItemsByRole[user?.role] || []
+    const currentValue = (() => {
+        const inventoryPaths = [
+            "/admin/inventory/manage-inventory",
+            "/admin/inventory/manage-product",
+            "/admin/inventory/manage-auction",
+            "/staff/inventory/manage-inventory",
+            "/staff/inventory/manage-product",
+            "/staff/inventory/manage-auction",
+        ];
 
-    const handleDrawerOpen = () => setOpen(true);
-    const handleDrawerClose = () => setOpen(false);
+        if (inventoryPaths.some((path) => currentPath.startsWith(path))) {
+            return "inventory";
+        }
 
-    const activeMenuItem = menuItems
-        .filter(item =>
-            location.pathname === item.path ||
-            location.pathname.startsWith(item.path + '/')
-        )
-        .sort((a, b) => b.path.length - a.path.length)[0];
+        const matched = menuItems
+            .filter(
+                (item) =>
+                    currentPath === item.path ||
+                    currentPath.startsWith(item.path + "/")
+                ).sort((a, b) => b.path.length - a.path.length)[0];
 
-    const isActive = (item) => activeMenuItem?.path === item.path;
+        return matched?.value || "dashboard";
+    })();
 
+    const isActive = (item) => currentValue === item.value;
 
     return (
-        <Box sx={{ display: 'flex' }}>
+        <Box sx={{ display: 'flex'}}>
             <CssBaseline />
             <AppBar position="fixed" color='secondary' open={open}>
                 <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -185,28 +201,47 @@ export default function AdminSidebar({ children }) {
 
                         <Typography variant="body1" sx={{ display: { xs: 'none', md: 'flex' } }}>
                             Welcome
+                            {/* Add User Display here*/}
                         </Typography>
                     </Box>
                 </Toolbar>
             </AppBar>
 
             <Drawer variant='permanent' open={open} 
+                PaperProps={{
+                    sx: {
+                        bgcolor: 'rgba(255, 255, 255, 0.5)'
+                    }
+                }}
                 sx={{
                     display: { md: 'block', xs: 'none' },
-                    '& .MuiDrawer-paper': { border: 'none', boxShadow: '1px 0px 1px rgba(0,0,0,0.3)' },
+                    '& .MuiDrawer-paper': { border: 'none', boxShadow: 5 },
                 }}
             >
                 <DrawerHeader sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <img src="/kimms-logo.svg" alt="" style={{ width: '30px', marginInline: '10px' }} />
+                    <img src="/sofa.svg" alt="" style={{ width: '30px', marginInline: '10px' }} />
                     <IconButton onClick={handleDrawerClose}>
                         {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
                     </IconButton>
                 </DrawerHeader>
-
-                <List style={{display: 'flex', flexDirection: 'column', gap: 3}}>
+                {open &&
+                    <>
+                    {console.log(user)}
+                        <Stack>
+                            <Typography variant="body1" color="initial">
+                                {user.fullName}
+                            </Typography>
+                            <Typography variant="body1" color="initial">{user.role}</Typography>
+                            <Typography variant="body1" color="initial">{user.email}</Typography>
+                        </Stack>
+                        <Divider/>
+                    </>
+                }
+                <List style={{display: 'flex',  flexDirection: 'column', gap: 3}}>
                     {menuItems.map((item) => (
                         <ListItem key={item.text} disablePadding sx={{ display: "block",}}>
                             <ListItemButton
+                                selected={isActive(item)}
                                 component={NavLink}
                                 to={item.path}
                                 sx={[
@@ -217,26 +252,23 @@ export default function AdminSidebar({ children }) {
                                         borderRadius: 2,
                                         mx: 1,
                                         bgcolor: '#37353E',
-                                        '& .MuiListItemIcon-root': { color: 'white' },
-                                        '& .MuiListItemText-root': { fontWeight: 'bold', color: 'white' },
-                                        '&:hover': {
-                                            bgcolor: '#37353E', // change hover background
-                                            '& .MuiListItemIcon-root': { color: 'white' },
-                                            '& .MuiListItemText-root': { color: 'white' },
-                                        },
+                                        "&.Mui-selected": {backgroundColor: "#37353e20"},
+                                        "&:hover .MuiSvgIcon-root": {color: "black",},
+                                        '& .MuiListItemIcon-root': { color: 'black' },
+                                        '& .MuiListItemText-root': { fontWeight: 'bold', color: 'black' },
                                     },
                                 ]}
                             >
                                 <ListItemIcon 
                                     sx={[
-                                        { minWidth: 0, justifyContent: "center", color: "#37353E" },
-                                        open ? { mr: 3 } : { mr: "auto" }
+                                        { minWidth: 0, justifyContent: "center", color: "#37353e90", "& svg": { fontSize: 20}},
+                                        open ? { mr: 1 } : { mr: "auto" }
                                     ]}
                                 >
                                     {item.icon}
                                 </ListItemIcon>
                                 <Fade in={open} timeout={{enter: 800, exit: 100}} mountOnEnter unmountOnExit>
-                                    <ListItemText primary={item.text} sx={[open ? { opacity: 1 } : { opacity: 0 }]} />
+                                    <ListItemText primary={item.text} primaryTypographyProps={{fontSize: 15}} sx={[{color: 'grey'}, open ? { opacity: 1 } : { opacity: 0 }]} />
                                 </Fade>
                             </ListItemButton>
                         </ListItem>
@@ -259,7 +291,7 @@ export default function AdminSidebar({ children }) {
 
             <Box component="main" sx={{ flexGrow: 1, width: '100%' }}>
                 <DrawerHeader />
-                <Box sx={{mb: 10}}>
+                <Box sx={{mb: 20}}>
                     {children}
                 </Box>
                 <AdminBottomNav />

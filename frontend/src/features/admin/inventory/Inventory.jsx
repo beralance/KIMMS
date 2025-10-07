@@ -33,7 +33,7 @@ export default function Inventory() {
 
     return (
         <Box sx={{mt: 2}}>
-            <Container maxWidth={'xl'}>
+            <Container maxWidth={'lg'}>
                 <SearchBar 
                     value={searchTerm}
                     onChange={setSearchTerm}
@@ -60,45 +60,45 @@ export default function Inventory() {
                         </Typography>
                     </Collapse>
                 </Box>
+                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                    <Tabs
+                        value={value}
+                        aria-label="basic tabs example"
+                        TabIndicatorProps={{ style: { backgroundColor: '#37353E',} }} // selected tab indicator color
+                        textColor="inherit" // inherit to override default primary
+                    >
+                        <Tab 
+                            label="Manage Inventory" 
+                            value='manage-inventory' component={Link} to='manage-inventory'
+                            sx={{ 
+                                '& .MuiTab-wrapper span': {
+                                    mr: 4,
+                                },
+                                fontWeight: value === 'manage-inventory' ? 'bold' : 'normal',
+                                color: value === 'manage-inventory' ? '#37353E' : 'text.secondary', // change active/inactive tab color
+                            }}
+                        />
+                        <Tab 
+                            label="Manage Product" 
+                            value='manage-product' component={Link} to='manage-product'
+                            sx={{ 
+                                fontWeight: value === 'manage-product' ? 'bold' : 'normal',
+                                color: value === 'manage-product' ? '#37353E' : 'text.secondary',
+                            }}
+                        />
+                        <Tab 
+                            label="Manage Auction" 
+                            value='manage-auction' component={Link} to='manage-auction'
+                            sx={{
+                                fontWeight: value === 'manage-auction' ? 'bold' : 'normal',
+                                color: value === 'manage-auction' ? '#37353E' : 'text.secondary',
+                            }}
+                        />
+                    </Tabs>
+                </Box>
             </Container>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Tabs
-                    value={value}
-                    aria-label="basic tabs example"
-                    TabIndicatorProps={{ style: { backgroundColor: '#37353E',} }} // selected tab indicator color
-                    textColor="inherit" // inherit to override default primary
-                >
-                    <Tab 
-                        label="Manage Inventory" 
-                        value='manage-inventory' component={Link} to='manage-inventory'
-                        sx={{ 
-                            '& .MuiTab-wrapper span': {
-                                mr: 4,
-                            },
-                            fontWeight: value === 'manage-inventory' ? 'bold' : 'normal',
-                            color: value === 'manage-inventory' ? '#37353E' : 'text.secondary', // change active/inactive tab color
-                        }}
-                    />
-                    <Tab 
-                        label="Manage Product" 
-                        value='manage-product' component={Link} to='manage-product'
-                        sx={{ 
-                            fontWeight: value === 'manage-product' ? 'bold' : 'normal',
-                            color: value === 'manage-product' ? '#37353E' : 'text.secondary',
-                        }}
-                    />
-                    <Tab 
-                        label="Manage Auction" 
-                        value='manage-auction' component={Link} to='manage-auction'
-                        sx={{ 
-                            fontWeight: value === 'manage-auction' ? 'bold' : 'normal',
-                            color: value === 'manage-auction' ? '#37353E' : 'text.secondary',
-                        }}
-                    />
-                </Tabs>
-            </Box>
 
-            <Container maxWidth={'xl'} sx={{mt: 3}}>
+            <Container maxWidth={'lg'} sx={{mt: 3}}>
                 <Outlet context={{searchTerm, setSearchTerm}}/>
             </Container>
 

@@ -17,24 +17,25 @@ export default function ProductCard({ images, category, name = 'Unknown', price 
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                p: 2,
-                borderRadius: 5,
+                p: 1,
+                borderRadius: 2,
                 boxShadow: 5,
             }}
         >
 
             {/* Clickable area for navigation */}
-            <Box onClick={onNavigate} sx={{ cursor: 'pointer', p: 1}}>
+            <Box sx={{ cursor: 'pointer'}}>
                 {/* Product Image */}
                 <Box sx={{position: 'relative'}}>
                     <CardMedia
+                        onClick={onNavigate} 
                         component="img"
                         image={images}
                         alt={name}
                         sx={{
                             aspectRatio: '9/12',
                             objectFit: 'cover',
-                            borderRadius: 3
+                            borderRadius: 1
                     }}
                     />
                     <Box sx={{position: 'absolute', top: 15, left: 0, bgcolor: '#37353E', p: .5, px: 2, borderRadius: '0px 5px 5px 0px'}}>
@@ -46,7 +47,7 @@ export default function ProductCard({ images, category, name = 'Unknown', price 
                 </Box>
 
                 {/* Card Body */}
-                <CardContent sx={{px: .5, mb: 1, '&:last-child': {paddingBlock: 1}}}>
+                <CardContent sx={{px: .5, '&:last-child': {paddingBlock: 1}}}>
                     {/* Product Name */}
                     <Typography
                         variant='body1'
@@ -73,8 +74,7 @@ export default function ProductCard({ images, category, name = 'Unknown', price 
                         sx={{
                             color: 'text.secondary',
                             display: '-webkit-box',
-                            height: 20,
-                            WebkitLineClamp: 1,
+                            WebkitLineClamp: 2,
                             WebkitBoxOrient: 'vertical',
                             overflow: 'hidden',
                         }}
@@ -82,36 +82,34 @@ export default function ProductCard({ images, category, name = 'Unknown', price 
                         {description}
                     </Typography>
                 </CardContent>
-            </Box>
-
-            {/* Add to Cart Button (separate from navigation click) */}
-            {/* Price */}
-            <Stack direction={'row'} gap={1}>
-                {/* Category */}
-                <Typography
-                    variant="body2"
-                    fontWeight={'bold'}
-                    sx={{ width: '100%', px: 1,py: .5, color: 'black', backdropFilter: 'blur(10px)', bgcolor: 'rgba(255, 255, 255, 255)', borderRadius: '999px'}}
-                >
-                    {category}
-                </Typography>
-                <CardActions sx={{ p: 0, pt: 0 }}>
-                    <Button
-                        variant="contained"
-                        size="medium"
-                        fullWidth
-                        color='secondary'
-                        onClick={addToCart}
-                        sx={{
-                            textTransform: 'none',
-                            fontWeight: 600,
-                            borderRadius: 3,
-                        }}
+                <Stack direction={'row'} gap={2} px={1}>
+                    {/* Category */}
+                    <Typography
+                        variant="body2"
+                        fontWeight={'bold'}
+                        align='center'
+                        sx={{ width: '100%', alignSelf: 'center', border: 1, px: 1,py: .5, color: 'black', backdropFilter: 'blur(10px)', bgcolor: 'rgba(255, 255, 255, 255)', borderRadius: '999px'}}
                     >
-                        <ShoppingCartRounded/>
-                    </Button>
-                </CardActions>
-            </Stack>
+                        {category}
+                    </Typography>
+                    <CardActions sx={{ p: 0, pt: 0 }}>
+                        <Button
+                            variant="contained"
+                            size="medium"
+                            fullWidth
+                            color='secondary'
+                            onClick={addToCart}
+                            sx={{
+                                textTransform: 'none',
+                                fontWeight: 600,
+                                borderRadius: 1,
+                            }}
+                        >
+                            <ShoppingCartRounded/>
+                        </Button>
+                    </CardActions>
+                </Stack>
+            </Box>
         </Card>
     );
 }

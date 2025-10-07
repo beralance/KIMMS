@@ -11,6 +11,8 @@
 - lodash.debounce
 - framer-motion
 - react dragabble
+- react-draggable
+
 
 
 BACKEND

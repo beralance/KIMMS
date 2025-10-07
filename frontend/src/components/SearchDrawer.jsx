@@ -82,7 +82,7 @@ export default function SearchDrawer({ open, onClose, anchor = "top" }) {
                             {results.length > 0 && 'Search Result'}
                         </Typography>
                         {results.length > 0 && (
-                            <List sx={{maxHeight: 400, overflowY: 'auto', borderRadius: 2, p: 0}}>
+                            <List sx={{maxHeight: 400, minHeight: 200, overflowY: 'auto', borderRadius: 2, p: 0}}>
                                 {results.map((product) => (
                                     <Box key={product._id}>
                                         <Grow timeout={800} in={results.length > 0} mountOnEnter unmountOnExit>

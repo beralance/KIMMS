@@ -47,7 +47,20 @@ router.post("/", (req,res,next) => {
 }, verifyToken, requireRole(['admin', 'staff']), createInventoryItem);
 router.get("/", getInventoryItems);
 router.get("/:id", getInventoryItemById);
-router.put("/:id", verifyToken, requireRole(['admin', 'staff']), upload.single("images"), updateInventoryItem);
+router.put("/:id", (req, res, next) => {
+    upload.array('images')(req, res, (err) => {
+        if (err instanceof multer.MulterError) {
+            if (err.code === 'LIMIT_FILE_SIZE') {
+                return res.status(400).json({error: 'File too large. Max 50MB allowed'})
+            }
+            return res.status(400).json({error: err.message})
+        }
+        else if (err) {
+            return res.status(500).json({error: 'Server error during file upload.'})
+        }
+        next();
+    })
+}, verifyToken, requireRole(['admin', 'staff']), updateInventoryItem);
 router.delete("/:id", verifyToken, adminOnly, requireRole(['admin']), deleteInventoryItem);
 
 export default router;

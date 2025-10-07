@@ -101,19 +101,31 @@ export function ProductProvider({ children }) {
         try {
             const res = await fetch(`${API_URL}/api/products/${id}`, {
                 method: "PUT",
-                headers: { 
+                headers: {
                     "Content-Type": "application/json",
-                    'Authorization' : `Bearer ${token}`,
-                    
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify(updatedData),
             });
-            const updated = await res.json();
-            setProducts(products.map((p) => (p._id === id ? updated : p)));
+
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.message || "Failed to update product");
+            }
+
+            const updatedProduct = await res.json();
+
+            // Safely update local state
+            setProducts((prev) =>
+                prev.map((p) => (p._id === id ? updatedProduct : p))
+            );
+
+            return updatedProduct; // optional: return if you want to handle it outside
         } catch (err) {
-            console.error("Error updating product:", err);
+            console.error("Error updating product:", err.message);
         }
     };
+
 
     // Soft delete product
     const deleteProduct = async (id) => {
@@ -124,6 +136,8 @@ export function ProductProvider({ children }) {
                 p._id === id ? { ...p, visibility: 'inactive' } : p
             ));
             console.log(result.message);
+            await fetchProducts()
+            await fetchInventory()
         } catch (err) {
             console.error("Error deleting product:", err);
         }

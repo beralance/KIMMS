@@ -12,8 +12,12 @@ export const getCart = async (req, res) => {
             .populate({
                 path: 'items.productId',
                 select: "productName category images price status description",
-                match: {purchaseStatus: "available"}
-            });
+                match: {purchaseStatus: "available"},
+                populate: {
+                    path: 'category',
+                    select: 'name createdAt'
+                }
+            }).lean();
 
         // If cart doesn't exist, create an empty one
         if (!cart) {

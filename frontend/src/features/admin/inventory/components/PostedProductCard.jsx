@@ -4,12 +4,15 @@ import { useContext, useState } from "react";
 import { ProductContext } from "../../../../contexts/ProductContext";
 import { useSnackbar } from '../../../../contexts/SnackbarContext'
 import ConfirmDialog from "../../../../components/ConfirmDialog";
-import { CheckRounded, DeleteRounded, EditRoadRounded, EditRounded } from '@mui/icons-material'
+import { CheckRounded, DeleteRounded, EditRoadRounded, EditRounded, QrCode } from '@mui/icons-material'
 import CustomPopover from '../../../../components/CustomPopover'
 import {toTitleCase} from '../../../../utils/stringUtils'
 import dayjs from "dayjs";
 import { formatNumber } from "../../../../utils/stringUtils";
 import { handleImageError } from "../../../../utils/imageErrorHandler";
+import UpdateDialog from './UpdateDialog'
+import UpdateDrawer from './UpdateDrawer'
+
 
 export default function ProductCard({ product, onEdit, onDelete }) {
     const { updateProductHighlight, updateProductStatus } = useContext(ProductContext);
@@ -18,6 +21,11 @@ export default function ProductCard({ product, onEdit, onDelete }) {
     const { showSnackbar } = useSnackbar();
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [statusLoading, setStatusLoading] = useState(false);
+
+    const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
+
+    const handleUpdateClose = () => setOpenUpdateDialog(false)
+    const handleUpdateOpen = () => setOpenUpdateDialog(true)
 
     const handleToggleFeatured = async () => {
         const newHighlight = isFeatured ? "none" : "featured";
@@ -44,6 +52,7 @@ export default function ProductCard({ product, onEdit, onDelete }) {
         }
     };
 
+    // remove
     const handleDeleteConfirmed = async () => {
         if (isFeatured) await updateProductHighlight(product._id, "none");
         await onDelete(product._id);
@@ -67,7 +76,7 @@ export default function ProductCard({ product, onEdit, onDelete }) {
         <>
             <Card sx={{ maxWidth: 320, borderRadius: 2, boxShadow: 3 }}>
                 <Box sx={{position: 'relative'}}>
-                    <Box>
+                    <Box onClick={handleUpdateOpen} sx={{cursor: 'pointer'}}>
                         <img 
                             src={`${product.images[1]}`} 
                             alt={product.productName}
@@ -102,33 +111,6 @@ export default function ProductCard({ product, onEdit, onDelete }) {
                     <Typography variant="body2">PHP {formatNumber(product.price)}</Typography>
                     <Typography variant="body2">{dayjs(product.createdAt).format('MMMM D, YYYY h:mm A')}</Typography>
                 </CardContent>
-                <Container>
-                    <Divider/>
-                </Container>
-                <CardActions>
-                    <Stack width={'100%'} gap={1}>
-                        <Stack direction={'row'} justifyContent={'space-between'}>
-                            <Box sx={{display: "flex", gap: 1, px: 1, justifyContent: 'flex-start'}}>
-                                <IconButton size="small" color="secondary" sx={{p:0}} onClick={() => onEdit(product._id)}>
-                                    <EditRounded/>
-                                </IconButton>
-                                <IconButton size="small" color="secondary" sx={{p:0}} onClick={() => setConfirmOpen(true)}>
-                                    <DeleteRounded/>
-                                </IconButton>
-                            </Box>
-                            <Typography variant="body2" color="secondary" sx={{border: '1px solid #37353E', p: 1, py: .5, borderRadius: '999px', fontSize: 'clamp(10px, 12px, 20px)'}}>
-                                {product.isLocal ? 'Local' : 'International'}
-                            </Typography>
-                        </Stack>
-                        <Stack direction={'row'} px={1} alignItems={'center'} width={'100%'} justifyContent={'space-between'}>
-                            <Typography variant="body1" fontWeight={'bold'} color={isFeatured ? "secondary" : 'grey'} sx={{display: 'flex', gap: .5, alignItems: 'center'}}>
-                                {isFeatured && <CheckRounded/>}
-                                Featured
-                            </Typography>
-                            <Switch color="secondary" checked={isFeatured} onChange={handleToggleFeatured} disabled={loading} />
-                        </Stack>
-                    </Stack>
-                </CardActions>
             </Card>
 
             <ConfirmDialog
@@ -142,6 +124,8 @@ export default function ProductCard({ product, onEdit, onDelete }) {
                 onConfirm={handleDeleteConfirmed}
                 onCancel={() => setConfirmOpen(false)}
             />
+            <UpdateDialog open={openUpdateDialog} productData={product} onClose={handleUpdateClose} title={product.productName} content={'update-product'} id={product._id}/>
+            <UpdateDrawer open={openUpdateDialog} productData={product} onClose={handleUpdateClose} title={product.productName} content={'update-product'} id={product._id}/>
         </>
     );
 }

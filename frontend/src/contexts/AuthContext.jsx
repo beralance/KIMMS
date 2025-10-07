@@ -23,9 +23,9 @@ export const AuthProvider = ({ children }) => {
         return null;
     });
 
-    const login = ({ userId, fullName, role, token, allowedModules, isLocal}) => {
-        setUser({ userId, fullName, role, token, allowedModules, isLocal });
-        localStorage.setItem("user", JSON.stringify({ userId, fullName, role, token, allowedModules, isLocal }));
+    const login = ({ userId, fullName, role, token, address, allowedModules, isLocal}) => {
+        setUser({ userId, fullName, role, token, address, allowedModules, isLocal });
+        localStorage.setItem("user", JSON.stringify({ userId, fullName, role, token, address, allowedModules, isLocal }));
     };
 
     const logout = () => {

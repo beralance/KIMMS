@@ -17,6 +17,10 @@ export const toTitleCase = (text) => {
 
 // utils/formatNumber.js
 export function formatNumber(num) {
-  return new Intl.NumberFormat().format(num);
+  // Convert to string and remove all non-digits
+  const numeric = String(num).replace(/\D/g, '');
+  if (!numeric) return ''; // if empty, return empty string
+
+  return new Intl.NumberFormat().format(Number(numeric));
 }
 
