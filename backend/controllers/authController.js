@@ -4,6 +4,10 @@ import jwt from 'jsonwebtoken';
 import StaffPermission from '../models/StaffPermission.js';
 import { generateCode } from '../utils/generateCode.js';
 import { sendEmail } from '../utils/sendEmail.js';
+import { createClient } from '@supabase/supabase-js';
+import {v4 as uuidv4} from 'uuid'
+
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
 
 const DEFAULT_AVATARS = {
     male: 'https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-male-02.svg.svg',
@@ -281,6 +285,7 @@ export const login = async (req, res) => {
     }
 };
 
+// GOOGLE LOGIN (user)
 export const googleLogin = async (req, res) => {
     try {
         const {email, fullName, googleId, avatar} = req.body
@@ -326,6 +331,113 @@ export const googleLogin = async (req, res) => {
         res.status(500).json({error: 'Server error'})
     }
 }
+
+// UPDATE user account (user)
+export const updateUserProfile = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { fullName, gender, phoneNumber, address } = req.body;
+
+        // Ensure at least one field is provided
+        if (!fullName && !gender && !phoneNumber && !address) {
+            return res.status(400).json({ error: 'No field to update' });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        // Update fields if provided
+        if (fullName) user.fullName = fullName.trim();
+        if (gender) user.gender = gender;
+        if (phoneNumber) user.phoneNumber = phoneNumber;
+
+        if (address && typeof address === 'object') {
+            user.address = {
+                ...user.address,
+                ...address,
+            };
+        }
+
+        await user.save();
+
+        res.status(200).json({
+            message: 'Profile updated successfully',
+            user: {
+                id: user._id,
+                email: user.email,
+                fullName: user.fullName,
+                gender: user.gender,
+                phoneNumber: user.phoneNumber,
+                address: user.address,
+                role: user.role,
+            }
+        });
+
+    } catch (err) {
+        console.error('Error updating user profile:', err);
+        res.status(500).json({ error: 'Server error: failed to update profile' });
+    }
+};
+
+export const updateUserAvatar = async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ error: "User not found" });
+
+        const sanitizedOriginal = req.file.originalname.replace(/[\s()]/g, "_");
+        const fileName = `avatars/${Date.now()}-${uuidv4()}-${sanitizedOriginal}`;
+
+        // Upload file to Supabase
+        const { data, error } = await supabase.storage
+            .from("User-Assets")
+            .upload(fileName, req.file.buffer, {
+                cacheControl: "3600",
+                upsert: false,
+                contentType: req.file.mimetype,
+            });
+
+        if (error) {
+            console.error("Supabase upload error:", error);
+            return res.status(500).json({ error: "Failed to upload avatar" });
+        }
+
+        // Generate public URL
+        const publicUrl = supabase.storage
+            .from("User-Assets")
+            .getPublicUrl(fileName).data?.publicUrl;
+
+        if (!publicUrl) return res.status(500).json({ error: "Failed to generate public URL" });
+
+        // Delete old avatar if exists
+        if (user.avatar && user.avatar.includes("/User-Assets/")) {
+            try {
+                const oldPath = user.avatar.split("/User-Assets/")[1];
+                if (oldPath) {
+                    await supabase.storage.from("User-Assets").remove([oldPath]);
+                }
+            } catch (delErr) {
+                console.warn("Failed to delete old avatar:", delErr);
+            }
+        }
+
+        // Update user's avatar
+        user.avatar = publicUrl;
+        await user.save();
+
+        res.status(200).json({
+            message: "Avatar updated successfully",
+            avatar: user.avatar,
+        });
+
+    } catch (err) {
+        console.error("Error updating avatar:", err);
+        res.status(500).json({ error: "Server error: failed to update avatar" });
+    }
+};
 
 // CREATE STAFF (admin only)
 export const createStaff = async (req, res) => {

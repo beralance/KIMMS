@@ -9,14 +9,25 @@ import { useNavigate } from "react-router-dom";
 import { Typography, Button, Stack, Divider } from "@mui/material";
 import { useAuth } from "../contexts/AuthContext";
 import CustomPopover from '../components/CustomPopover'
-
+import ProfilePicker from "./ProfilePicker";
 
 export default function UserDrawer({ open, onClose, links = [], anchor = "right" }) {
     const navigate = useNavigate();
-    const { user, logout } = useAuth();
-
+    const [showPicker, setShowPicker] = React.useState(false)
+    const {user, logout, login} = useAuth();
+    const [currentUser, setCurrentUser] = React.useState(user);
     const [loading, setLoading] = React.useState()
+    const handlePickerOpen = () => setShowPicker(true)
+    const handlePickerClose = () => setShowPicker(false)
 
+    const token = user?.token
+    const avatar = user?.avatar || '/user-placeholder.svg'
+    const fullname = user?.fullName || 'Guest'
+    const userId = user?.userId
+
+    const storeAvatarToLocal = (avatar) => {
+        login ({avatar})
+    }
     React.useEffect(() => {
         const loadData = async () => {
             setLoading(true);
@@ -25,6 +36,7 @@ export default function UserDrawer({ open, onClose, links = [], anchor = "right"
         }
         loadData()
     }, [])
+
     const handleClick = (to, action) => {
         if (action) action();
         if (to) navigate(to);
@@ -69,10 +81,11 @@ export default function UserDrawer({ open, onClose, links = [], anchor = "right"
                     <>
                         {/* User Info */}
                         <Stack alignItems={'center'} justifyContent={'center'} sx={{py: 2}}>
-                            <Stack sx={{width: 100, height: 100, mb: 1, borderRadius: '999px', overflow: 'hidden'}}>
+                            <Stack sx={{width: 100, height: 100, mb: 1, borderRadius: '999px', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.2)', overflow: 'hidden'}}>
                                 <img 
-                                    alt={user.fullName }
-                                    src={user.avatar || '/user-placeholder.svg'}
+                                    onClick={handlePickerOpen}
+                                    alt={fullname}
+                                    src={avatar}
                                     style={{ width: '100%', height: '100%', aspectRatio: '1/1', objectFit: 'cover'}}
                                 />
                             </Stack>
@@ -121,6 +134,7 @@ export default function UserDrawer({ open, onClose, links = [], anchor = "right"
                     </>
                 )}
             </Box>
+            <ProfilePicker open={showPicker} handleClose={handlePickerClose} avatar={avatar} userId={userId} token={token} onAvatarUpdate={(updated) => storeAvatarToLocal(updated)}/>
         </Drawer>
     );
 }

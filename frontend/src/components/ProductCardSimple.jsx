@@ -41,7 +41,7 @@ export default function ProductCardSimple ({ product, onNavigate, addToCart }) {
                         }}
                     />
                 </Box>
-                <CardContent sx={{pb: '10px !important'}}>
+                <CardContent sx={{py: '0px !important'}}>
                     <Stack alignItems={'center'} sx={{px: .5}}>
                         <Stack sx={{alignItems: 'center', py: 1}}>
                             <Stack alignItems={'center'} width={'100%'} sx={{mb: .5}}>
@@ -54,7 +54,7 @@ export default function ProductCardSimple ({ product, onNavigate, addToCart }) {
                             </Typography>
                         </Stack>
                         <Stack>
-                            <Button variant='contained' color='secondary' onClick={onNavigate} sx={{alignSelf: 'flex-end', py: .5, borderRadius: '999px', px: 4}}>
+                            <Button variant='contained' color='secondary' onClick={onNavigate} sx={{alignSelf: 'flex-end', py: .5, my: 1, borderRadius: '999px', px: 4}}>
                                 Visit
                             </Button>
                         </Stack>

@@ -8,7 +8,7 @@ import path from 'path'
 export default defineConfig({
     plugins: [react()],
     server: {
-        allowedHosts: ["68d56ce5fdfe.ngrok-free.app"],
+        allowedHosts: ["f264a7348861.ngrok-free.app"],
         host: true,
         'Cross-Origin-Opener-Policy': 'same-origin',
         'Cross-Origin-Embedder-Policy': 'require-corp',

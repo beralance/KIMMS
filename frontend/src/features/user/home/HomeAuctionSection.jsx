@@ -3,13 +3,13 @@ import React, {Children, useEffect, useRef, useState} from 'react'
 import { motion } from 'framer-motion'
 import SectionTransition from '../../../components/SectionTransition'
 
-export default function UserHero({children}) {
+export default function UserHero({children, sx}) {
     return(
         <>
             <Box
                 sx={{
                     height: '100vh',
-                    backgroundImage: 'url(/view-house-lamp-with-futuristic-design.jpg)',
+                    backgroundImage: 'url(/modern-styled-entryway.jpg)',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     position: 'sticky',
@@ -20,25 +20,18 @@ export default function UserHero({children}) {
             <Stack sx={{width: '100%'}}>
                 <Typography variant="h5" color="white">aksjdhf</Typography>
             </Stack>
-            <Box
+            <Stack
                 sx={{
-                    WebkitMaskImage: "linear-gradient(to bottom, transparent, black 20%, black 80%)",
-                    maskImage: "linear-gradient(to bottom, transparent, black 20%, black 80%)",
                     zIndex: 1,
-                    height: '200vh',
-                    backdropFilter: "blur(10px)",
-                    WebkitBackdropFilter: "blur(10px)",
+                    height: '100vh',
                     color: "white",
-                    display: 'flex', 
-                    alignItems: 'center',
-                    flexDirection: 'column',
-                    justifyContent: 'flex-end',
-                    position: "relative", // important to anchor the gradient
-                    
+                    scrollSnapType: 'y mandatory',
+                    overflowY: 'auto',
+                    scrollBehavior: 'smooth',
                 }}
             >
                 {children}
-            </Box>
+            </Stack>
         </>
     )
 }

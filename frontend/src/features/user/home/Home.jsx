@@ -23,7 +23,7 @@ export default function Home () {
             <Box sx={{bgcolor: 'white', py: 5}} >
                 <Container>
                     <section>
-                        <Stack gap={2} sx={{pb: 12}} justifyContent={'center'}>
+                        <Stack gap={2} sx={{pb: 15}} justifyContent={'center'}>
                             <Stack alignItems={'center'} justifyContent={'center'}>
                                 <Typography variant="h6" gutterBottom color="initial">
                                     Shop
@@ -59,11 +59,11 @@ export default function Home () {
                         </Stack>
                     </section>
                     <section>
-                        <Stack alignItems={'center'} sx={{mb: 12}}>
+                        <Stack alignItems={'center'} sx={{mb: 15}}>
                             <Typography variant='h5' color='initial'>
                                 Handpicked just for you
                             </Typography>
-                            <Typography variant='body1' color='secondary' align='center' sx={{mb: 3}}>
+                            <Typography variant='body1' color='secondary' align='center' sx={{mb: 1}}>
                                 Spotlight on products we think you’ll love the most
                             </Typography>
                             <Box sx={{width: '100%', px: 2}}>
@@ -87,7 +87,7 @@ export default function Home () {
                         </Stack>
                     </section>
                     <section>
-                        <Stack mb={12}>
+                        <Stack mb={15}>
                             <Stack alignItems={'center'} sx={{mb: 1}}>
                                 <Typography variant="h5" color="initial">
                                     Pick your style
@@ -102,30 +102,16 @@ export default function Home () {
                         </Stack>
                     </section>
                 </Container>
-                <HomeAuctionSection>
-                    <Box>
-                        <h1>test</h1>
-                        <h1>test</h1>
-                        <h1>test</h1>
-                        <h1>test</h1>
-                        <h1>test</h1>
-                        <h1>test</h1>
-                        <h1>test</h1>
-                        <h1>test</h1>
-                        <h1>test</h1>
-                        <h1>test</h1>
-                        <h1>test</h1>
-                        <h1>test</h1>
-                        <h1>test</h1>
-                        <h1>test</h1>
-                        <h1>test</h1>
-                        <h1>test</h1>
-                        <h1>test</h1>
-                        <h1>test</h1>
-                    </Box>
-                </HomeAuctionSection>
             </Box>
         </React.Fragment>
     )
 }
 
+export const scrollSnapContent = {
+    width: '100%',
+    height: '100vh',
+    scrollSnapAlign: 'start',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+}
