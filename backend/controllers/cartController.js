@@ -55,16 +55,33 @@ export const addToCart = async (req, res) => {
         }
 
         let cart = await Cart.findOne({ userId });
-        if (!cart) cart = await Cart.create({ userId, items: [] });
+        if (!cart) {
+            cart = await Cart.create({ userId, items: [] })
+            
+            cart = await cart.populate({
+                path: 'items.productId',
+                select: "productName category images price status description",
+                match: {purchaseStatus: "available"},
+                populate: {
+                    path: 'category',
+                    select: 'name createdAt'
+                }
+            })
+        };
 
         // Check if product is already in cart
         const exists = cart.items.some((i) => i.productId.toString() === productId);
         if (!exists) {
             cart.items.push({ productId });
             await cart.save();
+
         }
 
-        await cart.populate("items.productId", "productName category images price description");
+        await cart.populate({
+            path: "items.productId",
+            select: "productName category images price description",
+            populate: {path: 'category', select: 'name createdAt'}
+        });
 
         res.json(cart);
     } catch (err) {

@@ -16,12 +16,10 @@ export default function Auth() {
         setValue(tabValue)
     }, [location.pathname])
 
-    const handleRegisterSuccess = (user) => {
-        // redirect to VerifyPage with email
-        
-        navigate(`/auth/signup/verify?email=${encodeURIComponent(user.email)}`);
-        
+    const onRegisterSuccess = (user) => {
+        navigate(`/auth/signup/verify?email=${encodeURIComponent(user.email)}&id=${user.userId}`);
     };
+
     return (
         <Box>
             <Box 
@@ -39,6 +37,7 @@ export default function Auth() {
                 sx={{
                     width: '100%',
                     height: '100%',
+                    minHeight: '100vh',
                     backdropFilter: 'blur(10px)',
                     bgcolor: 'rgba(0, 0, 0, 0.5)'
                 }}
@@ -47,23 +46,34 @@ export default function Auth() {
                     {/*Upper level*/}
                     <Stack>
                         <Grow in={true} mountOnEnter unmountOnExit timeout={1000}>
-                            <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', mt: 2}}>
-                                <img src="/sofa.svg" alt="" style={{width: '60px', filter: 'invert(1)'}}/>
-                                <img src="/kimms-text.svg" alt="" style={{width: '200px',  filter: 'invert(1)'}}/>
+                            <Box onClick={() => navigate('/')} sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', mt: 2}}>
+                                <img src="/sofa.svg" alt="" style={{width: '30px', marginBottom: -5, filter: 'invert(1)'}}/>
+                                <Typography 
+                                    variant="body1" 
+                                    color="initial" 
+                                    fontWeight={200}
+                                    fontFamily={"'Cormorant Garamond', 'Playfair Display', 'Didot', 'Bodoni MT', 'Garamond', 'Times New Roman', 'serif'"}
+                                    sx={{ 
+                                        color: 'white', 
+                                        fontSize: 20,
+                                    }}
+                                >
+                                    K I M M S
+                                </Typography>
                             </Box> 
                         </Grow>
                     </Stack>
-                    <Stack alignItems={'center'} sx={{mb: 2}}>
+                    <Stack alignItems={'center'} sx={{my: 0}}>
                         <Tabs
                             value={value}
                             aria-label="auth tabs"
                             sx={{
                                 my: 3,
                                 bgcolor: 'rgba(255, 255, 255, 0.3)',
-                                borderRadius: '10px',
+                                borderRadius: '5px',
                                 transition: 'all .5s ease',
                                 height: 10,
-                                minHeight: 40,
+                                minHeight: 30,
                                 alignItems: 'center',
                                 boxShadow: 5,
                             }}
@@ -107,7 +117,7 @@ export default function Auth() {
                                 <Box>
                                     <ScrollSectionRight sx={{justifyContent: 'flex-start'}}>
                                         <Stack>
-                                            <Typography variant="h4" color="white" sx={{fontWeight: 'bold',}}>
+                                            <Typography variant="h5" color="white" sx={{fontWeight: 'bold',}}>
                                                 Welcome Back!
                                             </Typography>
                                             <Typography variant="body2" color="white" component="h1" mb={3} sx={{opacity: .8}}>
@@ -122,7 +132,7 @@ export default function Auth() {
                                 <>
                                     <ScrollSectionRight sx={{justifyContent: 'flex-start'}}>
                                         <Stack>
-                                            <Typography variant="h4" color="white" sx={{fontWeight: 'bold'}}>
+                                            <Typography variant="h5" color="white" sx={{fontWeight: 'bold'}}>
                                                 Let's get you started
                                             </Typography>
                                             <Typography variant="body2" color="white" component="h1" mb={3} sx={{opacity: .8}}>
@@ -136,7 +146,7 @@ export default function Auth() {
                     </Stack>
                     <Grow in={true} timeout={800}>
                         <Box>
-                            <Outlet context={{handleRegisterSuccess}}/>
+                            <Outlet context={{onRegisterSuccess}}/>
                         </Box>
                     </Grow>
                 </Box>

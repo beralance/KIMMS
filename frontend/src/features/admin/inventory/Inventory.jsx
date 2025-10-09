@@ -7,7 +7,7 @@ import ManagementDialog from './components/ManagementDialog';
 import ManagementDrawer from './components/ManagementDrawer';
 import SearchBar from './components/SearchBar';
 import { Collapse, Container, IconButton, Stack, Typography } from '@mui/material';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import {Outlet} from 'react-router-dom'
 import { InfoOutlineRounded, InfoRounded } from '@mui/icons-material';
 
@@ -23,14 +23,16 @@ export default function Inventory() {
 
     const handleOpenDialog = () => setOpenDialog(true)
     const handleCloseDialog = () => setOpenDialog(false)
-
-    const handleOpenGuide = () => setOpenGuide(true)
-    const handleCloseGuide = () => setOpenGuide(false)
-
+    
     React.useEffect(() => {
         setValue(tabValue)
     }, [location.pathname])
 
+    React.useEffect(() => {
+        if (location.state?.openDialog) {
+            setOpenDialog(true);
+        }
+    }, [location.state])
     return (
         <Box sx={{mt: 2}}>
             <Container maxWidth={'lg'}>

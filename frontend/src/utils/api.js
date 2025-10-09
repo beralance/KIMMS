@@ -8,13 +8,26 @@ const postRequest = async (url, payload) => {
         body: JSON.stringify(payload),
     });
 
-    if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Request failed");
+
+    let resData;
+    try {
+        resData = await res.json(); // parse once
+    } catch (e) {
+        console.error("Failed to parse JSON response:", e);
+        resData = null; // fallback
     }
 
-    return res.json();
+
+    if (!res.ok) {
+        const errMsg = resData?.error || resData?.message || "Request failed";
+        throw new Error(errMsg);
+    }
+
+
+    console.log("Server response data:", resData);
+    return resData;
 };
+
 
 // Signup new user
 export const signupUser = async (payload) => {
@@ -33,5 +46,24 @@ export const verifyEmail = async (payload) => {
 
 // Resend verification code
 export const resendCode = async (payload) => {
-    return postRequest(`${API_URL}/api/auth/resend-code`, payload);
+    return postRequest(`${API_URL}/api/auth/resent-code`, payload);
+};
+
+// Add Update Address
+export const updateUserAddress = async (userId, address, token) => {
+    //wrap in try catch
+     const res = await fetch(`${API_URL}/api/auth/${userId}/address`, {
+        method: "PATCH",
+        headers: { 
+            "Content-Type": "application/json",
+            'Authorization' : `Bearer ${token}`
+        },
+        body: JSON.stringify({address}),
+    });
+
+    if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || err.message || "Request failed");
+    }
+    return res.json();
 };

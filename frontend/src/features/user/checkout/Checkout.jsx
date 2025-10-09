@@ -4,9 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { useCheckout } from "../../../contexts/CheckoutContext";
 import BottomActionBar from "../../../components/BottomActionBar";
 import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
+import PaymentMethod from "./components/PaymentMethod";
+
 
 export default function Checkout() {
     const { checkoutItems, totalAmount, isProcessing, checkout } = useCheckout();
+    
+    const finalAmount = totalAmount + 1 // change 1 into shipping fee
     const navigate = useNavigate();
 
     if (!checkoutItems.length) {
@@ -25,6 +29,9 @@ export default function Checkout() {
             <Typography variant="h4" sx={{ mb: 3 }}>
                 Checkout
             </Typography>
+
+            <PaymentMethod/>
+
 
             {checkoutItems.map((item) => (
                 <Box key={item._id} sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>

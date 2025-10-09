@@ -12,9 +12,12 @@ export default function UserFooter() {
                 >
                     {/* About */}
                     <Box sx={{textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-                        <Typography variant="h6" sx={{ mb: 1 }}>
-                            Kimm’s Furniture & Merchandise
-                        </Typography>
+                        <Stack alignItems={'center'}>
+                            <img src='/sofa.svg' style={{width: 30}} />
+                            <Typography variant="h6" sx={{ mb: 1 }}>
+                                Kimm’s Furniture & Merchandise
+                            </Typography>
+                        </Stack>
                         <Typography variant="body2" color="text.secondary">
                             We bring you the best of Japan’s surplus furniture and home goods, carefully selected for quality, style, and affordability. Each piece tells its own story and adds a unique touch to your living space.
                         </Typography>

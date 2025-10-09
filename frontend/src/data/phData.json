@@ -16545,6 +16545,8 @@
       "ALBAY": {
         "municipality_list": {
           "BACACAY": {
+            "lat": 13.29593966713694,
+            "lng": 123.87474408755428,
             "barangay_list": [
               "BACLAYON",
               "BANAO",
@@ -16605,6 +16607,8 @@
             ]
           },
           "CAMALIG": {
+            "lat": 13.139640686570244,
+            "lng": 123.64170597181972,
             "barangay_list": [
               "ANOLING",
               "BALIGANG",
@@ -16659,6 +16663,8 @@
             ]
           },
           "CITY OF LIGAO": {
+            "lat": 13.238068008048442, 
+            "lng": 123.530789387583,
             "barangay_list": [
               "ABELLA",
               "ALLANG",
@@ -16718,6 +16724,8 @@
             ]
           },
           "DARAGA (LOCSIN)": {
+            "lat": 13.124715636257614, 
+            "lng": 123.69574742631414,
             "barangay_list": [
               "ALCALA",
               "ALOBO",
@@ -16776,6 +16784,8 @@
             ]
           },
           "GUINOBATAN": {
+            "lat": 13.192970122659244, 
+            "lng": 123.59389984966172,
             "barangay_list": [
               "AGPAY",
               "BALITE",
@@ -16824,6 +16834,8 @@
             ]
           },
           "JOVELLAR": {
+            "lat": 13.061320880746052,
+            "lng": 123.58521370172978,
             "barangay_list": [
               "AURORA POB. (BGY. 6)",
               "BAGACAY",
@@ -16851,6 +16863,8 @@
             ]
           },
           "LEGAZPI CITY": {
+            "lat": 13.114293138485195, 
+            "lng": 123.75299889883516,
             "barangay_list": [
               "BGY. 1 - EM'S BARRIO (POB.)",
               "BGY. 2 - EM'S BARRIO SOUTH (POB.)",
@@ -16925,6 +16939,8 @@
             ]
           },
           "LIBON": {
+            "lat": 13.26145765000944,  
+            "lng": 123.37441025109507,
             "barangay_list": [
               "ALONGONG",
               "APUD",
@@ -16976,6 +16992,8 @@
             ]
           },
           "MALILIPOT": {
+            "lat": 13.299168151946095,   
+            "lng": 123.71869824444462,
             "barangay_list": [
               "BARANGAY I (POB.)",
               "BARANGAY II (POB.)",
@@ -16998,6 +17016,8 @@
             ]
           },
           "MALINAO": {
+            "lat": 13.379941535152907,   
+            "lng": 123.63670416800834,
             "barangay_list": [
               "AWANG",
               "BAGATANGKI",
@@ -17031,6 +17051,8 @@
             ]
           },
           "MANITO": {
+            "lat": 13.125862734777604, 
+            "lng": 123.86457704394711,
             "barangay_list": [
               "BALABAGON",
               "BALASBAS",
@@ -17050,6 +17072,8 @@
             ]
           },
           "OAS": {
+            "lat": 13.138759706742112, 
+            "lng": 123.37041558289465,
             "barangay_list": [
               "BADBAD",
               "BADIAN",
@@ -17107,6 +17131,8 @@
             ]
           },
           "PIO DURAN": {
+            "lat": 13.04635178488829, 
+            "lng": 123.45541912040137, 
             "barangay_list": [
               "AGOL",
               "ALABANGPURO",
@@ -17144,6 +17170,8 @@
             ]
           },
           "POLANGUI": {
+            "lat": 13.293379334782516,
+            "lng": 123.48416003036134, 
             "barangay_list": [
               "AGOS",
               "ALNAY",
@@ -17192,6 +17220,8 @@
             ]
           },
           "RAPU-RAPU": {
+            "lat": 13.23328529712269, 
+            "lng": 124.0202691683039, 
             "barangay_list": [
               "BAGAOBAWAN",
               "BATAN",
@@ -17230,6 +17260,8 @@
             ]
           },
           "SANTO DOMINGO (LIBOG)": {
+            "lat": 13.253132655403629,  
+            "lng": 123.76653054226732, 
             "barangay_list": [
               "ALIMSOG",
               "BAGONG SAN ROQUE",
@@ -17257,6 +17289,8 @@
             ]
           },
           "TABACO CITY": {
+            "lat": 13.363020502422826,
+            "lng": 123.72976467105654, 
             "barangay_list": [
               "AGNAS (SAN MIGUEL ISLAND)",
               "BACOLOD",
@@ -17308,6 +17342,8 @@
             ]
           },
           "TIWI": {
+            "lat": 13.461644674368458, 
+            "lng": 123.63902488725081,
             "barangay_list": [
               "BAGUMBAYAN",
               "BARIIS",
@@ -17341,6 +17377,8 @@
       "CAMARINES NORTE": {
         "municipality_list": {
           "BASUD": {
+            "lat": 14.005891608544413, 
+            "lng": 122.9682130940565,
             "barangay_list": [
               "ANGAS",
               "BACTAS",
@@ -17374,6 +17412,8 @@
             ]
           },
           "CAPALONGA": {
+            "lat": 14.278236422533777, 
+            "lng": 122.51865553140146,
             "barangay_list": [
               "ALAYAO",
               "BINAWANGAN",
@@ -17400,6 +17440,8 @@
             ]
           },
           "DAET": {
+            "lat": 14.102825765615327, 
+            "lng": 122.931031299324,
             "barangay_list": [
               "ALAWIHAO",
               "AWITAN",
@@ -17429,6 +17471,8 @@
             ]
           },
           "JOSE PANGANIBAN": {
+            "lat": 14.285230157877463, 
+            "lng": 122.69129045418241,
             "barangay_list": [
               "BAGONG BAYAN",
               "CALERO",
@@ -17460,6 +17504,8 @@
             ]
           },
           "LABO": {
+            "lat": 14.137628267085434, 
+            "lng": 122.75966510579674,
             "barangay_list": [
               "ANAHAW (POB.)",
               "ANAMEAM",
@@ -17516,6 +17562,8 @@
             ]
           },
           "MERCEDES": {
+            "lat": 13.900346758212642, 
+            "lng": 123.06891265605327,
             "barangay_list": [
               "APUAO",
               "BARANGAY I (POB.)",
@@ -17546,6 +17594,8 @@
             ]
           },
           "PARACALE": {
+            "lat": 14.23660787202616, 
+            "lng": 122.795397714913,
             "barangay_list": [
               "AWITAN",
               "BAGUMBAYAN",
@@ -17577,6 +17627,8 @@
             ]
           },
           "SAN LORENZO RUIZ (IMELDA)": {
+            "lat": 14.035833452015334,  
+            "lng": 122.85871990398205,
             "barangay_list": [
               "DACULANG BOLO",
               "DAGOTDOTAN",
@@ -17593,6 +17645,8 @@
             ]
           },
           "SAN VICENTE": {
+            "lat": 14.072226306748927,   
+            "lng": 122.86656315023014,
             "barangay_list": [
               "ASDUM",
               "CABANBANAN",
@@ -17606,6 +17660,8 @@
             ]
           },
           "SANTA ELENA": {
+            "lat": 14.136704581507612,   
+            "lng": 122.37670092505952,
             "barangay_list": [
               "BASIAD",
               "BULALA",
@@ -17629,6 +17685,8 @@
             ]
           },
           "TALISAY": {
+            "lat": 14.139971292992746,   
+            "lng": 122.92630300849076,
             "barangay_list": [
               "BINANUAAN",
               "CAAWIGAN",
@@ -17648,6 +17706,8 @@
             ]
           },
           "VINZONS": {
+            "lat": 14.210656608950494,    
+            "lng": 122.89067075786376,
             "barangay_list": [
               "AGUIT-IT",
               "BANOCBOC",
@@ -17675,6 +17735,8 @@
       "CAMARINES SUR": {
         "municipality_list": {
           "BAAO": {
+            "lat": 13.491920503045725,  
+            "lng": 123.36190147447635,
             "barangay_list": [
               "AGDANGAN POB. (SAN CAYETANO)",
               "ANTIPOLO",
@@ -17709,6 +17771,8 @@
             ]
           },
           "BALATAN": {
+            "lat": 13.349649546823475,   
+            "lng": 123.24720517472153,
             "barangay_list": [
               "CABANBANAN",
               "CABUNGAN",
@@ -17730,6 +17794,8 @@
             ]
           },
           "BATO": {
+            "lat": 13.319236377136708,  
+            "lng": 123.31253665760735,
             "barangay_list": [
               "AGOS",
               "BACOLOD",
@@ -17767,6 +17833,8 @@
             ]
           },
           "BOMBON": {
+            "lat": 13.683802865172026,  
+            "lng": 123.21067669222515,
             "barangay_list": [
               "PAGAO (SAN JUAN)",
               "SAN ANTONIO",
@@ -17779,6 +17847,8 @@
             ]
           },
           "BUHI": {
+            "lat": 13.409460881262133, 
+            "lng": 123.51474985982975,
             "barangay_list": [
               "AMLONGAN (DEL ROSARIO)",
               "ANTIPOLO",
@@ -17821,6 +17891,8 @@
             ]
           },
           "BULA": {
+            "lat": 13.443859886984143, 
+            "lng": 123.23463526526149,
             "barangay_list": [
               "BAGOLADIO",
               "BAGUMBAYAN",
@@ -17858,6 +17930,8 @@
             ]
           },
           "CABUSAO": {
+            "lat": 13.726262091740823, 
+            "lng": 123.11344195767656,
             "barangay_list": [
               "BARCELONITA",
               "BIONG",
@@ -17871,6 +17945,8 @@
             ]
           },
           "CALABANGA": {
+            "lat": 13.717207887150805, 
+            "lng": 123.28049977417773,
             "barangay_list": [
               "BALATASAN",
               "BALOMBON",
@@ -17923,6 +17999,8 @@
             ]
           },
           "CAMALIGAN": {
+            "lat": 13.619724896293981,  
+            "lng": 123.16712428072948,
             "barangay_list": [
               "DUGCAL",
               "MARUPIT",
@@ -17940,6 +18018,8 @@
             ]
           },
           "CANAMAN": {
+            "lat": 13.647243028017526,   
+            "lng": 123.13595365113285,
             "barangay_list": [
               "BARAS (POB.)",
               "DEL ROSARIO",
@@ -17968,6 +18048,8 @@
             ]
           },
           "CARAMOAN": {
+            "lat": 13.796293197356704,  
+            "lng": 123.82776885177942,
             "barangay_list": [
               "AGAAS",
               "ANTOLON",
@@ -18021,6 +18103,8 @@
             ]
           },
           "DEL GALLEGO": {
+            "lat": 13.923511960993544, 
+            "lng": 122.68678312938411,
             "barangay_list": [
               "BAGONG SILANG",
               "BUCAL",
@@ -18057,6 +18141,8 @@
             ]
           },
           "GAINZA": {
+            "lat": 13.611345121617495, 
+            "lng": 123.14175112050049,
             "barangay_list": [
               "CAGBUNGA",
               "DAHILIG",
@@ -18069,6 +18155,8 @@
             ]
           },
           "GARCHITORENA": {
+            "lat": 13.862908792380392, 
+            "lng": 123.64189328645702,
             "barangay_list": [
               "ASON (ANSON)",
               "BAHI",
@@ -18096,6 +18184,8 @@
             ]
           },
           "GOA": {
+            "lat": 13.697921480986377,
+            "lng": 123.49052377459165,
             "barangay_list": [
               "ABUCAYAN",
               "BAGUMBAYAN GRANDE (POB.)",
@@ -18134,6 +18224,8 @@
             ]
           },
           "IRIGA CITY": {
+            "lat": 13.42162475499179, 
+            "lng": 123.41279696977917,
             "barangay_list": [
               "ANTIPOLO",
               "CRISTO REY",
@@ -18174,6 +18266,8 @@
             ]
           },
           "LAGONOY": {
+            "lat": 13.86735280130101,  
+            "lng": 123.48581617944835,
             "barangay_list": [
               "AGOSAIS",
               "AGPO-CAMAGONG-TABOG",
@@ -18216,6 +18310,8 @@
             ]
           },
           "LIBMANAN": {
+            "lat": 13.694630346779082,  
+            "lng": 123.06346898919088, 
             "barangay_list": [
               "ASLONG",
               "AWAYAN",
@@ -18295,6 +18391,8 @@
             ]
           },
           "LUPI": {
+            "lat": 13.790921905217004, 
+            "lng": 122.90690507906962, 
             "barangay_list": [
               "ALLEOMAR",
               "BAGANGAN SR.",
@@ -18337,6 +18435,8 @@
             ]
           },
           "MAGARAO": {
+            "lat": 13.670616680259613, 
+            "lng": 123.15048241081342, 
             "barangay_list": [
               "BAROBAYBAY",
               "BELL (POB.)",
@@ -18356,6 +18456,8 @@
             ]
           },
           "MILAOR": {
+            "lat": 13.596816038573854,  
+            "lng": 123.1731562058061, 
             "barangay_list": [
               "ALIMBUYOG",
               "AMPARADO (POB.)",
@@ -18380,6 +18482,8 @@
             ]
           },
           "MINALABAC": {
+            "lat": 13.529050848152291,  
+            "lng": 123.18786579325277, 
             "barangay_list": [
               "ANTIPOLO",
               "BAGOLATAO",
@@ -18409,6 +18513,8 @@
             ]
           },
           "NABUA": {
+            "lat": 13.406408294114593, 
+            "lng": 123.37356874462549, 
             "barangay_list": [
               "ANGUSTIA (ANGUSTIA INAPATAN)",
               "ANTIPOLO OLD",
@@ -18455,6 +18561,8 @@
             ]
           },
           "NAGA CITY": {
+            "lat": 13.6460036622167, 
+            "lng": 123.26813359141207, 
             "barangay_list": [
               "ABELLA",
               "BAGUMBAYAN NORTE",
@@ -18486,6 +18594,8 @@
             ]
           },
           "OCAMPO": {
+            "lat": 13.582019121338735,
+            "lng": 123.37271302199888, 
             "barangay_list": [
               "AYUGAN",
               "CABARIWAN",
@@ -18515,6 +18625,8 @@
             ]
           },
           "PAMPLONA": {
+            "lat": 13.59708852892756, 
+            "lng": 123.06671656013194,
             "barangay_list": [
               "BATANG",
               "BURABOD",
@@ -18536,6 +18648,8 @@
             ]
           },
           "PASACAO": {
+            "lat": 13.54674242527459, 
+            "lng": 123.00034429831922,
             "barangay_list": [
               "ANTIPOLO",
               "BAGONG SILANG",
@@ -18559,6 +18673,8 @@
             ]
           },
           "PILI": {
+            "lat": 13.557082606292687, 
+            "lng": 123.28137031788175,
             "barangay_list": [
               "ANAYAN",
               "BAGONG SIRANG",
@@ -18589,6 +18705,8 @@
             ]
           },
           "PRESENTACION (PARUBCAN)": {
+            "lat": 13.768168034293979, 
+            "lng": 123.72899337099852,
             "barangay_list": [
               "AYUGAO",
               "BAGONG SIRANG",
@@ -18611,6 +18729,8 @@
             ]
           },
           "RAGAY": {
+            "lat": 13.82940803941251, 
+            "lng": 122.77950217584574,
             "barangay_list": [
               "AGAO-AO",
               "AGRUPACION",
@@ -18653,6 +18773,8 @@
             ]
           },
           "SAGÑAY": {
+            "lat": 13.561745221336277, 
+            "lng": 123.50440675835874,
             "barangay_list": [
               "ANIOG",
               "ATULAYAN",
@@ -18676,6 +18798,8 @@
             ]
           },
           "SAN FERNANDO": {
+            "lat": 13.529879605985908, 
+            "lng": 123.11600686174829,
             "barangay_list": [
               "ALIANZA",
               "BEBERON",
@@ -18702,6 +18826,8 @@
             ]
           },
           "SAN JOSE": {
+            "lat": 13.687816170249919, 
+            "lng": 123.54071439819093,
             "barangay_list": [
               "ADIANGAO",
               "BAGACAY",
@@ -18735,6 +18861,8 @@
             ]
           },
           "SIPOCOT": {
+            "lat": 13.770265562381418,  
+            "lng": 122.97622911059,
             "barangay_list": [
               "ALDEZAR",
               "ALTEZA",
@@ -18785,6 +18913,8 @@
             ]
           },
           "SIRUMA": {
+            "lat": 14.020927534793001, 
+            "lng": 123.2565652593205,
             "barangay_list": [
               "BAGONG SIRANG",
               "BAHAO",
@@ -18811,6 +18941,8 @@
             ]
           },
           "TIGAON": {
+            "lat": 13.617484319709986, 
+            "lng": 123.47207954417081,
             "barangay_list": [
               "ABO",
               "CABALINADAN",
@@ -18838,6 +18970,8 @@
             ]
           },
           "TINAMBAC": {
+            "lat": 13.903501721747284, 
+            "lng": 123.37747704623871,
             "barangay_list": [
               "AGAY-AYAN",
               "ANTIPOLO",
@@ -18890,6 +19024,8 @@
       "CATANDUANES": {
         "municipality_list": {
           "BAGAMANOC": {
+            "lat": 13.9402191870358, 
+            "lng": 124.28384539019234,
             "barangay_list": [
               "ANTIPOLO",
               "BACAK",
@@ -18912,6 +19048,8 @@
             ]
           },
           "BARAS": {
+            "lat": 13.70153214925744, 
+            "lng": 124.3621586197118,
             "barangay_list": [
               "ABIHAO",
               "AGBAN",
@@ -18945,6 +19083,8 @@
             ]
           },
           "BATO": {
+            "lat": 13.607599785120614, 
+            "lng": 124.31952920291921,
             "barangay_list": [
               "AROYAO PEQUEÑO",
               "BAGUMBAYAN",
@@ -18976,6 +19116,8 @@
             ]
           },
           "CARAMORAN": {
+            "lat": 13.820064923182223,  
+            "lng": 124.17842700844405,
             "barangay_list": [
               "BAYBAY (POB.)",
               "BOCON",
@@ -19007,6 +19149,8 @@
             ]
           },
           "GIGMOTO": {
+            "lat": 13.791089752694372,  
+            "lng": 124.35258203144215,
             "barangay_list": [
               "BIONG",
               "DORORIAN",
@@ -19020,6 +19164,8 @@
             ]
           },
           "PANDAN": {
+            "lat": 14.027131044381788,  
+            "lng": 124.19106494530271,
             "barangay_list": [
               "BAGAWANG",
               "BALAGÑONAN",
@@ -19050,6 +19196,8 @@
             ]
           },
           "PANGANIBAN (PAYO)": {
+            "lat": 13.893541808279446, 
+            "lng": 124.27637093254233,
             "barangay_list": [
               "ALINAWAN",
               "BABAGUAN",
@@ -19077,6 +19225,8 @@
             ]
           },
           "SAN ANDRES (CALOLBON)": {
+            "lat": 13.631032315517055,  
+            "lng": 124.08794888184194,
             "barangay_list": [
               "AGOJO",
               "ALIBUAG",
@@ -19119,6 +19269,8 @@
             ]
           },
           "SAN MIGUEL": {
+            "lat": 13.686431143751477, 
+            "lng": 124.26936106518876,
             "barangay_list": [
               "ATSAN (DISTRICT I)",
               "BALATOHAN",
@@ -19147,6 +19299,8 @@
             ]
           },
           "VIGA": {
+            "lat": 13.850923210429418,  
+            "lng": 124.29734412783958,
             "barangay_list": [
               "ALMOJUELA",
               "ANANONG",
@@ -19182,6 +19336,8 @@
             ]
           },
           "VIRAC": {
+            "lat": 13.619081669614642, 
+            "lng": 124.17514423638043,
             "barangay_list": [
               "ANTIPOLO DEL NORTE",
               "ANTIPOLO DEL SUR",
@@ -19253,6 +19409,8 @@
       "MASBATE": {
         "municipality_list": {
           "AROROY": {
+            "lat": 12.388065185013515, 
+            "lng": 123.32879810328188,
             "barangay_list": [
               "AMBOLONG",
               "AMOROY",
@@ -19298,6 +19456,8 @@
             ]
           },
           "BALENO": {
+            "lat": 12.408256925981375, 
+            "lng": 123.46083915372586,
             "barangay_list": [
               "BAAO",
               "BANASE",
@@ -19326,6 +19486,8 @@
             ]
           },
           "BALUD": {
+            "lat": 12.041892944965456, 
+            "lng": 123.23750352492479,
             "barangay_list": [
               "BAYBAY (LUMOCAB)",
               "BONGCANAWAY",
@@ -19362,6 +19524,8 @@
             ]
           },
           "BATUAN": {
+            "lat": 12.398298528663153, 
+            "lng": 123.7628151704486,
             "barangay_list": [
               "BURGOS",
               "CAMBAÑEZ",
@@ -19380,6 +19544,8 @@
             ]
           },
           "CATAINGAN": {
+            "lat": 11.986425917096636, 
+            "lng": 123.95245906826739,
             "barangay_list": [
               "ABACA",
               "AGUADA",
@@ -19420,6 +19586,8 @@
             ]
           },
           "CAWAYAN": {
+            "lat": 12.053145550892177, 
+            "lng": 123.73276292607581,
             "barangay_list": [
               "BEGIA",
               "CABAYUGAN",
@@ -19461,6 +19629,8 @@
             ]
           },
           "CLAVERIA": {
+            "lat": 12.879127804861163,  
+            "lng": 123.23879417543203,
             "barangay_list": [
               "ALBASAN",
               "BOCA ENGAÑO",
@@ -19487,6 +19657,8 @@
             ]
           },
           "DIMASALANG": {
+            "lat": 12.150599928027864, 
+            "lng": 123.8335188987298,
             "barangay_list": [
               "BALANTAY",
               "BALOCAWE",
@@ -19511,6 +19683,8 @@
             ]
           },
           "ESPERANZA": {
+            "lat": 11.810474884489885, 
+            "lng": 124.00791830993897,
             "barangay_list": [
               "AGOHO",
               "ALMERO",
@@ -19535,6 +19709,8 @@
             ]
           },
           "MANDAON": {
+            "lat": 12.270358842651707, 
+            "lng": 123.32747576614078,
             "barangay_list": [
               "ALAS",
               "AYAT",
@@ -19565,6 +19741,8 @@
             ]
           },
           "MASBATE CITY": {
+            "lat": 12.372668784689399, 
+            "lng": 123.62633105067181,
             "barangay_list": [
               "ANAS",
               "ASID",
@@ -19599,6 +19777,8 @@
             ]
           },
           "MILAGROS": {
+            "lat": 12.244630038035071,  
+            "lng": 123.51215877330331,
             "barangay_list": [
               "BACOLOD",
               "BANGAD",
@@ -19630,6 +19810,8 @@
             ]
           },
           "MOBO": {
+            "lat": 12.335989653748639, 
+            "lng": 123.65962445969217,
             "barangay_list": [
               "BAANG",
               "BAGACAY",
@@ -19663,6 +19845,8 @@
             ]
           },
           "MONREAL": {
+            "lat": 12.622180291920621, 
+            "lng": 123.64025956220439,
             "barangay_list": [
               "CANTORNA",
               "FAMOSA",
@@ -19678,6 +19862,8 @@
             ]
           },
           "PALANAS": {
+            "lat": 12.112060463557881, 
+            "lng": 123.91123496982264,
             "barangay_list": [
               "ANTIPOLO",
               "BANCO",
@@ -19706,6 +19892,8 @@
             ]
           },
           "PIO V. CORPUZ (LIMBUHAN)": {
+            "lat": 11.848173782690136, 
+            "lng": 124.02795541065622,
             "barangay_list": [
               "ALEGRIA",
               "BUENASUERTE",
@@ -19728,6 +19916,8 @@
             ]
           },
           "PLACER": {
+            "lat": 11.96041841163112, 
+            "lng": 123.86639532579082,
             "barangay_list": [
               "AGUADA",
               "BAN-AO",
@@ -19767,6 +19957,8 @@
             ]
           },
           "SAN FERNANDO": {
+            "lat": 12.478766091562882, 
+            "lng": 123.74197844273964,
             "barangay_list": [
               "ALTAVISTA",
               "BAYANIHAN POB. (DISTRICT 4)",
@@ -19797,6 +19989,8 @@
             ]
           },
           "SAN JACINTO": {
+            "lat": 12.53688741524214, 
+            "lng": 123.68571855993288,
             "barangay_list": [
               "ALMIÑE",
               "BAGACAY",
@@ -19822,6 +20016,8 @@
             ]
           },
           "SAN PASCUAL": {
+            "lat": 13.072315361219953, 
+            "lng": 123.01218313430051,
             "barangay_list": [
               "BOCA CHICA",
               "BOLOD (POB.)",
@@ -19848,6 +20044,8 @@
             ]
           },
           "USON": {
+            "lat": 12.180036205322649, 
+            "lng": 123.78646493408822,
             "barangay_list": [
               "ARADO",
               "ARMENIA",
@@ -19891,6 +20089,8 @@
       "SORSOGON": {
         "municipality_list": {
           "BARCELONA": {
+            "lat": 12.842456507448448, 
+            "lng": 124.12049658111525,
             "barangay_list": [
               "ALEGRIA",
               "BAGACAY",
@@ -19920,6 +20120,8 @@
             ]
           },
           "BULAN": {
+            "lat": 12.70324744055242, 
+            "lng": 123.9102134944399,
             "barangay_list": [
               "A. BONIFACIO",
               "ABAD SANTOS",
@@ -19987,6 +20189,8 @@
             ]
           },
           "BULUSAN": {
+            "lat": 12.766065377760505, 
+            "lng": 124.09803991416945,
             "barangay_list": [
               "BAGACAY",
               "CENTRAL (POB.)",
@@ -20015,6 +20219,8 @@
             ]
           },
           "CASIGURAN": {
+            "lat": 12.843082955234742,
+            "lng": 124.04200919355345,
             "barangay_list": [
               "ADOVIS (POB.)",
               "BOTON",
@@ -20044,6 +20250,8 @@
             ]
           },
           "CASTILLA": {
+            "lat": 12.955980853308882, 
+            "lng": 123.820808099618,
             "barangay_list": [
               "AMOMONTING",
               "BAGALAYAG",
@@ -20082,6 +20290,8 @@
             ]
           },
           "DONSOL": {
+            "lat": 12.990049251802512, 
+            "lng": 123.59476303142382,
             "barangay_list": [
               "ALIN",
               "AWAI",
@@ -20137,6 +20347,8 @@
             ]
           },
           "GUBAT": {
+            "lat": 12.924402324829465, 
+            "lng": 124.09888375858353,
             "barangay_list": [
               "ARIMAN",
               "BAGACAY",
@@ -20183,6 +20395,8 @@
             ]
           },
           "IROSIN": {
+            "lat": 12.724594709105654, 
+            "lng": 124.03821656320689,
             "barangay_list": [
               "BACOLOD (POB.)",
               "BAGSANGAN",
@@ -20215,6 +20429,8 @@
             ]
           },
           "JUBAN": {
+            "lat": 12.805369562266257, 
+            "lng": 123.96461533350183,
             "barangay_list": [
               "ANOG",
               "AROROY",
@@ -20244,6 +20460,8 @@
             ]
           },
           "MAGALLANES": {
+            "lat": 12.833673866117923, 
+            "lng": 123.85815400647428,
             "barangay_list": [
               "AGUADA NORTE",
               "AGUADA SUR",
@@ -20282,6 +20500,8 @@
             ]
           },
           "MATNOG": {
+            "lat": 12.605794749635685, 
+            "lng": 124.04342793857101,
             "barangay_list": [
               "BALOCAWE",
               "BANOGAO",
@@ -20326,6 +20546,8 @@
             ]
           },
           "PILAR": {
+            "lat": 12.973609988285936, 
+            "lng": 123.68535276349346,
             "barangay_list": [
               "ABAS",
               "ABUCAY",
@@ -20379,6 +20601,8 @@
             ]
           },
           "PRIETO DIAZ": {
+            "lat": 13.033473369868798, 
+            "lng": 1124.16682672523156,
             "barangay_list": [
               "BRILLANTE (POB.)",
               "BULAWAN",
@@ -20406,6 +20630,8 @@
             ]
           },
           "SANTA MAGDALENA": {
+            "lat": 12.648764638313013, 
+            "lng": 124.07640797828219,
             "barangay_list": [
               "BARANGAY POBLACION I",
               "BARANGAY POBLACION II",
@@ -20424,6 +20650,8 @@
             ]
           },
           "SORSOGON CITY": {
+            "lat": 12.979062734799502, 
+            "lng": 123.98560381541978,
             "barangay_list": [
               "ABUYOG",
               "ALMENDRAS-COGON (POB.)",

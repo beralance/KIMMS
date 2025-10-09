@@ -61,7 +61,6 @@ export const getPostedCategories = async (req, res) => {
 export const getAllCategoriesFromProducts = async (req, res) => {
     try {
         const user = req.user;
-        console.log('USER@@', user)
 
         let matchStage = {visibility: 'active'}
 
@@ -70,7 +69,6 @@ export const getAllCategoriesFromProducts = async (req, res) => {
                 matchStage.isLocal = false;
             }
         }
-        console.log('match stage%%%%%%%%%%', matchStage)
         const categories = await Product.aggregate([
             { $match: matchStage },
 

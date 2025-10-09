@@ -41,6 +41,8 @@ import Auth from '../features/auth/Auth'
 import SignupForm from '../features/auth/components/SignupForm'
 import LoginForm from '../features/auth/components/LoginForm'
 import VerifyForm from '../features/auth/components/VerifyForm'
+import AddressForm from "../features/auth/components/AddressForm";
+import AccountDelete from '../features/auth/components/AccountDelete'
 
 // Layouts
 import AdminLayout from '../layout/AdminLayout'
@@ -58,7 +60,8 @@ export default function AppRoutes() {
                 <Route path='signup' element={<SignupForm/>}/>
             </Route>
             <Route path="/auth/signup/verify" element={<VerifyForm/>}/>
-            
+            <Route path="/auth/signup/address" element={<AddressForm/>}/> {/*Use only when user doesnt have an address*/}
+            <Route path="/auth/account-deletion" element={<AccountDelete/>}/>
             {/*
             <Route path='/auth/login' element={<Auth/>}/>
             <Route path='/auth/signup' element={<Auth/>}/>

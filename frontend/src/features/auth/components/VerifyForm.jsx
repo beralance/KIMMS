@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Box, TextField, Button, Typography, Stack } from "@mui/material";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -10,12 +10,18 @@ export default function VerifyForm() {
     const [searchParams] = useSearchParams()
     const { login } = useAuth();
     const email = searchParams.get('email') || '';
+    const userId = searchParams.get('id') || '';
     const [codes, setCodes] = useState(["", "", "", "", "", ""]);
     const [code, setCode] = useState("");
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const inputsRef = useRef([]);
 
+    useEffect(() => {
+        if (inputsRef.current[0]) {
+            inputsRef.current[0].focus()
+        }
+    }, [])
     const handleVerify = async (e) => {
         e.preventDefault();
         setError("");
@@ -25,13 +31,25 @@ export default function VerifyForm() {
         }
         try {
             const data = await verifyEmail({ email, code: combinedCode });
+
+            // store data in local storage
             login({
                 userId: data.userId,
                 fullName: data.fullName,
                 role: data.role,
                 token: data.token,
+                address: data.address,
+                isLocal: data.isLocal,
+                avatar: data.avatar
             });
-            navigate("/"); // redirect after verification
+
+            // redirect after verification
+            if (!data.address || !data.address.region || !data.address.province || !data.address.city || !data.address.street){
+                navigate(`/auth/signup/address?id=${userId}`);
+            }
+            else {
+                navigate("/"); 
+            }
         } catch (err) {
             setError(err.message);
         }
@@ -73,7 +91,7 @@ export default function VerifyForm() {
         <Box>
             <Box 
                 sx={{
-                    backgroundImage: 'url(/modern-clean-interior-design.jpg)',
+                    backgroundImage: 'url(/modern-styled-entryway.jpg)',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
                     backgroundSize: 'cover',
@@ -87,21 +105,22 @@ export default function VerifyForm() {
                 sx={{
                     width: '100%',
                     height: '100vh',
-                    bgcolor: 'rgba(0, 0, 0, 0.1)',
+                    bgcolor: 'rgba(0, 0, 0, 0.5)',
                     display: 'flex',
                     backdropFilter: 'blur(10px)',
                     alignItems: 'center',
                     flexDirection: 'column',
                     justifyContent: 'center',
-                    pb: 10,
                 }}
             >
                 <Stack 
                     sx={{
                         bgcolor: 'rgba(255, 255, 255, 0.1)',
-                        borderRadius: 5,
+                        width: {xs: '100%', sm: 'auto'},
+                        borderRadius: {xs: 0, sm: 5},
                         py: 10,
-                        px: 2
+                        px: 2,
+                        height: {xs: '100vh', sm: 'auto'},
                     }}
                 >
                     <Stack justifyContent={'center'} alignItems={'center'}>
@@ -117,9 +136,10 @@ export default function VerifyForm() {
                                 onChange={(e) => handleChange(index, e.target.value)}
                                 onKeyDown={(e) => handleKeyDown(index, e)}
                                 inputRef={(el) => (inputsRef.current[index] = el)}
-                                inputProps={{ maxLength: 1, color: 'white', style: { textAlign: "center" } }}
+                                inputProps={{ maxLength: 1, color: 'white', style: { textAlign: "center"} }}
                                 sx={{ 
-                                    width: 50,
+                                    minWidth: 30,
+                                    maxWidth: 40,
                                     border: '2px solid white',
                                     borderRadius: 1,
                                     my: 5,
@@ -127,6 +147,8 @@ export default function VerifyForm() {
                                     bgcolor: 'rgba(255, 255, 255, 0.2)',
                                     "& .MuiOutlinedInput-input": {
                                         color: "white",
+                                        p: 1,
+                                        py: 1.5,
                                     }
                                 }}
                             />

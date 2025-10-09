@@ -5,7 +5,7 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import InventoryIcon from "@mui/icons-material/Inventory2";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import { Box } from '@mui/material';
+import { Box, Container, Stack } from '@mui/material';
 import { NavLink, useLocation } from 'react-router-dom';
 import { PersonAddAlt1Rounded } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
@@ -64,33 +64,39 @@ export default function LabelBottomNavigation() {
                 bottom: 0,
                 left: 0,
                 right: 0,
+                justifyContent: 'center',
+                width: '100%',
+                zIndex: 1000,
+                bgcolor: 'white',
             }}
         >
-            <BottomNavigation
-                sx={{ width: "100%",  }}
-                value={currentValue}
-            >
-                {navItems.map((item) => (
-                    <BottomNavigationAction
-                        component={NavLink}
-                        to={item.path}
-                        key={item.value}
-                        label={item.label}
-                        value={item.value}
-                        icon={item.icon}
-                        sx={{
-                            px: 0,
-                            transition: 'all 0.5 ease',
-                            "&.Mui-selected": {
-                                color: "black",
-                            },
-                            "&:hover .MuiSvgIcon-root": {
-                                color: "black",
-                            },
-                        }}
-                    />
-                ))}
-            </BottomNavigation>
+            <Container maxWidth='sm' sx={{px: 5}} alignItems={'center'}>
+                <BottomNavigation
+                    sx={{ width: "100%",  }}
+                    value={currentValue}
+                >
+                    {navItems.map((item) => (
+                        <BottomNavigationAction
+                            component={NavLink}
+                            to={item.path}
+                            key={item.value}
+                            label={item.label}
+                            value={item.value}
+                            icon={item.icon}
+                            sx={{
+                                px: 0,
+                                transition: 'all 0.5 ease',
+                                "&.Mui-selected": {
+                                    color: "black",
+                                },
+                                "&:hover .MuiSvgIcon-root": {
+                                    color: "black",
+                                },
+                            }}
+                        />
+                    ))}
+                </BottomNavigation>
+            </Container>
         </Box>
     );
 }

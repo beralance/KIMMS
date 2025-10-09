@@ -5,55 +5,154 @@ import StaffPermission from '../models/StaffPermission.js';
 import { generateCode } from '../utils/generateCode.js';
 import { sendEmail } from '../utils/sendEmail.js';
 
+const DEFAULT_AVATARS = {
+    male: 'https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-male-02.svg.svg',
+    female: 'https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-female-01.svg.svg',
+    other: 'https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-male-01.svg',
+}
 // SIGN UP (user)
 export const signup = async (req, res) => {
     try {
-        const { email, password, fullName, phoneNumber, address} = req.body;
+        const { email, password, fullName, phoneNumber, gender, address, googleId, avatar} = req.body;
 
-        // check if user already exists
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ error: 'Email already used' });
+        if (!email || typeof email !== 'string') {
+            return res.status(400).json({error: 'Valid email is required'})
+        }
+        if (!fullName || typeof fullName !== 'string') {
+            return res.status(400).json({error: 'Full name is required'})
+        }
+        if (!googleId && (!password || typeof password !== 'string' || password.length < 6)) {
+            return res.status(400).json({error: 'Password is required for local signup (min 6 chars)'})
         }
 
-        // create verification code
-        const code = generateCode(6);
-        const expiry = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
+        const orCondition = [{email}]
+        if (googleId) orCondition.push({googleId})
+        // check if user already exists
+        const existingUser = await User.findOne({ 
+            $or: orCondition
+        });
 
+        if (existingUser) {
+            return res.status(400).json({ error: 'User already exists' });
+        }
+
+        // if local or google signup
+        const isGoogle = !!googleId;
+        let code, expiry;
+        if (!isGoogle) {
+            code = generateCode(6)
+            expiry = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
+        }
+
+
+        console.log('Avatar', avatar)
         const newUser = new User({
             email,
-            password,
+            password: isGoogle ? null : password,
             fullName,
             phoneNumber,
             address,
             role: 'user',
-            isVerified: false,
-            isLocal: address.region === '05',
+            isVerified: isGoogle,
+            isLocal: !isGoogle && address?.region === '05', // if navigate google sign up to address, only google sign up
             verificationCode: code,
             verificationExpiry: expiry,
+            googleId: googleId || undefined,
+            gender,
+            avatar: avatar || DEFAULT_AVATARS[gender || 'other']
         });
+
+        console.log('NEW USER before save:', newUser)
 
         await newUser.save();
 
-        console.log('EMAIL: ', email)
-        // send email
-        await sendEmail({
-            to: email,
-            subject: 'Verify Your Account',
-            text: `Your verification code is ${code}`,
-            html: `<p>Your verification code is <b>${code}</b>. It will expire in 10 minutes.</p>`,
-        });
+        if (!isGoogle) {
+            // send email
+            await sendEmail({
+                to: email,
+                subject: 'Verify Your Account',
+                text: `Your verification code is ${code}`,
+                html: `<p>Your verification code is <b>${code}</b>. It will expire in 10 minutes.</p>`,
+            });
+        }
 
+        if (isGoogle) {
+            const token = jwt.sign(
+                { id: newUser._id, role: newUser.role, isLocal: newUser.isLocal },
+                process.env.JWT_SECRET,
+                {expiresIn: '12h'}
+            )
+
+            return res.status(201).json({
+                message: 'Google signup successful',
+                token,
+                userId: newUser._id,
+                role: newUser.role,
+                address: newUser.address,
+                fullName: newUser.fullName,
+                isLocal: newUser.isLocal,
+                avatar: newUser.avatar
+            })
+        }
         res.status(201).json({
             message: 'Signup successful. Please verify your email.',
             userId: newUser._id,
             email: newUser.email,
         });
     } catch (err) {
+        console.error('Signup error deatils: ', err)
         res.status(500).json({ error: err.message });
     }
 };
 
+export const updateAddress = async (req, res) => {
+    const {userId} = req.params;
+    const { address: wrapper } = req.body; // unwrap the frontend object
+    const address = wrapper?.address || wrapper; // in case it's double-wrapped
+
+    if (!address) {
+        return res.status(400).json({ error: 'Address is required' });
+    }
+
+    console.log('USER ID', userId)
+    console.log('ADDRESS', address)
+    console.log(address)
+
+    if (!address) {
+        return res.status(400).json({error: 'Address is required'})
+    }
+
+    try {
+        //const isLocal = address?.region === '05'
+        console.log('BACKEND IS LOCAL REGION 5 CHECK', address.address?.region)
+        console.log('BACKEND IS LOCAL REGION 5 CHECK', address?.region)
+        console.log('BACKEND IS LOCAL REGION 5 CHECK', address?.region === '05')
+
+        const isLocal = address.region === '05'
+        console.log('BACKEND IS LOCAL REGION 5 CHECK', isLocal)
+
+        const user = await User.findByIdAndUpdate(
+            userId,
+            {address, isLocal},
+            {new: true},
+        )
+
+        if (!user) {
+            return res.status(400).json({error: 'User not found'})
+        }
+
+        console.log('USER BACKEND IS LOCAL', user.isLocal)
+        res.json({
+            message: 'Address updated successfully',
+            address: user.address,
+            isLocal: user.isLocal
+        })
+    }
+    catch (err) {
+        console.error(err) 
+        res.status(500).json({error: 'Server error'})
+    }
+}
 // VERIFY EMAIL
 export const verifyEmail = async (req, res) => {
     try {
@@ -90,8 +189,10 @@ export const verifyEmail = async (req, res) => {
             token,
             userId: user._id,
             role: user.role,
+            address: user.address,
             fullName: user.fullName,
             isLocal,
+            avatar: user.avatar
         });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -145,7 +246,7 @@ export const login = async (req, res) => {
 
         // ensure verified
         if (!user.isVerified) {
-            return res.status(400).json({ error: 'Please verify your email before logging in' });
+            return res.status(400).json({ error: 'Please verify your email before logging in', code: 'notVerified' });
         }
 
         // compare password
@@ -172,12 +273,59 @@ export const login = async (req, res) => {
             address: user.address,
             isLocal,
             allowedModules,
+            avatar: user.avatar,
             token,
         });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 };
+
+export const googleLogin = async (req, res) => {
+    try {
+        const {email, fullName, googleId, avatar} = req.body
+
+        if (!email || !fullName || !googleId) {
+            return res.status(400).json({error: 'Incomplete Google login credenial'})
+        }
+
+        let user = await User.findOne({$or: [{email}, {googleId}]})
+
+        if (!user) {
+            user = new User ({
+                email,
+                fullName,
+                googleId,
+                avatar: avatar || DEFAULT_AVATARS,
+                role: 'user',
+                isVerified: 'true',
+                isLocal: false
+            })
+            await user.save()
+        }
+
+        const token = jwt.sign(
+            {id: user._id, role: user.role, isLocal: user.isLocal},
+            process.env.JWT_SECRET,
+            {expiresIn: '12h'}
+        )
+
+        res.status(200).json({
+            message: 'Google login successful',
+            token,
+            userId: user._id,
+            fullName: user.fullName,
+            role: user.role,
+            isLocal: user.isLocal,
+            address: user.address,
+            avatar: user.avatar
+        });
+    }
+    catch (err) {
+        console.error(err)
+        res.status(500).json({error: 'Server error'})
+    }
+}
 
 // CREATE STAFF (admin only)
 export const createStaff = async (req, res) => {

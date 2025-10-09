@@ -10,7 +10,9 @@ import {
   ListItem,
   ListItemButton,
   Divider,
-  Container
+  Container,
+  useTheme,
+  useMediaQuery
 } from "@mui/material";
 import { NavLink, useLocation } from "react-router-dom";
 import SearchBar from "./SearchBar";
@@ -69,9 +71,15 @@ export default function UserHeader() {
     const location = useLocation()
     const { searchProducts, products } = useContext(ProductContext);
     const [results, setResults] = useState([]);
+    const theme = useTheme()
+    const isSm = useMediaQuery(theme.breakpoints.up('sm'))
     const [query, setQuery] = useState("");
     
-     useEffect(() => {
+    useEffect(() => {
+            if (isSm && searchDrawerOpen) setSearchDrawerOpen(false);
+        })
+
+    useEffect(() => {
         const handleScroll = () => {
             if (location.pathname === "/") {
                 setShowBg(false);
@@ -80,6 +88,7 @@ export default function UserHeader() {
             }
         };
 
+        
         window.addEventListener("scroll", handleScroll);
         handleScroll(); // check immediately in case page loads scrolled down
 
@@ -154,7 +163,17 @@ export default function UserHeader() {
                         <Button component={NavLink} to='/' variant="text"
                             sx={{ color: "#37353E", p: { sm: 0, md: 0 }, display: 'flex', flexGrow: { xs: 2, sm: 1 } }}
                         >
-                            <Typography variant="body1" color="initial" sx={{ fontWeight: 'thin', color: showBg ? 'black' : 'white', fontSize: { xs: 20, md: 22, lg: 24 }, display: {xs: 'flex', sm: 'none', md: 'flex'}}}>
+                            <Typography 
+                                variant="body1" 
+                                color="initial" 
+                                fontWeight={200}
+                                fontFamily={"'Cormorant Garamond', 'Playfair Display', 'Didot', 'Bodoni MT', 'Garamond', 'Times New Roman', 'serif'"}
+                                sx={{ 
+                                    color: showBg ? 'black' : 'white', 
+                                    fontSize: { xs: 20, md: 22, lg: 24 }, 
+                                    display: {xs: 'flex', sm: 'none', md: 'flex'},
+                                }}
+                            >
                                 K I M M S
                             </Typography>
                             <Box sx={{display: {xs: 'none', sm: 'block', md: 'none'}, width: 35, filter: showBg ? '0' : 'invert(1)' }}>
@@ -257,8 +276,9 @@ export default function UserHeader() {
                     <></>    
                 }
                 {/* Search Drawer */}
-                <SearchDrawer open={searchDrawerOpen} onClose={() => setSearchDrawerOpen(false)} />
-
+                <Box sx={{display: {xs: 'display', sm: 'none'}}}>
+                    <SearchDrawer open={searchDrawerOpen} onClose={() => setSearchDrawerOpen(false)} />
+                </Box>
                 {/* User Drawer */}
                 <UserDrawer open={userDrawerOpen} onClose={() => setUserDrawerOpen(false)} links={userLinks} />
                 <Box sx={{bgcolor: showBg ? 'white' : 'rgba(0, 0, 0, 0.5)', backdropFilter: {xs: '', md: 'blur(10px)'}, borderRadius: 5, mt: {sx: 0, md: 2}, boxShadow: 5}}>

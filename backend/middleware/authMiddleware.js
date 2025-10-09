@@ -54,10 +54,14 @@ export const adminOnly = (req, res, next) => {
 }
 
 export const requireRole = (roles) => {
+
     return (req, res, next) => {
         if (!req.user || !roles.includes(req.user.role)) {
+            console.log('WE ARE IN!')
+            console.log('USER check', req.user)
             return res.status(403).json({error: 'Access denied'})
         }
+        
         next()
     }
 }

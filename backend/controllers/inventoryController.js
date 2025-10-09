@@ -28,7 +28,6 @@ export const createInventoryItem = async (req, res) => {
                 })
             if(error) throw error;
             
-            console.log('$$$ DATA PATH', data.path)
             const publicUrl = data
                 ? supabase.storage.from('Product-Uploads').getPublicUrl(data.path).data.publicUrl
                 : null
@@ -36,7 +35,6 @@ export const createInventoryItem = async (req, res) => {
             if (!publicUrl) throw new Error('Failed to generate public URL');
 
             console.log(supabase.storage.from('Product-Uploads').getPublicUrl(data.path))
-            console.log('$$$ PUBLIC URL', publicUrl)
             
             uploadedFiles.push(publicUrl) 
         }
@@ -46,7 +44,6 @@ export const createInventoryItem = async (req, res) => {
         const generatedProductId = await generateProductId(category);
         const generatedPhysicalCode = await generatePhysicalCode(category);
 
-        console.log('### UPLOADED FILES', uploadedFiles)
         const inventoryItem = new Inventory({
             productId: generatedProductId,
             physicalCode: generatedPhysicalCode,
@@ -64,7 +61,8 @@ export const createInventoryItem = async (req, res) => {
 
         try {
             const savedItem = await inventoryItem.save()
-            await savedItem.populate('category', 'name')
+            await savedItem
+                .populate('category', 'name productCount')
             await incrementProductCount(category)
             res.status(201).json(savedItem)
         }
@@ -89,7 +87,7 @@ export const getInventoryItems = async (req, res) => {
         const filter = status ? {status} : {}
         const items = await Inventory.find(filter)
             .sort({ createdAt: -1 })
-            .populate('category', 'name');
+            .populate('category', 'name productCount');
         res.json(items);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -202,7 +200,6 @@ export const deleteInventoryItem = async (req, res) => {
             }
         }
 
-        console.log('ITEM DATA', item)
         await item.deleteOne();
         await decrementProductCount(item.category)
 

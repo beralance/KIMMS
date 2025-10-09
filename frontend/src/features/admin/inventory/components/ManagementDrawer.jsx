@@ -13,6 +13,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ManageAuction from "../auctionManagement/ManageAuction";
 import ManageProducts from "../productManagement/ManageProducts";
 import ManageInventory from "../inventoryManagement/ManageInventory";
+import { useLocation } from "react-router-dom";
 
 export default function AddItemDrawer({ open, onClose, activeTab }) {
     const renderForm = () => {
@@ -40,7 +41,6 @@ export default function AddItemDrawer({ open, onClose, activeTab }) {
                 return "";
         }
     };
-
     return (
         <Drawer anchor="bottom" open={open} onClose={onClose} sx={{ width: "100%", display: {xs: 'block', md: 'none'}, }} PaperProps={{sx: {height: '70vh'}}}>
             <Box 

@@ -6,6 +6,7 @@ export const InventoryContext = createContext();
 
 export function InventoryProvider({ children }) {
     const [inventoryItems, setInventoryItems] = useState([]);
+    const [allInventoryItems, setAllInventoryItems] = useState([]);
     const API_URL = import.meta.env.VITE_API_URL;
     const [error, setError] = useState(null)
     const {token} = useAuth()
@@ -20,6 +21,7 @@ export function InventoryProvider({ children }) {
             // Only keep items that are available
             const availableItems = data.filter(item => item.status === "available");
             setInventoryItems(availableItems);
+            setAllInventoryItems(data)
         } catch (err) {
             console.error("Error fetching inventory:", err);
         }
@@ -109,6 +111,7 @@ export function InventoryProvider({ children }) {
         <InventoryContext.Provider
             value={{
                 inventoryItems,
+                allInventoryItems,
                 error,
                 fetchInventoryItems,
                 addInventoryItem,

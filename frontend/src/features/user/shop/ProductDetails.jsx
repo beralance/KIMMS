@@ -72,7 +72,7 @@ export default function ProductDetails() {
             <Box
                 onClick={() => setImageOpen(true)}
                 sx={{
-                    height: '50vh',
+                    height: '70vh',
                     bgcolor: 'white',
                     position: 'sticky',
                     top: 0,
@@ -96,14 +96,14 @@ export default function ProductDetails() {
                     >
                         {Array.isArray(product.images) && product.images.length > 0 && (
                             product.images.map((img, idx) => (
-                                <SwiperSlide key={idx} style={{height: '50vh'}}>
+                                <SwiperSlide key={idx} style={{height: '70vh'}}>
                                     <Box sx={{justifySelf: 'center', height: '100%', width: '100%'}}>
                                         <img
                                             src={`${img}`}
                                             alt={`${product.productName}`}
                                             style={{ 
                                                 display: 'block',
-                                                width: "100%", 
+                                                width: "100%",
                                                 height: "100%", 
                                                 backgroundColor: 'white', 
                                                 objectFit: "cover", 
@@ -125,7 +125,7 @@ export default function ProductDetails() {
                     mt: -1,
                     width: '100%',
                     overflow: 'hidden',
-                    borderRadius: '20px 20px 0px 0px',
+                    borderRadius: '10px 10px 0px 0px',
                     boxShadow: '0px 0px 20px 0px rgba(0, 0, 0, 0.2)'
                 }}
             >

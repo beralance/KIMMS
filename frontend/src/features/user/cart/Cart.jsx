@@ -5,7 +5,7 @@ import { useCheckout } from "../../../contexts/CheckoutContext";
 import { NavLink, useNavigate } from "react-router-dom";
 import BottomActionBar from "../../../components/BottomActionBar";
 import {DeleteRounded, DoneAllRounded, KeyboardArrowDownRounded, KeyboardArrowUpRounded, RemoveDoneRounded } from '@mui/icons-material'
-import { toTitleCase } from '../../../utils/stringUtils'
+import { toTitleCase, formatNumber } from '../../../utils/stringUtils'
 export default function Cart() {
     const { cartItems, removeFromCart } = useCart();
     const { setCheckoutItems } = useCheckout();
@@ -90,7 +90,8 @@ export default function Cart() {
             name: item.productId.productName,
             price: item.productId.price,
         }))
-    console.log('$$$$$$$$cart Items', validCartItems[0].productId.category.name)
+    console.log('$$$$$$$$cart Items', validCartItems[0].productId.category?.name)
+    console.log('$$$$$$$$cart Items', validCartItems)
     return (
         <Container sx={{ pb: {xs: "120px", md: 0 }}}>
 
@@ -234,14 +235,14 @@ export default function Cart() {
                         </Typography>
                         <Box sx={{my: 1}}>
                             {selectedItemsDetails.map((item, index) => (
-                                <Grow in={true} mountOnEnter unmountOnExit timeout={500}>
-                                    <List sx={{py: 0}} key={index}>
+                                <Grow in={true}  key={index} mountOnEnter unmountOnExit timeout={500}>
+                                    <List sx={{py: 0}}>
                                         <ListItem sx={{display: 'flex', px: 0, justifyContent: 'space-between', py: 1, my: 0}}>
                                             <Typography noWrap variant="subtitle2" color="initial">
                                                 - {item.name}
                                             </Typography>
                                             <Typography variant="subtitle2" color="grey">
-                                                PHP {item.price.toLocaleString('en-PH', {minimumFractionDigits: 2})}
+                                                PHP {formatNumber(item.price)}
                                             </Typography>
                                         </ListItem>
                                     </List>
@@ -262,7 +263,7 @@ export default function Cart() {
                                 ) :
                             </Typography>
                             <Typography variant="subtitle2">
-                                PHP {totalPrice.toLocaleString('en-PH', {minimumFractionDigits: 2})} 
+                                PHP {formatNumber(totalPrice)} 
                             </Typography>
                         </Box>
                         <Box sx={{width: '100%'}}>
@@ -297,7 +298,7 @@ export default function Cart() {
                                                     - {item.name}
                                                 </Typography>
                                                 <Typography variant="subtitle2" color="grey">
-                                                    PHP {item.price.toLocaleString('en-PH', {minimumFractionDigits: 2})}
+                                                    PHP {formatNumber(item.price)}
                                                 </Typography>
                                             </ListItem>
                                             <Divider/>

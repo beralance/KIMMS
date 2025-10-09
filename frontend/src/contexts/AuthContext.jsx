@@ -23,10 +23,27 @@ export const AuthProvider = ({ children }) => {
         return null;
     });
 
-    const login = ({ userId, fullName, role, token, address, allowedModules, isLocal}) => {
-        setUser({ userId, fullName, role, token, address, allowedModules, isLocal });
-        localStorage.setItem("user", JSON.stringify({ userId, fullName, role, token, address, allowedModules, isLocal }));
+    const login = (newData) => {
+
+        console.log('LKASJKFJKALSJD', newData)
+        // Get existing user from localStorage
+        const existingUser = JSON.parse(localStorage.getItem("user")) || {};
+
+        // Merge existing data with new data
+        const updatedUser = { ...existingUser, ...newData };
+
+        // Update React context state
+        setUser(updatedUser);
+
+        // Update localStorage
+        localStorage.setItem("user", JSON.stringify(updatedUser));
     };
+    /*
+    const login = ({ userId, fullName, avatar, role, token, address, allowedModules, isLocal}) => {
+        setUser({ userId, fullName, avatar, role, token, address, allowedModules, isLocal });
+        localStorage.setItem("user", JSON.stringify({ userId, fullName, avatar, role, token, address, allowedModules, isLocal }));
+    };
+    */
 
     const logout = () => {
         setUser(null);

@@ -1,4 +1,4 @@
-import { Box, Button, Container, Fade, Grow, Stack, Typography } from '@mui/material'
+import { Box, Button, Container, Divider, Fade, Grow, Stack, Typography } from '@mui/material'
 import React, {useEffect, useRef, useState} from 'react'
 import { motion } from 'framer-motion'
 import SectionTransition from '../../../components/SectionTransition'
@@ -32,13 +32,13 @@ export default function UserHero() {
                         <Typography color='white' variant='h4' align='center'>
                             Discover hidden gems
                         </Typography>
-                        <Typography color='white' variant='subtitle2' gutterBottom align='center'>
+                        <Typography color='white' variant='body2' gutterBottom align='center'>
                             “Timeless pieces made for every home.”
                         </Typography>
                     </Box>
                 </Fade>
                 <Grow in={true} mountOnEnter unmountOnExit timeout={1000}>
-                    <Button variant='contained' onClick={() => navigate('/shop')} sx={{zIndex: 2, bgcolor: 'rgba(0,0,0,.5)', my: 2, boxShadow: 5, borderRadius: '999px', px: 3}}>
+                    <Button variant='contained' onClick={() => navigate('/shop')} sx={{zIndex: 2, bgcolor: 'rgba(0,0,0,.7)', my: 2, boxShadow: 5, borderRadius: '999px', px: 3}}>
                         Shop Now
                     </Button>
                 </Grow>
@@ -59,10 +59,21 @@ export default function UserHero() {
                     <SectionTransition>
                         <Stack mb={10} mt={5}>
                             <Box sx={{width: '100%', flexDirection: 'column', alignItems: 'center', pb: 1, display: 'flex', justifyContent: 'center',}}>
-                                <img src="/sofa.svg" alt="" style={{aspectRatio: '1/1', opacity: 0.8, width: 100}}/>
-                                <img src="/kimms-text.svg" alt="" style={{width: 250}}/>
+                                <img src="/sofa.svg" alt="" style={{aspectRatio: '1/1', opacity: 0.8, width: 80, marginBottom: -38}}/>
+                                <Typography 
+                                    variant="body1" 
+                                    color="initial" 
+                                    fontSize={80}
+                                    align='center'
+                                    noWrap
+                                    sx={{mb: -5, fontSize: 'clamp(20px, 20vw, 80px)'}}
+                                    fontFamily={"'Cormorant Garamond', 'Playfair Display', 'Didot', 'Bodoni MT', 'Garamond', 'Times New Roman', 'serif'"}
+
+                                >
+                                    K I M M S
+                                </Typography>
                             </Box>
-                            <Typography variant="subtitle1" color="initial" align='center'>
+                            <Typography variant="body1" color="initial" align='center'>
                                 Kimms Furniture and Merchandise brings you affordable finds with lasting quality that never goes out of style.
                             </Typography>
                             <Button variant='outlined' color='secondary' sx={{width: 150, alignSelf: 'center', borderRadius: '999px', fontWeight: 'bold', my: 2}}>

@@ -12,6 +12,7 @@ import { useContext, useState } from "react";
 import ProductCardSimple from './ProductCardSimple'
 import { useNavigate } from 'react-router-dom'
 import SearchRecommended from './SearchRecommended'
+import CategoriesList from '../features/user/home/CategoriesList'
 
 export default function SearchDrawer({ open, onClose, anchor = "top" }) {
     const { searchProducts, products } = useContext(ProductContext);
@@ -134,11 +135,11 @@ export default function SearchDrawer({ open, onClose, anchor = "top" }) {
                             </List>
                         )}
                         <Box sx={{mt: results.length > 0 ? 3 : 0}}>
-                            <Typography variant="body1" color="grey" sx={{m: 2}}>
-                                Recommendation
+                            <Typography variant="body1" color="grey" sx={{m: 2, mb: 0}}>
+                                Categories
                             </Typography>
                             <Box>
-                                <SearchRecommended products={products}/>
+                                <CategoriesList/>
                             </Box>
                         </Box>
                     </Stack>

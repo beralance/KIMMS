@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Box, TextField, Button, Typography, InputAdornment, IconButton, Container, Stack, FormControl, InputLabel, Select, MenuItem, CircularProgress } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Google, Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { signupUser } from "../../../utils/api"; // <- new import
 import phData from '../../../data/phData.json'
@@ -8,7 +8,8 @@ import { useAuth } from "../../../contexts/AuthContext";
 import {useSnackbar} from '../../../contexts/SnackbarContext'
 import { ScrollSectionLeft, ScrollSectionRight } from '../../../components/SectionTransitionX';
 import { useOutletContext } from "react-router-dom";
-
+import { signupWithGoogle } from "../../../firebase";
+import FullScreenLoader from '../../../components/FullScreenLoader'
 
 function toTitleCase(str) {
     return str
@@ -29,27 +30,22 @@ export default function SignUpForm() {
     const [phoneNumber, setPhoneNumber] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
-
-    // address
-    const [street, setStreet] = useState("");
-    const [city, setCity] = useState("");
-    const [province, setProvince] = useState("");
-    const [regionCode, setRegionCode] = useState("");
-    const [postalCode, setPostalCode] = useState("");
-
-    const {handleRegisterSuccess} = useOutletContext()
+    const [gender, setGender] = useState('')
     const [loading, setLoading] = useState(false)
+
+    const {onRegisterSuccess} = useOutletContext()
     const [error, setError] = useState("");
     const { showSnackbar } = useSnackbar()
-
-
-    const navigate = useNavigate();
+    const navigate = useNavigate()
+    const { login } = useAuth()
 
     const labelSx = (hasError) => ({
         "& .MuiInputLabel-root": { color: hasError ? "red" : "grey" },
         "& .MuiInputLabel-root.Mui-focused": { color: hasError ? "red" : "" },
     });
 
+    
+    
     const handleSignup = async (e) => {
         e.preventDefault();
         setError("");
@@ -58,12 +54,6 @@ export default function SignUpForm() {
         if (!email || !password || !confirmPassword || !fullName) {
             showSnackbar("All required fields must be filled", 'warning');
             return;
-        }
-
-        // check address field
-        if (!regionCode || !province || !city || !street) {
-            showSnackbar('Please complete your address before signing up', 'warning')
-            return
         }
 
         // password matching
@@ -86,63 +76,97 @@ export default function SignUpForm() {
             return
         }
 
+        
+
+        // avatar
+        const genderValue = gender || 'other'
+        let avatar;
+        if (gender === 'male') avatar = 'https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-male-02.svg.svg'
+        else if (gender === 'female') avatar = 'https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-female-01.svg.svg'
+        else avatar = 'https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-male-01.svg'
+        
+        const payload = {
+            email,
+            password,
+            fullName,
+            phoneNumber,
+            gender: genderValue,
+            avatar
+        };
+
         // store data to database
         try {
             setLoading(true)
-            // prepare payload (lowercased for consistency)
-            const payload = {
-                email,
-                password,
-                fullName,
-                phoneNumber,
-                address: { 
-                    street: street.toLowerCase(),
-                    city: city.toLowerCase(), 
-                    province: province.toLowerCase(), 
-                    region: regionCode.toLowerCase(), 
-                    postalCode: postalCode.toLowerCase(),
-                },
-            };
-
-            // ✅ use centralized API function
-            const data = await signupUser(payload);
-            
-            // call onsuccess to handle login/redirect in signuppage
-            if (handleRegisterSuccess) handleRegisterSuccess({userId: data.userId, email: data.email})
-
+            const data = await signupUser(payload)
+            if (onRegisterSuccess) onRegisterSuccess({userId: data.userId, email: data.email})
         } 
         catch (err) {
-            showSnackbar(err.message || 'Signup failed', 'warning');
+            let message = 'Signup failed'
+            if (err.message === 'User already exists') message = 'Account already created'
+            console.error(err)
+            showSnackbar(message, 'warning');
         }
         finally {
             setLoading(false)
         }
     };
 
-    // region list: code + name
-    const regions = Object.entries(phData).map(([code, data]) => ({
-        code,
-        name: data.region_name,
-    }))
+    const handleGoogleSignup = async () => {
+        setLoading(true)
+        try {
+            const firebaseData = await signupWithGoogle();
+            
+            console.log('')
+            console.log('FIREBASE DATA ', firebaseData)
 
-    // Provinces list for selected region
-    const provinces = regionCode
-        ? Object.keys(phData[regionCode].province_list)
-        : [];
+            const payload = {
+                email: firebaseData.email,
+                fullName: firebaseData.fullName,
+                googleId: firebaseData.googleId,
+                avatar: firebaseData.avatar || 'https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-male-01.svg',
+                phoneNumber: firebaseData.phoneNumber || '',
+                gender: 'other',
+            }
 
-    // Cities list for selected province in selected region
-    const cities = regionCode && province
-        ? Object.keys(phData[regionCode].province_list[province].municipality_list)
-        : [];
+            console.log('PAYLOAD ', firebaseData)
+            console.log('PAYLOAD ', payload)
 
-    // Cities list for selected province in selected region
-    const streets = Object.values(phData[regionCode]?.province_list[province]?.municipality_list[city]?.barangay_list || {})
+            if (!payload.email || !payload.fullName || !payload.googleId) {
+                showSnackbar("Google signup data is incomplete", "error");
+                return;
+            }
 
-   
+            const backendData = await signupUser(payload)
+
+            console.log('BACKEND DATA', backendData)
+            console.log('BACKEND DATA googleID', backendData.userId)
+
+            if (onRegisterSuccess) {
+                login({
+                    userId: backendData.userId,
+                    fullName: backendData.fullName,
+                    role: backendData.role,
+                    token: backendData.token,
+                    address: backendData.address,
+                    isLocal: backendData.isLocal,
+                    avatar: backendData.avatar
+                });
+                showSnackbar(backendData.message, 'success')
+                navigate(`/auth/signup/address?id=${backendData.userId}`);
+            }
+        }
+        catch (err){
+            console.error(err)
+            showSnackbar(err.message || 'Google signup failed', 'error' )
+        }
+        finally {
+            setLoading(false)
+        }
+    }
     return (
         <form onSubmit={handleSignup}>
             <Box sx={{ my: 0.5, overflowY: 'auto', maxHeight: '45vh'}}>
-                <Box sx={{ mb: 2, display: "flex", flexDirection: "column", gap: 2 }}>
+                <Stack justifyContent={'center'} sx={{ mb: 2, gap: 2 }}>
                     <TextField 
                         disabled={loading}  
                         label="Full Name" 
@@ -153,6 +177,9 @@ export default function SignUpForm() {
                         sx={{
                             ...labelSx(error && !fullName),
                             input: {color: 'white'},
+                            "& .MuiInputLabel-root": {
+                                color: 'white'
+                            },
                             "& .MuiInput-underline:before": {
                                 borderBottomColor: "white",
                             },
@@ -165,6 +192,36 @@ export default function SignUpForm() {
                             "&.Mui-focused": { color: "white" }
                         }}
                     />
+                    <FormControl variant="standard" fullWidth>
+                        <InputLabel sx={{color: 'white', "&.Mui-focused": { color: "white" }, "&.Mui-disabled": { color: "darkgray" },}}>Gender</InputLabel>
+                        <Select 
+                            labelId="gender"
+                            id="gender-select"
+                            value={gender} 
+                            onChange={e => setGender(e.target.value)}
+                            sx={{
+                                color: "white",
+                                "&.Mui-focused": {
+                                    color: "white",
+                                },
+                                "&.MuiSvgIcon-root": {
+                                    color: "white",
+                                },
+                                "& .MuiSvgIcon-root": { color: "white" }, // arrow
+                                "&:before": {
+                                    borderBottom: "1px solid white",
+                                },
+                                "&:after": {
+                                    borderBottom: "2px solid white",
+                                },
+                            }}
+                        >
+                            <MenuItem value={''} disabled>Select Gender</MenuItem>
+                            <MenuItem value={'male'}>Male</MenuItem>
+                            <MenuItem value={'female'}>Female</MenuItem>
+                            <MenuItem value={'other'}>Other</MenuItem>
+                        </Select>
+                    </FormControl>
                     <TextField 
                         disabled={loading}  
                         label="Email" 
@@ -175,6 +232,9 @@ export default function SignUpForm() {
                         sx={{
                             ...labelSx(error && !email),
                             input: {color: 'white'},
+                            "& .MuiInputLabel-root": {
+                                color: 'white'
+                            },
                             "& .MuiInput-underline:before": {
                                 borderBottomColor: "white",   // default / unfocused
                             },
@@ -198,6 +258,9 @@ export default function SignUpForm() {
                         sx={{
                             ...labelSx(error && !phoneNumber),
                             input: {color: 'white'},
+                            "& .MuiInputLabel-root": {
+                                color: 'white'
+                            },
                             "& .MuiInput-underline:before": {
                                 borderBottomColor: "white",   // default / unfocused
                             },
@@ -210,152 +273,6 @@ export default function SignUpForm() {
                             "&.Mui-focused": { color: "white" }
                         }}
                     />
-
-                    {/* Address Fields */}
-                    <Box sx={{mt: 2}}>
-                        <Typography component='label' color="white">
-                            Address:
-                        </Typography>
-                        <Stack sx={{p: 2, mt: 1, bgcolor: 'rgba(0, 0, 0, 0.5)', borderRadius: 3}} spacing={1}>
-                            <Stack spacing={2}>
-                                <FormControl variant="standard" fullWidth disabled={loading}>
-                                    <InputLabel sx={{color: 'white', "&.Mui-focused": { color: "white" }, "&.Mui-disabled": { color: "darkgray" },}}> Region </InputLabel>
-                                    <Select 
-                                        value={regionCode} 
-                                        onChange={e => {setRegionCode(e.target.value); setProvince(''); setCity('');}}
-                                        sx={{
-                                            color: "white",
-                                            "&.Mui-focused": {
-                                                color: "white",
-                                            },
-                                            "&.MuiSvgIcon-root": {
-                                                color: "white",
-                                            },
-                                            "& .MuiSvgIcon-root": { color: "white" }, // arrow
-                                            "&:before": {
-                                                borderBottom: "1px solid white",
-                                            },
-                                            "&:after": {
-                                                borderBottom: "2px solid white",
-                                            },
-                                        }}
-                                    >
-                                        {regions.map(r => (
-                                            <MenuItem key={r.code} value={r.code}>{r.name}</MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                                <FormControl variant="standard" fullWidth disabled={!regionCode || loading}>
-                                    <InputLabel sx={{color: 'white', "&.Mui-focused": { color: "white" }, "&.Mui-disabled": { color: "darkgray" },}}>Province</InputLabel>
-                                    <Select 
-                                        value={province} 
-                                        onChange={e => { setProvince(e.target.value); setCity(""); }}
-                                        sx={{
-                                            color: "white",
-                                            "&.Mui-focused": {
-                                                color: "white",
-                                            },
-                                            "&.MuiSvgIcon-root": {
-                                                color: "white",
-                                            },
-                                            "& .MuiSvgIcon-root": { color: "white" }, // arrow
-                                            "&:before": {
-                                                borderBottom: "1px solid white",
-                                            },
-                                            "&:after": {
-                                                borderBottom: "2px solid white",
-                                            },
-                                        }}
-                                    >
-                                        {provinces.map(p => (
-                                            <MenuItem key={p} value={p}>{toTitleCase(p)}</MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-
-                                <FormControl variant="standard" fullWidth disabled={!province || loading}>
-                                    <InputLabel sx={{color: 'white', "&.Mui-focused": { color: "white" }, "&.Mui-disabled": { color: "darkgray" },}}>City/Town</InputLabel>
-                                    <Select 
-                                        value={city} 
-                                        onChange={e => setCity(e.target.value)}
-                                        sx={{
-                                            color: "white",
-                                            "&.Mui-focused": {
-                                                color: "white",
-                                            },
-                                            "&.MuiSvgIcon-root": {
-                                                color: "white",
-                                            },
-                                            "& .MuiSvgIcon-root": { color: "white" }, // arrow
-                                            "&:before": {
-                                                borderBottom: "1px solid white",
-                                            },
-                                            "&:after": {
-                                                borderBottom: "2px solid white",
-                                            },
-                                        }}
-                                    >
-                                        {cities.map(c => (
-                                            <MenuItem key={c} value={c}>{toTitleCase(c)}</MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-
-                                 <FormControl variant="standard" fullWidth disabled={!city || loading}>
-                                    <InputLabel sx={{color: 'white', "&.Mui-focused": { color: "white" }, "&.Mui-disabled": { color: "darkgray" },}}>Brgy</InputLabel>
-                                    <Select 
-                                        value={street} 
-                                        onChange={e => setStreet(e.target.value)}
-                                        sx={{
-                                            color: "white",
-                                            "&.Mui-focused": {
-                                                color: "white",
-                                            },
-                                            "&.MuiSvgIcon-root": {
-                                                color: "white",
-                                            },
-                                            "& .MuiSvgIcon-root": { color: "white" }, // arrow
-                                            "&:before": {
-                                                borderBottom: "1px solid white",
-                                            },
-                                            "&:after": {
-                                                borderBottom: "2px solid white",
-                                            },
-                                        }}
-                                    >
-                                        {streets.map(s => (
-                                            <MenuItem key={s} value={s}>{toTitleCase(s)}</MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-
-                                <TextField 
-                                    disabled={loading} 
-                                    inputProps={{maxLength: 4}} 
-                                    label="Postal Code" 
-                                    variant="standard" 
-                                    value={postalCode} 
-                                    onChange={(e) => setPostalCode(e.target.value)} 
-                                    fullWidth
-                                    sx={{
-                                        input: {color: 'white'},
-                                        "& .MuiInputLabel-root": { color: error ? "red" : "white", },
-                                        "& .MuiInputLabel-root.Mui-focused": { color: error ? "red" : "white" },
-                                        "& .MuiInput-underline:before": {
-                                            borderBottomColor: "white",   // default / unfocused
-                                        },
-                                        "& .MuiInput-underline:hover:before": {
-                                            borderBottomColor: "white",  // hover
-                                        },
-                                        "& .MuiInput-underline:after": {
-                                            borderBottomColor: "white",   // focused
-                                        },
-                                        "&.Mui-focused": { color: "white" }
-                                    }}
-                                />
-                            </Stack>
-                        </Stack>
-                    </Box>
                     <TextField
                         disabled={loading}
                         label="Password"
@@ -365,6 +282,9 @@ export default function SignUpForm() {
                         sx={{
                             ...labelSx(error && !password),
                             input: {color: 'white'},
+                            "& .MuiInputLabel-root": {
+                                color: 'white'
+                            },
                             "& .MuiInput-underline:before": {
                                 borderBottomColor: "white",   // default / unfocused
                             },
@@ -381,7 +301,7 @@ export default function SignUpForm() {
                         InputProps={{
                             endAdornment: password && (
                                 <InputAdornment position="end">
-                                    <IconButton onClick={() => setShowPassword((p) => !p)} edge="end">
+                                    <IconButton onClick={() => setShowPassword((p) => !p)} edge="end" sx={{mr: 0}}>
                                         {showPassword ? <VisibilityOff sx={{color: 'white'}}/> : <Visibility sx={{color: 'white'}}/>}
                                     </IconButton>
                                 </InputAdornment>
@@ -398,6 +318,9 @@ export default function SignUpForm() {
                         sx={{
                             ...labelSx(error && !confirmPassword),
                             input: {color: 'white'},
+                            "& .MuiInputLabel-root": {
+                                color: 'white'
+                            },
                             "& .MuiInput-underline:before": {
                                 borderBottomColor: "white",   // default / unfocused
                             },
@@ -414,15 +337,35 @@ export default function SignUpForm() {
                         InputProps={{
                             endAdornment: confirmPassword && (
                                 <InputAdornment position="end">
-                                    <IconButton onClick={() => setShowConfirm((p) => !p)} edge="end">
+                                    <IconButton onClick={() => setShowConfirm((p) => !p)} edge="end" sx={{mr: 0}}>
                                         {showConfirm ? <VisibilityOff sx={{color: 'white'}}/> : <Visibility sx={{color: 'white'}}/>}
                                     </IconButton>
                                 </InputAdornment>
                             ),
                         }}
                     />
-                </Box>
+                </Stack>
 
+                <Button 
+                    variant="contained" 
+                    color="secondary" 
+                    onClick={handleGoogleSignup}
+                    sx={{
+                        width: 100,
+                        bgcolor: 'rgba(0, 0, 0, 0.2)',
+                        border: '1px solid white',
+                        py: 1, 
+                        borderRadius: '999px',
+                        my: 1,
+                        "&.Mui-disabled": {
+                            backgroundColor: "rgba(255, 255, 255, 0.2)",
+                            color: "grey",   
+                            border: '2px solid grey'    
+                        },
+                    }}
+                > 
+                    <img src="/google-icon.svg" alt="google-icon" style={{width: 25, aspectRatio: '1/1'}} />
+                </Button>
                 {error && (
                     <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
                         <Typography variant="body2" color="red">
@@ -453,11 +396,7 @@ export default function SignUpForm() {
                         !email ||
                         !password ||
                         !confirmPassword ||
-                        !fullName ||
-                        !regionCode ||
-                        !province ||
-                        !city ||
-                        !street
+                        !fullName
                     }
                 >
                     {loading ? 
@@ -469,12 +408,12 @@ export default function SignUpForm() {
                         </Box> 
                         :
                         <>
-                            SIGN UP
+                            SIGN  UP
                         </>
                     }
                 </Button>
             </Box>
-            <></>
+            <FullScreenLoader open={loading} message="Creating account..."/>
         </form>
     );
 }
