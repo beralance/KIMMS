@@ -54,6 +54,7 @@ export default function Auth() {
                                     fontWeight={200}
                                     fontFamily={"'Cormorant Garamond', 'Playfair Display', 'Didot', 'Bodoni MT', 'Garamond', 'Times New Roman', 'serif'"}
                                     sx={{ 
+                                        textDecoration: 'underline',
                                         color: 'white', 
                                         fontSize: 20,
                                     }}

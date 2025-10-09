@@ -1,3 +1,5 @@
+import User from "../../../backend/models/User";
+
 // src/utils/api.js
 const API_URL = import.meta.env.VITE_API_URL;
 // Generic helper for POST requests
@@ -67,3 +69,69 @@ export const updateUserAddress = async (userId, address, token) => {
     }
     return res.json();
 };
+
+
+
+
+
+
+
+
+
+export const updateUserProfile = async (userId, payload, token) => {
+    const res = await fetch(`${API_URL}/api/auth/${userId}/profile`, {
+        method: 'PATCH',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json', // needed for JSON
+        },
+        body: JSON.stringify(payload),
+    });
+
+    let resData;
+    try {
+        resData = await res.json();
+    } catch (e) {
+        console.error('Failed to parse JSON response:', e);
+        resData = null;
+    }
+
+    if (!res.ok) {
+        const errMsg = resData?.error || resData?.message || 'Request failed';
+        throw new Error(errMsg);
+    }
+
+    console.log('Profile updated: ', resData);
+    return resData;
+};
+
+export const uploadUserAvatar = async (userId, file, token) => {
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    const res = await fetch(`${API_URL}/api/auth/${userId}/avatar`, { // <-- updated endpoint
+        method: 'PATCH',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            // Do NOT set Content-Type, browser sets it automatically for FormData
+        },
+        body: formData
+    });
+
+    let resData;
+    try {
+        resData = await res.json();
+    } catch (e) {
+        console.error('Failed to parse JSON response:', e);
+        resData = null;
+    }
+
+    if (!res.ok) {
+        const errMsg = resData?.error || resData?.message || 'Request failed';
+        throw new Error(errMsg);
+    }
+
+    console.log('Avatar uploaded: ', resData);
+    return resData;
+};
+
