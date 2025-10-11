@@ -120,8 +120,10 @@ export default function ProfilePicker({ open, handleClose, avatar, userId, token
                                 <Box 
                                     sx={{
                                         transition: 'all .2s ease',
-                                        width: 60, 
-                                        height: 60, 
+                                        minWidth: 40,
+                                        minHeight: 40,
+                                        maxWidth: 60,
+                                        maxHeight: 60,
                                         display: 'flex', 
                                         justifyContent: 'center', 
                                         alignItems: 'center', 

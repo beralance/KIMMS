@@ -52,7 +52,6 @@ export const getProducts = async (req, res) => {
         
         if (user) {
             if (user.role === 'admin' || user.role === 'staff') {
-                // see all products
             } else {
                 query.isLocal = user.isLocal;
             }

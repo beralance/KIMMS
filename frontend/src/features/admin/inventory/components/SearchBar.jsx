@@ -15,21 +15,53 @@ export default function SearchBar({ value, onChange, activeTab }) {
         <Box>
             <TextField
                 type="search" 
+                placeholder="Search product..."
                 sx={{
-                    minWidth: '100%',
+                    minWidth: '100%',            
                     '& .MuiOutlinedInput-root': {
                         borderRadius: 2,
+                        bgcolor: 'rgba(255, 255, 255, 0.2)',
                         px: '.5rem',
+                        boxShadow: '0px 0px 10px rgba(255, 255, 255, 0.5)',
+                        color: 'white',
+                        height: 40,
+                        display: 'flex',
+                        borderRadius: '999px',
+                        borderColor: 'white',
                         '& fieldset': {
-                            borderColor: 'grey'
+                            color: 'white',
+                            borderColor: '#bbbbbbff',
+                            minHeight: 40,
+                            boxShadow:'0px 0px 1px rgba(255, 255, 255, 0.2)'
                         },
                         '&:hover fieldset': {
-                            borderColor: 'grey'
+                            borderColor: 'white'
                         },
                         '&.Mui-focused fieldset': {
-                            borderColor: 'transparent',
-                            boxShadow:'0px 1px 3px rgba(0, 0, 0, 0.5)'
+                            borderColor: 'white',
+                            boxShadow:'0px 1px 3px rgba(255, 255, 255, 0.5)'
                         }
+                    },
+                    '& .MuiInputLabel-root': {
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        top: -7,
+                        opacity: .7,
+                        color: 'white',        
+                    },
+                    '& .MuiInputLabel-root.Mui-focused': {
+                        color: 'red',             
+                    },
+                    '& .MuiInputLabel-root.MuiInputLabel-shrink': {
+                        fontSize: '0.8rem',       
+                        color: 'white',         
+                    },
+                    '& .MuiInputBase-input': {
+                        bgcolor: "transparent",
+                        p: 1,
+                        '& fieldset': {
+                            bgcolor: 'blue',
+                        },
                     }
                 }}
                 fullWidth

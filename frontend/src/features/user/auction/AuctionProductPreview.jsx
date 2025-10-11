@@ -111,6 +111,8 @@ const AuctionProductPreview = () => {
                                 }}
                                 className='swipe'
                                 style={{
+                                    background: 'white',
+                                    borderRadius: '5px',
                                     width: '350px', 
                                     boxShadow: '0px 0px 20px rgba(255, 255, 255, 0.2)',
                                     '--swiper-navigation-color': '#333333ff',
@@ -154,7 +156,7 @@ const AuctionProductPreview = () => {
                                     {auction.status}
                                 </Typography>
 
-                                <Stack direction={'row'} alignItems={'center'} gap={1} sx={{position: 'absolute', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)', zIndex: 1, bottom: 0, left: 0, px: 4, py: 1, m: 2, bgcolor: 'white', borderRadius: '999px'}}>
+                                <Stack direction={'row'} alignItems={'center'} gap={1} sx={{position: 'absolute', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)', zIndex: 1, bottom: 0, left: 0, px: 4, py: 1, m: 2, bgcolor: '#f8f8f8', borderRadius: '999px'}}>
                                     <Typography 
                                         variant="body1" 
                                         color="secondary"
@@ -203,14 +205,14 @@ const AuctionProductPreview = () => {
                             <Typography variant="body1" fontWeight={'bold'} gutterBottom color="white">More Details</Typography>
                             <Stack gap={1}>
                                 <ScrollSectionRight>
-                                <Stack sx={{bgcolor: 'rgba(255, 255, 255, 0.1)', boxShadow: 5, p: 2, borderRadius: 2}}>
+                                <Stack sx={{bgcolor: 'rgba(255, 255, 255, 0.1)', width: '100%', boxShadow: 5, p: 2, borderRadius: 2}}>
                                     <Typography variant="body2" color="white">
                                         {auction.inventoryId?.description}
                                     </Typography>
                                 </Stack>
                                 </ScrollSectionRight>
                                 <ScrollSectionRight>
-                                    <Stack sx={{bgcolor: 'rgba(255, 255, 255, 0.1)', boxShadow: 5, p: 2, borderRadius: 2}}>
+                                    <Stack sx={{bgcolor: 'rgba(255, 255, 255, 0.1)', width: '100%', boxShadow: 5, p: 2, borderRadius: 2}}>
                                         <Typography variant="body2" color="white">
                                             {auction.inventoryId?.details}
                                         </Typography>

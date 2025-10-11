@@ -2,6 +2,7 @@ import { Typography, typographyClasses } from '@mui/material'
 import { createTheme } from '@mui/material/styles'
 
 // Black 37353E
+// Component BG '#F0F0F0'
 // Dark White D3DAD9
 
 const theme = createTheme({
@@ -142,6 +143,11 @@ const theme = createTheme({
         MuiSvgIcon: {
             root: {
                 color: '#000000ff'
+            }
+        },
+        MuiSelect: {
+            styleOverrides: {
+                root: {}
             }
         }
     }

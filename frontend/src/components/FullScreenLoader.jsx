@@ -19,7 +19,7 @@ const FullScreenLoader = ({ open, message = "Loading..." }) => {
         >
         <CircularProgress color="inherit" />
             <Box>
-                <Typography variant="h6">{message}</Typography>
+                <Typography variant="body1">{message}</Typography>
             </Box>
         </Backdrop>
     );

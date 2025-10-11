@@ -59,13 +59,13 @@ function Row({ product, open, onToggle, deleteItem }) {
 
     return (
         <React.Fragment>
-            <TableRow sx={{ "& > *": { borderBottom: "unset" }, boxShadow: 0}}>
+            <TableRow sx={{ "& > *": { borderBottom: "unset" }, boxShadow: 0, borderBottom: open && '1px solid #cfcfcfff', m: 0}}>
                 <TableCell>
                     {product.images?.length > 0 && (
                         <img
                             src={product.images[0]}
                             alt={product.productName}
-                            style={{ width: 60, height: 60, objectFit: "cover", aspectRatio: '1/1', borderRadius: 5}}
+                            style={{ width: 60, height: 60, display: 'block', objectFit: "cover", aspectRatio: '1/1', borderRadius: 5}}
                         />
                     )}
                 </TableCell>
@@ -73,7 +73,7 @@ function Row({ product, open, onToggle, deleteItem }) {
                     <CustomPopover 
                         trigger={
                             <Button sx={{p: 0}}>
-                                <Typography color="initial" variant="body2" noWrap sx={{minWidth: 80, maxWidth: 100}}>
+                                <Typography color="secondary" fontWeight={'bold'} variant="body2" noWrap sx={{minWidth: 80, maxWidth: 100}}>
                                     {product.productName}
                                 </Typography>
                             </Button>
@@ -86,10 +86,10 @@ function Row({ product, open, onToggle, deleteItem }) {
                 <TableCell>{product.category?.name}</TableCell>
                 <TableCell>PHP {product.price}</TableCell>
                 <TableCell>
-                    <Typography variant="subtitle2" color="initial">
+                    <Typography variant="body2" fontWeight={'bold'} color="secondary">
                         {dayjs(product.createdAt).format('MMMM D, YYYY')}
                     </Typography>
-                    <Typography variant="subtitle2" color="grey">
+                    <Typography variant="body2" color="grey">
                         {dayjs(product.createdAt).format('h:mm A')}
                     </Typography>
                 </TableCell>
@@ -339,9 +339,9 @@ export default function InventoryTable({ searchTerm }) {
 
     return (
         <>
-            <TableContainer component={Paper} sx={{borderRadius: 2, boxShadow: 5}}>
+            <TableContainer component={Paper} sx={{borderRadius: 2, maxHeight: '80vh', overflowY: 'auto'}}>
                 <Table aria-label="inventory table">
-                    <TableHead>
+                    <TableHead sx={{position: 'sticky', top: 0, boxShadow: 5}}>
                         <TableRow sx={{bgcolor: '#37353E'}}>
                             <TableCell/>
                             <TableCell sx={{ cursor: 'pointer'}} onClick={() => handleSort('productName')}>

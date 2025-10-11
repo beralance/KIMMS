@@ -26,8 +26,7 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import { NavLink, useLocation } from 'react-router-dom';
 import {useAuth} from '../../contexts/AuthContext'
 import ConfirmDialog from '../../components/ConfirmDialog';
-import { color } from 'framer-motion';
-
+import {LogOut} from 'lucide-react'
 const drawerWidth = 240;
 
 const openedMixin = (theme) => ({
@@ -178,7 +177,7 @@ export default function AdminSidebar({ children }) {
     return (
         <Box sx={{ display: 'flex'}}>
             <CssBaseline />
-            <AppBar position="fixed" color='secondary' open={open}>
+            <AppBar position="fixed" color='secondary' sx={{height: 60, justifyContent: 'center'}} open={open}>
                 <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <IconButton
                         color="inherit"
@@ -191,12 +190,24 @@ export default function AdminSidebar({ children }) {
                     </IconButton>
 
                     <Button component={NavLink} to='/admin' color='white'>
-                        <Typography variant="body1">K I M M S</Typography>
+                        <Typography 
+                            variant="body1" 
+                            color="initial" 
+                            fontWeight={200}
+                            fontFamily={"'Cormorant Garamond', 'Playfair Display', 'Didot', 'Bodoni MT', 'Garamond', 'Times New Roman', 'serif'"}
+                            sx={{ 
+                                color: 'white', 
+                                fontSize: { xs: 15, md: 17, lg: 19 }, 
+                                display: {xs: 'flex', sm: 'none', md: 'flex'},
+                            }}
+                        >
+                            K I M M S
+                        </Typography>
                     </Button>
 
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <IconButton onClick={handleLogoutOpen} variant='text' sx={{ display: { xs: 'flex', md: 'none' }, color: 'white', p: 0 }}>
-                            <LogoutRoundedIcon />
+                            <LogOut style={{color: 'white'}}/>
                         </IconButton>
 
                         <Typography variant="body1" sx={{ display: { xs: 'none', md: 'flex' } }}>
@@ -283,17 +294,17 @@ export default function AdminSidebar({ children }) {
                             { justifyContent: 'initial', bgcolor: 'transparent', color: 'black', boxShadow: 'none' },
                         ]}
                     >
-                        <LogoutRoundedIcon sx={[{ justifyContent: 'center' }, open ? { mr: 2 } : { mr: 0 }]} />
+                        <LogoutRoundedIcon sx={[{ justifyContent: 'center', }, open ? { mr: 2 } : { mr: 0 }]} />
                         <Typography sx={[open ? { opacity: 1 } : { opacity: 0 }]}>Logout</Typography>
                     </Button>
                 </Box>
             </Drawer>
 
-            <Box component="main" sx={{ flexGrow: 1, width: '100%' }}>
+            <Box component="main" sx={{width: '100%' }}>
                 <DrawerHeader />
-                <Box sx={{mb: 20}}>
+                <Stack>
                     {children}
-                </Box>
+                </Stack>
                 <AdminBottomNav />
             </Box>
 

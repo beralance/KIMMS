@@ -1,11 +1,10 @@
 // AddItemDialog.js
 import * as React from "react";
 import { Dialog, DialogTitle,Typography, Box, IconButton, DialogContent, DialogActions, Button } from "@mui/material";
-import ManageAuction from '../auctionManagement/ManageAuction'
 import ManageInventory from '../inventoryManagement/ManageInventory'
 import { CloseRounded } from '@mui/icons-material'
 import UpdatePosted from '../productManagement/UpdatePosted'
-
+import AuctionProductDetails from '../auctionManagement/AuctionProductDetails'
 
 export default function AddItemDialog({ open, onClose, productData, id, title, content }) {
     const renderForm = () => {
@@ -14,8 +13,8 @@ export default function AddItemDialog({ open, onClose, productData, id, title, c
                 return <ManageInventory productId={id} onClose={onClose}/>;
             case 'update-product':
                 return <UpdatePosted productId={id} productData={productData} onClose={onClose}/>;
-            case 'update-auction':
-                return <ManageAuction />;
+            case 'auction-details':
+                return <AuctionProductDetails productId={id} auction={productData} onClose={onClose}/>;
             default:
                 return null;
         }
@@ -27,15 +26,15 @@ export default function AddItemDialog({ open, onClose, productData, id, title, c
                 return `Item - ${title}`;
             case 'update-product':
                 return `Posted - ${title}`;
-            case 'update-auction':
-                return "Create Auction";
+            case 'auction-details':
+                return `Create Auction - ${title}`;
             default:
                 return "";
         }
     };
     
     return (
-        <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" sx={{display: {xs: 'none', md: 'block'}}}>
+        <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" sx={{height: 500, display: {xs: 'none', md: 'block'}}}>
             <Box 
                 sx={{ 
                     p: 2, 

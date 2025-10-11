@@ -74,9 +74,9 @@ export default function ProductCard({ product, onEdit, onDelete }) {
 
     return (
         <>
-            <Card sx={{ maxWidth: 320, borderRadius: 2, boxShadow: 3 }}>
+            <Card sx={{ maxWidth: 320, borderRadius: 0, boxShadow: 0, bgcolor: 'transparent' }}>
                 <Box sx={{position: 'relative'}}>
-                    <Box onClick={handleUpdateOpen} sx={{cursor: 'pointer'}}>
+                    <Box onClick={handleUpdateOpen} sx={{cursor: 'pointer', boxShadow: 5, borderRadius: 1, overflow: 'hidden'}}>
                         <img 
                             src={`${product.images[1]}`} 
                             alt={product.productName}
@@ -85,31 +85,54 @@ export default function ProductCard({ product, onEdit, onDelete }) {
                                 objectFit: 'cover',
                                 aspectRatio: '9/10',
                                 width: '100%',
-                                height: '100%'
+                                height: '100%',
+                                display: 'block'
                             }}  
                         />
-                        <Box sx={{position: 'absolute', top: 0, left: 0, py: 3, display: 'flex'}}>
-                            <Typography variant="body2" color="white" sx={{bgcolor: '#37353E', p: 2, py: .5, borderRadius: '0px 10px 10px 0px'}}>
-                                {toTitleCase(product.condition)}
-                            </Typography>
-                        </Box>
                     </Box>
                 </Box>
-                <CardContent sx={{py: 1}}>
-                    <CustomPopover 
-                        trigger={
-                            <Button sx={{p: 0}}>
-                                <Typography color="initial" variant="body1" noWrap sx={{maxWidth: 150}}>
-                                    {product.productName}
-                                </Typography>
-                            </Button>
-                        }
-                    >
-                        <p>{product.productName}</p>
-                    </CustomPopover>
-                    <Typography variant="body2" color="textSecondary">{product.category?.name}</Typography>
-                    <Typography variant="body2">PHP {formatNumber(product.price)}</Typography>
-                    <Typography variant="body2">{dayjs(product.createdAt).format('MMMM D, YYYY h:mm A')}</Typography>
+                <CardContent sx={{p: 0, pb: '5px !important', m: 1,}}>
+                    <Stack>
+                        <CustomPopover 
+                            trigger={
+                                <Box sx={{ overflow: 'hidden', textOverflow: 'ellipsis'}}>
+                                    <Typography 
+                                        color="initial" 
+                                        variant="body1"
+                                        noWrap
+                                    >
+                                        {product.productName}
+                                    </Typography>
+                                </Box>
+                            }
+                        >
+                            <p>{product.productName}</p>
+                        </CustomPopover>
+                        <Typography variant="body2" component={'div'} color="grey" sx={{display: 'flex'}}>
+                            <Stack sx={{border: 1, my: .5, mr: .5}}/>
+                            <Stack gap={.5} direction={'row'}>
+                            <b>PHP</b> {formatNumber(product.price)}
+                            </Stack>
+                        </Typography>
+
+                    </Stack>
+                    <Divider/>
+                    <Stack>
+                        <Typography 
+                            variant="body2" 
+                            color="textSecondary"
+                            noWrap
+                            sx={{
+                                textOverflow: 'ellipsis',
+                                overflow: 'hidden',
+                            }}
+                        >
+                            {product.category?.name}
+                        </Typography>
+                        <Typography variant="body2">
+                            {dayjs(product.createdAt).format('MMMM D, YYYY h:mm A')}
+                        </Typography>
+                    </Stack>
                 </CardContent>
             </Card>
 

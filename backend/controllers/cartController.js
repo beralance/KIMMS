@@ -50,7 +50,12 @@ export const addToCart = async (req, res) => {
         if (!product) return res.status(404).json({error: 'Product not found'})
 
         // backend restriction, block local only items for non local user
+        console.log('IS USER LOCAL', req.user.isLocal)
+        console.log('IS PRODUCT LOCAL', product.isLocal)
+        console.log('COMPARE', product.isLocal && !req.user.isLocal)
         if (product.isLocal && !req.user.isLocal) {
+            console.log('RESULT', product.isLocal && !req.user.isLocal)
+
             return res.status(403).json({error: 'You cannot add local-only products to your cart'})
         }
 

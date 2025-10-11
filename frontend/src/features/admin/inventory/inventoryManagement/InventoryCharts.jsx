@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import {} from '@mui/icons-material'
-import { Box, Button, Stack, Typography } from '@mui/material'
+import { Box, Button, ButtonGroup, Stack, Typography } from '@mui/material'
 import Chart from '../components/Charts/Chart'
 import { InventoryContext } from '../../../../contexts/InventoryContext'
 import { useContext } from 'react'
@@ -59,20 +59,18 @@ const InventoryChart = () => {
         return totals
     }, [allInventoryItems])
     return (
-        <Box sx={{bgcolor: '#f8f8f8', borderRadius: 5, p: 2}}>
-            <Box>
-                <strong>Totals:</strong> 
-                <span style={{ marginLeft: 8 }}>All: {statusTotals.all}</span>
-                <span style={{ marginLeft: 8 }}>Available: {statusTotals.available}</span>
-                <span style={{ marginLeft: 8 }}>Reserve: {statusTotals.reserve}</span>
+        <Stack gap={2}>
+            <Box sx={{bgcolor: '#f8f8f8', borderRadius: 3, p: 2}}>
+                <ButtonGroup fullWidth color='secondary' variant='outlined'>
+                    {['all', 'available', 'reserved'].map(status => (
+                            <Button variant='outlined' sx={{borderRadius: 2}} key={status} onClick={() => setSelectedStatus(status)}>
+                                {status.toUpperCase()}
+                            </Button>
+                    ))}
+                </ButtonGroup>
+                <Chart onClick={(data) => setSelectedCategory(data.category)} data={Array.isArray(chartData) ? chartData : []}/>
             </Box>
-            {['all', 'available', 'reserved'].map(status => (
-                <Button key={status} onClick={() => setSelectedStatus(status)}>
-                    {status.toUpperCase()}
-                </Button>
-            ))}
-            <Chart onClick={(data) => setSelectedCategory(data.category)} data={Array.isArray(chartData) ? chartData : []}/>
-        </Box>
+        </Stack>
     )   
 }
 

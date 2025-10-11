@@ -6,3 +6,9 @@ html {
 * {
   scrollbar-width: thin;
 }
+.lucide {
+  color: #37353E;
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.5;
+}

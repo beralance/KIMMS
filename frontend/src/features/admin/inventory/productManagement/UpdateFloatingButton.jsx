@@ -17,6 +17,7 @@ export default function UpdateFloatingButton({editClick, deleteClick, featuredCl
         <Box sx={{ height: '100%', position: 'fixed', bottom: 10, right: 16, zIndex: 1000, transform: 'translateZ(0px)', flexGrow: 1 }}>
             <SpeedDial
                 ariaLabel="Tools"
+                FabProps={{color: 'secondary'}}
                 sx={{ position: 'fixed', bottom: 10, right: 16, }}
                 icon={<AppsRounded />}
             >

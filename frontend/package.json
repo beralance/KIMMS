@@ -23,6 +23,7 @@
     "framer-motion": "^12.23.22",
     "jwt-decode": "^4.0.0",
     "lodash.debounce": "^4.0.8",
+    "lucide-react": "^0.545.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

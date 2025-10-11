@@ -1,35 +1,29 @@
 import * as React from 'react';
-import BottomNavigation from '@mui/material/BottomNavigation';
-import BottomNavigationAction from '@mui/material/BottomNavigationAction';
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import InventoryIcon from "@mui/icons-material/Inventory2";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import BarChartIcon from "@mui/icons-material/BarChart";
-import { Box, Container, Stack } from '@mui/material';
+import { Box, Container, IconButton, Stack } from '@mui/material';
 import { NavLink, useLocation } from 'react-router-dom';
-import { PersonAddAlt1Rounded } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import { LayoutDashboardIcon, Package2, PackageIcon, UserPenIcon, ChartColumnBigIcon } from 'lucide-react';
 
-export default function LabelBottomNavigation() {
-    const location = useLocation()
-    const {user, token} = useAuth()
+export default function CustomBottomNav() {
+    const location = useLocation();
+    const { user } = useAuth();
 
     const navItemsByRole = {
-        admin:[
-                { label: "Dashboard", value: "dashboard", icon: <DashboardIcon />, path: '/admin' },
-                { label: "Inventory", value: "inventory", icon: <InventoryIcon />, path: '/admin/inventory/manage-inventory' },
-                { label: "Orders", value: "orders", icon: <ShoppingCartIcon />, path: '/admin/orders' },
-                { label: "Reports", value: "reports", icon: <BarChartIcon />, path: '/admin/reports' },
-                { label: "Staff", value: "staff", icon: <PersonAddAlt1Rounded />, path: '/admin/manage-staff' },
-            ],
-        staff:[
-                { label: "Dashboard", value: "dashboard", icon: <DashboardIcon />, path: '/staff' },
-                { label: "Inventory", value: "inventory", icon: <InventoryIcon />, path: '/staff/inventory/manage-inventory' },
-                { label: "Orders", value: "orders", icon: <ShoppingCartIcon />, path: '/staff/orders' },
-                { label: "Reports", value: "reports", icon: <BarChartIcon />, path: '/staff/reports' },
-            ]
-    }
-    const navItems = navItemsByRole[user?.role] || []
+        admin: [
+            { value: "dashboard", icon: <LayoutDashboardIcon style={{width: '18px'}}/>, path: '/admin' },
+            { value: "inventory", icon: <Package2 style={{width: '18px'}}/>, path: '/admin/inventory/manage-inventory' },
+            { value: "orders", icon: <PackageIcon style={{width: '18px'}}/>, path: '/admin/orders' },
+            { value: "reports", icon: <ChartColumnBigIcon style={{width: '18px'}}/>, path: '/admin/reports' },
+            { value: "staff", icon: <UserPenIcon style={{width: '18px'}}/>, path: '/admin/manage-staff' },
+        ],
+        staff: [
+            { value: "dashboard", icon: <LayoutDashboardIcon style={{width: '18px'}}/>, path: '/staff' },
+            { value: "inventory", icon: <Package2 style={{width: '18px'}}/>, path: '/staff/inventory/manage-inventory' },
+            { value: "orders", icon: <PackageIcon style={{width: '18px'}}/>, path: '/staff/orders' },
+            { value: "reports", icon: <ChartColumnBigIcon style={{width: '18px'}}/>, path: '/staff/reports' },
+        ]
+    };
+    const navItems = navItemsByRole[user?.role] || [];
 
     const currentValue = (() => {
         const inventoryPaths = [
@@ -40,63 +34,89 @@ export default function LabelBottomNavigation() {
             "/staff/inventory/manage-product",
             "/staff/inventory/manage-auction",
         ];
-
-        if (inventoryPaths.some((path) => location.pathname.startsWith(path))) {
-            return "inventory"; // must match navItems' value
-        }
-
+        if (inventoryPaths.some(path => location.pathname.startsWith(path))) return "inventory";
         const matched = navItems
-            .filter(
-                (item) =>
-                    location.pathname === item.path ||
-                    location.pathname.startsWith(item.path + "/")
-            )
+            .filter(item => location.pathname === item.path || location.pathname.startsWith(item.path + "/"))
             .sort((a, b) => b.path.length - a.path.length)[0];
-
         return matched?.value || "dashboard";
     })();
-    
+
     return (
         <Box
             sx={{
-                display: { xs: "block", md: "none" },
+                display: { xs: "flex", md: "none" },
                 position: "fixed",
                 bottom: 0,
                 left: 0,
                 right: 0,
                 justifyContent: 'center',
+                overflowX: 'scroll',
                 width: '100%',
+                scrollBehavior: 'smooth',
                 zIndex: 1000,
-                bgcolor: 'white',
+
             }}
         >
-            <Container maxWidth='sm' sx={{px: 5}} alignItems={'center'}>
-                <BottomNavigation
-                    sx={{ width: "100%",  }}
-                    value={currentValue}
-                >
-                    {navItems.map((item) => (
-                        <BottomNavigationAction
+            <Box
+                sx={{
+                    borderRadius: '999px',
+                    display: 'flex',
+                    boxShadow: '0px 2px 10px 1px rgba(0, 0, 0, 0.5)',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    minWidth: 'auto',
+                    bgcolor: 'rgba(0, 0, 0, 0.5)',
+                    backdropFilter: 'blur(10px)',
+                    my: 1,
+                    mt: 2,
+                    p: .5,
+                    px: 5,
+                }}
+            >
+                <Stack direction={'row'} position={'relative'} justifyContent={'center'} alignContent={'center'} sx={{flex: 1, minWidth: 300}}>
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            height: 3,
+                            width: `${100 / navItems.length}%`,
+                            bgcolor: 'rgba(255, 255, 255, 1)',
+                            borderRadius: '999px',
+                            transition: 'transform 0.3s ease',
+                            transform: `translateX(${navItems.findIndex(i => i.value === currentValue) * 100}%)`,
+                            zIndex: 0,
+                        }}
+                    />
+
+                    {navItems.map(item => (
+                        <IconButton
+                            key={item.value}
                             component={NavLink}
                             to={item.path}
-                            key={item.value}
-                            label={item.label}
-                            value={item.value}
-                            icon={item.icon}
                             sx={{
+                                flex: 1,
+                                transition: 'color 0.3s ease',
+                                '&:hover': { color: 'black' },
+                                maxWidth: 'none',
+                                mb: currentValue === item.value ? 1 : 0,
+                                py: 1.5,
                                 px: 0,
-                                transition: 'all 0.5 ease',
-                                "&.Mui-selected": {
-                                    color: "black",
-                                },
-                                "&:hover .MuiSvgIcon-root": {
-                                    color: "black",
-                                },
+                                zIndex: 1, // above highlight
                             }}
-                        />
+                        >
+                            {React.cloneElement(item.icon, {
+                                color: currentValue === item.value ? 'transparent' : 'white',
+                                strokeWidth: '3',
+                                transition: 'all .5s ease',
+                                width: '10px',
+                                fill: currentValue === item.value ? 'white' : 'none',
+                                transform: currentValue === item.value ? 'scale(1.4)' : 'none',
+                            })}
+                        </IconButton>
                     ))}
-                </BottomNavigation>
-            </Container>
+                </Stack>
+            </Box>
         </Box>
     );
 }

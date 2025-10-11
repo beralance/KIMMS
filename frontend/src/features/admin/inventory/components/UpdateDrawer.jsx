@@ -9,9 +9,9 @@ import {
   Stack,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import ManageAuction from "../auctionManagement/ManageAuction";
 import ManageInventory from '../inventoryManagement/ManageInventory'
 import UpdatePosted from '../productManagement/UpdatePosted'
+import AuctionProductDetails from "../auctionManagement/AuctionProductDetails";
 
 export default function AddItemDrawer({ open, onClose, productData, id, title, content }) {
     const renderForm = () => {
@@ -20,8 +20,8 @@ export default function AddItemDrawer({ open, onClose, productData, id, title, c
                 return <ManageInventory productId={id} onClose={onClose}/>;
             case 'update-product':
                 return <UpdatePosted productId={id} productData={productData} onClose={onClose}/>;
-            case 'update-auction':
-                return <ManageAuction />;
+            case 'auction-details':
+                return <AuctionProductDetails productId={id} auction={productData} onClose={onClose}/>;
             default:
                 return null;
         }
@@ -30,11 +30,11 @@ export default function AddItemDrawer({ open, onClose, productData, id, title, c
     const getTitle = () => {
         switch (content) {
             case 'update-inventory':
-                return `Item - ${title}`;
+                return `Update Item - ${title}`;
             case 'update-product':
-                return `Posted - ${title}`;
-            case 'update-auction':
-                return "Create Auction";
+                return `Update Posted - ${title}`;
+            case 'auction-details':
+                return `View Details - ${title}`;
             default:
                 return "";
         }
@@ -57,7 +57,7 @@ export default function AddItemDrawer({ open, onClose, productData, id, title, c
                     boxShadow: '0px 1px 5px rgba(0,0,0,0.2)'
                 }}
             >
-                <Typography color='white' variant="subtitle1" fontWeight='bold'>Update {getTitle()}</Typography>
+                <Typography color='white' variant="subtitle1" fontWeight='bold'>{getTitle()}</Typography>
                 <IconButton onClick={onClose}>
                     <CloseIcon sx={{color: 'white'}}/>
                 </IconButton>
