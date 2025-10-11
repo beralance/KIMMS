@@ -19,7 +19,6 @@ export default function SearchBar({ value, onChange, activeTab }) {
                 sx={{
                     minWidth: '100%',            
                     '& .MuiOutlinedInput-root': {
-                        borderRadius: 2,
                         bgcolor: 'rgba(255, 255, 255, 0.2)',
                         px: '.5rem',
                         boxShadow: '0px 0px 10px rgba(255, 255, 255, 0.5)',
