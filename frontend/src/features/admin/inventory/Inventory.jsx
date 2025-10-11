@@ -40,11 +40,11 @@ export default function Inventory() {
                     backgroundSize: 'cover',
                     backgroundRepeat: 'no-repeat',
                     top: 0, left: 0, right: 0, bottom: 0,
-                    height: '70vh',
+                    height: 'auto',
                     position: 'sticky',
                     top: 0,
                     left: 0,
-                    width: '100%'
+                    width: '100%',
                 }}
             >
                 <Container sx={{p: 2, backdropFilter: 'blur(10px)', height: '100%'}}>
@@ -53,7 +53,7 @@ export default function Inventory() {
                         onChange={setSearchTerm}
                         activeTab={value}
                     />
-                    <Box sx={{p: 2, mb: 2, borderRadius: 5,}}>
+                    <Box sx={{p: 2, borderRadius: 5, py: 3, pb: 16}}>
                         <Stack direction={'row'} alignItems={'center'}>
                             <Typography variant="body1" color="white" fontWeight={'bold'}>
                                 Quick Overview 
