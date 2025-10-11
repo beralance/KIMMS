@@ -25,18 +25,11 @@ import { useAuth } from "../contexts/AuthContext";
 import { ProductContext } from "../contexts/ProductContext"; // adjust path
 
 // Icons
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
-import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
-import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined'
-import SearchIcon from '@mui/icons-material/Search'
-import HomeRoudedIcon from '@mui/icons-material/HomeRounded'
-import ShoppingBagRoundedIcon from '@mui/icons-material/ShoppingBagRounded'
-import SellRoundedIcon from '@mui/icons-material/SellRounded'
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded'
 import LockOutlineIcon from '@mui/icons-material/LockOutline'
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined'
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined'
- 
+import {MenuIcon, UserRoundIcon, ShoppingCartIcon, SearchIcon, XIcon, LockIcon, Package2Icon, BellIcon, HouseIcon, ShoppingBagIcon, TagIcon, HomeIcon} from 'lucide-react'
 function HideOnScroll ({children}) {
     const trigger = useScrollTrigger();
         return (
@@ -47,15 +40,15 @@ function HideOnScroll ({children}) {
     }
 
     const navLinks = [
-        { label: "Home", to: "/", icon: <HomeRoudedIcon /> },
-        { label: "Shop", to: "/shop", icon: <ShoppingBagRoundedIcon /> },
-        { label: "Auction", to: "/auction/listing", icon: <SellRoundedIcon /> },
+        { label: "Home", to: "/", icon: <HouseIcon style={{color: "white", width: 17}}/> },
+        { label: "Shop", to: "/shop", icon: <ShoppingBagIcon style={{color: "white", width: 17}}/> },
+        { label: "Auction", to: "/auction/listing", icon: <TagIcon style={{color: "white", width: 17}} /> },
     ];
 
     const userLinks = [
-        { label: 'Account', to: '/*', icon: < LockOutlineIcon/> },
-        { label: 'My Purchases', to: '/*', icon: < ReceiptLongOutlinedIcon/> },
-        { label: 'Notification', to: '/*', icon: < NotificationsOutlinedIcon/> },
+        { label: 'Account', to: '/*', icon: < LockIcon style={{color: "black", width: 17}}/> },
+        { label: 'My Purchases', to: '/*', icon: < Package2Icon style={{color: "black", width: 17}}/> },
+        { label: 'Notification', to: '/*', icon: < BellIcon style={{color: "black", width: 17}}/> },
     ]
 
 export default function UserHeader() {
@@ -149,12 +142,12 @@ export default function UserHeader() {
                     <Box sx={{ display: { sm: "none", xs: "flex" }, mx: 2, gap: 2, flexGrow: 1, justifyContent: "start" }}>
                         <IconButton onClick={() => setNavOpen(prev => !prev)} sx={{ p: 0 }}>
                             {!navOpen ? 
-                                <MenuRoundedIcon color="secondary" sx={{ fontSize: 22, color: showBg ? 'black' : 'white' }} /> :
-                                <CloseRoundedIcon color="grey"  sx={{color: showBg ? 'black' : 'white' }}/>
+                                <MenuIcon style={{ width: 16, color: showBg ? 'black' : 'white' }} /> :
+                                <XIcon color="grey"  style={{width: 20, strokeWidth: 2, color: showBg ? 'black' : 'white' }}/>
                             }
                         </IconButton>
                         <IconButton onClick={() => setSearchDrawerOpen(true)} sx={{ p: 0 }}>
-                            <SearchIcon color="secondary" sx={{ fontSize: 22, color: showBg ? 'black' : 'white'}} />
+                            <SearchIcon style={{ width: 16, color: showBg ? 'black' : 'white'}} />
                         </IconButton>
                     </Box>
 
@@ -185,11 +178,11 @@ export default function UserHeader() {
                     {/* Right side (mobile) */}
                     <Box sx={{ display: { sm: "none", xs: "flex" }, mx: 2, gap: 2, flexGrow: 1, justifyContent: "end" }}>
                         <IconButton onClick={handleUserDrawerClick} sx={{ p: 0 }}>
-                            <PersonOutlinedIcon color="secondary" sx={{ fontSize: 22, color: showBg ? 'black' : 'white' }} />
+                            <UserRoundIcon style={{ width: 16, color: showBg ? 'black' : 'white' }} />
                         </IconButton>
                         <Badge badgeContent={isLoggedIn ? cartItems.length : 0} color="error">
                             <IconButton component={NavLink} to='/cart' sx={{ p: 0 }}>
-                                <ShoppingCartOutlinedIcon color="secondary" sx={{ fontSize: 22, color: showBg ? 'black' : 'white' }} />
+                                <ShoppingCartIcon style={{ width: 16, color: showBg ? 'black' : 'white' }} />
                             </IconButton>
                         </Badge>
                     </Box>
@@ -233,11 +226,11 @@ export default function UserHeader() {
                     {/* Desktop icons */}
                     <Box sx={{ display: { sm: "flex", xs: "none" },  mx: 2, gap: 2, flexGrow: {md: 1}, justifyContent: "end" }}>
                         <IconButton onClick={handleUserDrawerClick} sx={{ p: 0 }}>
-                            <PersonOutlinedIcon color="secondary" sx={{ fontSize: 22, color: showBg ? 'black' : 'white', }} />
+                            <UserRoundIcon color="secondary" style={{ fontSize: 22, color: showBg ? 'white' : 'black', }} />
                         </IconButton>
                         <Badge badgeContent={isLoggedIn ? cartItems.length : 0} color="error">
-                            <IconButton component={NavLink} to='/cart' sx={{ p: 0 }}>
-                                <ShoppingCartOutlinedIcon color="secondary" sx={{ fontSize: 22, color: showBg ? 'black' : 'white', }} />
+                            <IconButton component={NavLink} to='/cart' style={{ p: 0 }}>
+                                <ShoppingCartIcon color="secondary" style={{ fontSize: 22, color: showBg ? 'white' : 'black', }} />
                             </IconButton>
                         </Badge>
                     </Box>

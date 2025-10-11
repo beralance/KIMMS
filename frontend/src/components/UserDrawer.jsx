@@ -117,9 +117,11 @@ export default function UserDrawer({ open, onClose, links = [], anchor = "right"
                         <List>
                             {links.map(({ label, to, action, icon }) => (
                                 <ListItem key={label} disablePadding>
-                                    <ListItemButton onClick={() => handleClick(to, action)} sx={{ display: 'flex', alignItems: 'center', p: 2, py: 1 }}>
-                                        <Box sx={{ pr: 2 }}>{icon}</Box>
-                                        <Typography variant="body2">{label}</Typography>
+                                    <ListItemButton onClick={() => handleClick(to, action)} sx={{ display: 'flex', p: 2, py: 1 }}>
+                                        <Stack direction={'row'} >
+                                            <Box sx={{ pr: 2 }}>{icon}</Box>
+                                            <Typography variant="body2">{label}</Typography>
+                                        </Stack>
                                     </ListItemButton>
                                 </ListItem>
                             ))}

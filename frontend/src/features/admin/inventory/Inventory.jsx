@@ -83,7 +83,7 @@ export default function Inventory() {
                     boxShadow: '0px 0px 20px 0px rgba(0, 0, 0, 0.2)',
                 }}
             >
-                <Box>
+                <Container maxWidth={'lg'}>
                     <Box sx={{ borderBottom: 1, borderColor: '#FAFAFA'}}>
                         <Tabs
                             sx={{overflowX: 'auto',  color: 'white', width: '100%', scrollBehavior: 'smooth'}}
@@ -141,11 +141,10 @@ export default function Inventory() {
                             />
                         </Tabs>
                     </Box>
-
-                    <Container maxWidth={'lg'} sx={{pt: 3, pb: 30, bgcolor: '#FAFAFA'}}>
-                        <Outlet context={{searchTerm, setSearchTerm}}/>
-                    </Container>
-                </Box>
+                </Container>
+                <Container maxWidth={'lg'} sx={{pt: 3, pb: 30, bgcolor: '#FAFAFA'}}>
+                    <Outlet context={{searchTerm, setSearchTerm}}/>
+                </Container>
             </Box>
             <AddItemButton onOpen={handleOpenDialog} open={openDialog}/>
             
