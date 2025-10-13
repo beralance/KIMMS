@@ -41,6 +41,7 @@ const QrPreview = () => {
     const navigate = useNavigate();
     const {user} = useAuth()
 
+    
     useEffect(() => {
         const fetchProduct = async () => {
             const data = await getInventoryById(id);

@@ -127,6 +127,7 @@ export default function ProductForm({productId, productData, onClose}) {
         setConfirmOpen(false);
     };
 
+    console.log('product data', productData)
     return (
         <Container maxWidth='sm'>
             <Stack sx={{mt: 1}}>
@@ -336,7 +337,7 @@ export default function ProductForm({productId, productData, onClose}) {
                 onCancel={() => setConfirmOpen(false)}
             />
             <PhysicalCodeDisplayer 
-                id={productData._id}
+                id={productData.inventoryId}
                 name={productData.productName} 
                 category={productData.category}
                 physicalCode={productData.physicalCode}
