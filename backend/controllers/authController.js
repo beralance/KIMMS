@@ -80,6 +80,9 @@ export const signup = async (req, res) => {
             });
         }
 
+        console.log('IS NEW USER LOCAL FROM AUTH, this should be true', newUser)
+        console.log('IS NEW USER LOCAL FROM AUTH, this should be true', newUser.isLocal)
+
         if (isGoogle) {
             const token = jwt.sign(
                 { id: newUser._id, role: newUser.role, isLocal: newUser.isLocal },
@@ -115,16 +118,12 @@ export const updateAddress = async (req, res) => {
     const address = wrapper?.address || wrapper; // in case it's double-wrapped
 
     if (!address) {
-        return res.status(400).json({ error: 'Address is required' });
+        return res.status(400).json({error: 'Address is required'})
     }
 
     console.log('USER ID', userId)
     console.log('ADDRESS', address)
     console.log(address)
-
-    if (!address) {
-        return res.status(400).json({error: 'Address is required'})
-    }
 
     try {
         //const isLocal = address?.region === '05'
@@ -146,10 +145,18 @@ export const updateAddress = async (req, res) => {
         }
 
         console.log('USER BACKEND IS LOCAL', user.isLocal)
+
+        const token = jwt.sign(
+            {id: user._id, role: user.role, isLocal: user.isLocal},
+            process.env.JWT_SECRET,
+            {expiresIn: '12h'}
+        )
+
         res.json({
             message: 'Address updated successfully',
             address: user.address,
-            isLocal: user.isLocal
+            isLocal: user.isLocal,
+            token
         })
     }
     catch (err) {
@@ -257,10 +264,12 @@ export const login = async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
 
+        const expiresIn = user.role === 'admin' ? '4h' : '12h';
+
         const token = jwt.sign(
             { id: user._id, role: user.role, isLocal: isLocal },
             process.env.JWT_SECRET,
-            { expiresIn: '12h' }
+            { expiresIn } // from {expiresIn: 12h}
         );
 
         let allowedModules = [];
@@ -314,7 +323,6 @@ export const googleLogin = async (req, res) => {
             process.env.JWT_SECRET,
             {expiresIn: '12h'}
         )
-
         res.status(200).json({
             message: 'Google login successful',
             token,

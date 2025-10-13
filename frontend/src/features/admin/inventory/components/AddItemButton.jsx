@@ -36,38 +36,38 @@ export default function AddItemButton({ onOpen, open }) {
   };
 
   return (
-    <Draggable
-      nodeRef={nodeRef}
-      position={position}
-      onStart={handleStart}
-      onDrag={handleDrag}
-      onStop={handleStop}
-    >
-      <motion.div
-        ref={nodeRef}
-        style={{ position: 'fixed', bottom: 80, right: 16, zIndex: 1000 }}
-        animate={position}
-        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-      >
-        <IconButton
-          sx={{
-            border: '2px solid white',
-            bgcolor: !open ? '#37353E' : 'transparent',
-            color: !open ? 'white' : '#37353E',
-            width: buttonSize,
-            height: buttonSize,
-            boxShadow: !open ? 3 : 0,
-            transition: 'all 0.3s ease',
-            '&:hover': {
-              bgcolor: open ? '#37353E' : '#c0c0c0ff',
-              color: open ? '#c0c0c0ff' : '#37353E',
-              boxShadow: !open ? 6 : 2,
-            },
-          }}
+        <Draggable
+            nodeRef={nodeRef}
+            position={position}
+            onStart={handleStart}
+            onDrag={handleDrag}
+            onStop={handleStop}
         >
-          {!open ? <AddIcon /> : <EditIcon />}
-        </IconButton>
-      </motion.div>
-    </Draggable>
-  );
+            <motion.div
+                ref={nodeRef}
+                style={{ position: 'fixed', bottom: 80, right: 16, zIndex: 1000 }}
+                animate={position}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            >
+                <IconButton
+                    sx={{
+                        bgcolor: !open ? 'rgba(0, 0, 0, 0.6)' : 'transparent',
+                        backdropFilter: !open ? 'blur(5px)' : 'transparent',
+                        color: !open ? 'white' : '#37353E',
+                        width: buttonSize,
+                        height: buttonSize,
+                        boxShadow: !open ? '0px 0px 8px rgba(0, 0, 0, 0.4)' : 0,
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                        bgcolor: open ? '#37353E' : '#c0c0c0ff',
+                        color: open ? '#c0c0c0ff' : '#37353E',
+                        boxShadow: !open ? 6 : 2,
+                        },
+                    }}
+                >
+                    {!open ? <AddIcon /> : <EditIcon />}
+                </IconButton>
+            </motion.div>
+        </Draggable>
+    );
 }

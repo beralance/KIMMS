@@ -20,6 +20,7 @@ import bidRoutes from './routes/bidRoutes.js'
 import auctionNotificationRoutes from './routes/auctionNotificationRoutes.js'
 import staffPermissionRoutes from './routes/staffPermissionRoutes.js'
 import categoryRoutes from './routes/categoryRoutes.js'
+import reportsRoutes from './routes/reportsRoutes.js'
 
 // cron
 import { auctionLifecycleCron } from './cron/auctionCron.js'
@@ -82,6 +83,7 @@ app.use('/api/bids', bidRoutes)
 app.use('/api/auction-notification', auctionNotificationRoutes)
 app.use('/api/staff-permissions', staffPermissionRoutes)
 app.use('/api/categories', categoryRoutes)
+app.use('/api/reports', reportsRoutes)
 
 
 

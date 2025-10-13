@@ -35,7 +35,7 @@ const AdminAuctionMonitor = ({searchTerm}) => {
     const { token } = useAuth()
     const API_URL = import.meta.env.VITE_API_URL;
     const [loading, setLoading] = useState(false)
-    const [collapseOpen, setCollapseOpen] = useState(false)
+    const [collapseOpen, setCollapseOpen] = useState(true)
     
     const fetchAuctions = async () => {
         setLoading(true)
@@ -139,6 +139,7 @@ const AdminAuctionMonitor = ({searchTerm}) => {
                 sx={{ 
                     position: 'sticky', 
                     top: 70,
+                    zIndex: 1000,
                     minWidth: 100,
                     display: {xs: 'inline-block', sm: 'none' },
                     transition: 'all .5s ease',
@@ -152,11 +153,11 @@ const AdminAuctionMonitor = ({searchTerm}) => {
                     <IconButton sx={{bgcolor: collapseOpen ? 'transparent' : '#37353E'}} onClick={() => setCollapseOpen((prev) => !prev)}>
                         { collapseOpen ? <CloseRounded sx={{color: '#37353E'}}/> : <MoreVert sx={{color: 'white'}}/> }
                     </IconButton>
-                    <Collapse in={collapseOpen} orientation="horizontal" timeout={ collapseOpen ? 1000 : 1000}>
+                    <Collapse in={collapseOpen} orientation="horizontal" timeout={800}>
                         <Stack direction={'row'}>
                             <ButtonGroup color='secondary'>
                                 {auctionStatusFilter.map(status => 
-                                    <Slide direction={collapseOpen ? 'left' : 'right'} in={collapseOpen} timeout={status.key * 200}>
+                                    <Slide direction={collapseOpen ? 'left' : 'right'} in={collapseOpen} timeout={status.key * 300}>
                                         <Button
                                             sx={{
                                                 transition: 'all 1s ease',
@@ -186,7 +187,7 @@ const AdminAuctionMonitor = ({searchTerm}) => {
             <Grid container spacing={3} sx={{p: 0,}}>
                 {filteredAuctions.length > 0 ? (
                     filteredAuctions.map((auction) => (
-                        <Grid size={{xs: 12, md: 6, lg: 4}} key={auction._id}>
+                        <Grid size={{xs: 12, sm: 6, md: 6, lg: 4}} key={auction._id}>
                             <AuctionProductCard auction={auction}/>
                         </Grid>
                     )))
@@ -197,7 +198,7 @@ const AdminAuctionMonitor = ({searchTerm}) => {
                                 <img src="/shocked-shock.svg" alt="shocked-shock" style={{ paddingBottom: '10px', width: 80, opacity: .8,}}/>
                             </Grow>
                             <Typography variant="body1" fontWeight={'bold'} color="secondary"> No Results found </Typography>
-                            <Typography variant="body2" color="grey"> 
+                            <Typography variant="body2" color="grey" align="center"> 
                                 Click the + button to start an auction
                             </Typography>
                         </Stack>

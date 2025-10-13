@@ -23,9 +23,9 @@ export default function AddItemDialog({ open, onClose, productData, id, title, c
     const getTitle = () => {
         switch (content) {
             case 'update-inventory':
-                return `Item - ${title}`;
+                return `Update Item - ${title}`;
             case 'update-product':
-                return `Posted - ${title}`;
+                return `${title}`;
             case 'auction-details':
                 return `Create Auction - ${title}`;
             default:
@@ -46,12 +46,28 @@ export default function AddItemDialog({ open, onClose, productData, id, title, c
                     position: 'sticky',
                     top: 0,
                     height: 60,
-                    backgroundColor: '#37353E',
+                    backgroundColor: '#585858ff',
                     zIndex: 500,
                     boxShadow: '0px 1px 5px rgba(0,0,0,0.2)',
                 }}
             >
-                <Typography pl={2} variant="subtitle1" color="white" fontWeight='bold'>Update {getTitle()}</Typography>
+                <Typography 
+                    pl={2} 
+                    variant="body"
+                    color="white" 
+                    sx={{
+                        overflowX: 'auto',
+                        textOverflow: 'clamp', 
+                        width: '100%', 
+                        p: 0,
+                        borderRight: '1px solid gray',
+                        whiteSpace: 'nowrap', 
+                        textWrap: 'nowrap',
+                        scrollbarColor: 'transparent transparent',
+                    }}
+                >
+                    {getTitle()}
+                </Typography>
                 <IconButton onClick={onClose}>
                     <CloseRounded sx={{color: 'white'}}/>
                 </IconButton>

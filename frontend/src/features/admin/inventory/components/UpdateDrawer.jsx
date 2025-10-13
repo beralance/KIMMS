@@ -32,7 +32,7 @@ export default function AddItemDrawer({ open, onClose, productData, id, title, c
             case 'update-inventory':
                 return `Update Item - ${title}`;
             case 'update-product':
-                return `Update Posted - ${title}`;
+                return `${title}`;
             case 'auction-details':
                 return `View Details - ${title}`;
             default:
@@ -50,14 +50,30 @@ export default function AddItemDrawer({ open, onClose, productData, id, title, c
                     borderBottom: 1, 
                     borderColor: "divider", 
                     position: 'sticky',
-                    backgroundColor: '#37353E',
+                    backgroundColor: '#585858ff',
                     top: 0,
                     height: 60,
                     zIndex: 500,
                     boxShadow: '0px 1px 5px rgba(0,0,0,0.2)'
                 }}
             >
-                <Typography color='white' variant="subtitle1" fontWeight='bold'>{getTitle()}</Typography>
+                <Typography 
+                    pl={2} 
+                    variant="body"
+                    color="white" 
+                    sx={{
+                        overflowX: 'auto',
+                        textOverflow: 'clamp', 
+                        width: '100%', 
+                        p: 0,
+                        borderRight: '1px solid gray',
+                        whiteSpace: 'nowrap', 
+                        textWrap: 'nowrap',
+                        scrollbarColor: 'transparent transparent',
+                    }}
+                >
+                    {getTitle()}
+                </Typography>
                 <IconButton onClick={onClose}>
                     <CloseIcon sx={{color: 'white'}}/>
                 </IconButton>

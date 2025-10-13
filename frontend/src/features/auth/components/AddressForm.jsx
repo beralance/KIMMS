@@ -52,10 +52,13 @@ const AddressForm = () => {
         console.log('ADDRESS PAYLOAD', province)
         console.log('ADDRESS PAYLOAD', city)
 
+
+        console.log('^^^^^^^^TOKEN', token)
         try {
             const data = await updateUserAddress(userId, addressPayload, token)
-            console.log('Address updated: ', data.address)
-            login({address: data.address, isLocal: data.isLocal})
+            
+            console.log('______TOKEN INSIDE ADDRESS FORM: ', data)
+            login({address: data.address, isLocal: data.isLocal, token: data.token})
             navigate('/')
         }
         catch (err) {

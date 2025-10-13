@@ -10,7 +10,7 @@ export default function CustomBottomNav() {
 
     const navItemsByRole = {
         admin: [
-            { value: "dashboard", icon: <LayoutDashboardIcon style={{width: '18px', }}/>, path: '/admin' },
+            { value: "dashboard", icon: <LayoutDashboardIcon style={{width: '18px'}}/>, path: '/admin' },
             { value: "inventory", icon: <Package2 style={{width: '18px'}}/>, path: '/admin/inventory/manage-inventory' },
             { value: "orders", icon: <PackageIcon style={{width: '18px'}}/>, path: '/admin/orders' },
             { value: "reports", icon: <ChartColumnBigIcon style={{width: '18px'}}/>, path: '/admin/reports' },
@@ -62,10 +62,9 @@ export default function CustomBottomNav() {
                     flex={1} 
                     sx={{
                         bgcolor: 'rgba(0, 0, 0, 0.5)',
-                        backdropFilter: 'blur(10px)',
+                        backdropFilter: 'blur(5px)',
                         borderRadius: '999px',
                         py: 1,
-                        transition: 'all .5 ease',
                         boxShadow: 20,
 
                     }}
@@ -74,7 +73,7 @@ export default function CustomBottomNav() {
                         sx={{
                             position: 'absolute',
                             left: 0,
-                            bottom: 5,
+                            bottom: 4,
                             height: 5,
                             justifyContent: 'center',
                             display: 'flex',
@@ -83,20 +82,21 @@ export default function CustomBottomNav() {
                             borderRadius: '999px',
                             transition: 'transform 0.3s ease',
                             transform: `translateX(${navItems.findIndex(i => i.value === currentValue) * 100}%)`,
+                            zIndex: 0,
                         }}
                     >
-                        <Box sx={{width: '20px', zIndex: 1, borderRadius: '999px', height: 1, bgcolor: 'white'}}/>
+                        <Box sx={{width: '60%', zIndex: 1, borderRadius: '999px', height: 1, bgcolor: 'white'}}/>
                     </Box>
                     {navItems.map(item =>
                         <Box key={item .value}
                             sx={{
                                 transition: 'all .3s ease-out',
-                                transform: currentValue === item.value ? 'translateY(-8px)' : 'none',
-                                bgcolor: currentValue === item.value ? 'transparent' : 'none',
-                                opacity: currentValue === item.value ? 1 : 0.5,
-                                //outline: currentValue === item.value ? '.5px solid white' : 'none',
+                                backdropFilter: currentValue === item.value ? 'blur(999px)' : 'transparent',
+                                transform: currentValue === item.value ? 'translateY(-20px)' : 'none',
+                                boxShadow: currentValue === item.value ? '0px 0px 10px rgba(255, 255, 255, 0.5)' : 'none',
+                                bgcolor: currentValue === item.value ? 'white' : 'none',
+                                outline: currentValue === item.value ? '.5px solid white' : 'none',
                                 borderRadius: '999px',
-                                zIndex: 1000,
                             }}
                         > 
                             <IconButton
@@ -104,14 +104,15 @@ export default function CustomBottomNav() {
                                 to={item.path}
                             >
                                 {React.cloneElement(item.icon, {
-                                    color: 'white',
-                                    border: currentValue === item.value ? '1px solid blue' : 'white',
+                                    color: currentValue === item.value ? 'transparent' : 'white',
+                                    strokeWidth: '3',
                                     transition: 'all .5s ease',
-                                    fill: currentValue === item.value ? 'white' : 'none',
+                                    width: '10px',
+                                    fill: currentValue === item.value ? 'black' : 'none',
+                                    transform: currentValue === item.value ? 'scale(1.4)' : 'none',
                                 })}
                             </IconButton>
                         </Box>
-                        
                     )}
                 </Stack>
             </Box>

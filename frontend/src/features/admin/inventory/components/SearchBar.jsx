@@ -21,7 +21,6 @@ export default function SearchBar({ value, onChange, activeTab }) {
                     '& .MuiOutlinedInput-root': {
                         bgcolor: 'rgba(255, 255, 255, 0.2)',
                         px: '.5rem',
-                        boxShadow: '0px 0px 10px rgba(255, 255, 255, 0.5)',
                         color: 'white',
                         height: 40,
                         display: 'flex',
@@ -49,7 +48,8 @@ export default function SearchBar({ value, onChange, activeTab }) {
                         color: 'white',        
                     },
                     '& .MuiInputLabel-root.Mui-focused': {
-                        color: 'red',             
+                        color: 'red',        
+                        mt: 1,     
                     },
                     '& .MuiInputLabel-root.MuiInputLabel-shrink': {
                         fontSize: '0.8rem',       

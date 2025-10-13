@@ -59,8 +59,11 @@ export const CartProvider = ({ children }) => {
             showSnackbar("Item is already in your cart!", "warning");
             return;
         }
+        console.log('THIS IS THE TOKEN^^^^^^^', token)
 
         try {
+
+            console.log('THIS IS THE TOKEN^^^^^^^', token)
             const res = await fetchWithAuth(
                 `${API_URL}/api/cart`,
                 {

@@ -175,3 +175,97 @@ export const getPastAuctions = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+/**
+ * Get auction stats for reports
+ * @param {Object} options - optional filters
+ *   options.period: 'week' | 'month' | 'year' | {from: Date, to: Date}
+ *   options.category: categoryId (requires inventory population)
+ *   options.inventoryId: specific inventory item
+ *   options.alertThresholds: { pendingHours: Number, liveHours: Number }
+ */
+export const getAuctionReportStats = async (options = {}) => {
+    const { period, category, inventoryId, alertThresholds } = options;
+    const pendingHours = alertThresholds?.pendingHours || 24;
+    const liveHours = alertThresholds?.liveHours || 2;
+
+    const now = new Date();
+    let filter = {};
+
+    // Period filter
+    if (period) {
+        let fromDate;
+        if (period === 'week') {
+            fromDate = new Date();
+            fromDate.setDate(now.getDate() - 7);
+        } else if (period === 'month') {
+            fromDate = new Date();
+            fromDate.setMonth(now.getMonth() - 1);
+        } else if (period === 'year') {
+            fromDate = new Date();
+            fromDate.setFullYear(now.getFullYear() - 1);
+        } else if (period.from && period.to) {
+            filter.createdAt = { $gte: new Date(period.from), $lte: new Date(period.to) };
+        }
+
+        if (fromDate && !filter.createdAt) {
+            filter.createdAt = { $gte: fromDate };
+        }
+    }
+
+    // Inventory filter
+    if (inventoryId) filter.inventoryId = inventoryId;
+
+    // Fetch auctions and populate inventory
+    const auctions = await Auction.find(filter).populate('inventoryId', 'productName category');
+
+    // Category filter (after populate)
+    const filteredAuctions = category
+        ? auctions.filter(a => a.inventoryId?.category?.toString() === category.toString())
+        : auctions;
+
+    // Counts
+    const totalAuctions = filteredAuctions.length;
+    const liveAuctions = filteredAuctions.filter(a => a.status === 'LIVE').length;
+    const pendingAuctions = filteredAuctions.filter(a => a.status === 'PENDING').length;
+    const endedAuctions = filteredAuctions.filter(a => a.status === 'ENDED').length;
+    const closedAuctions = filteredAuctions.filter(a => a.status === 'CLOSED').length;
+
+    // Alerts
+    const alerts = [];
+
+    // Pending auctions starting soon
+    filteredAuctions
+        .filter(a => a.status === 'PENDING')
+        .forEach(a => {
+            const diffHours = (new Date(a.startTime) - now) / (1000 * 60 * 60);
+            if (diffHours <= pendingHours && diffHours > 0) {
+                alerts.push({
+                    type: 'pending_start',
+                    message: `Auction '${a.inventoryId.productName}' starts in ${Math.round(diffHours)} hours.`
+                });
+            }
+        });
+
+    // Live auctions ending soon
+    filteredAuctions
+        .filter(a => a.status === 'LIVE')
+        .forEach(a => {
+            const diffHours = (new Date(a.endTime) - now) / (1000 * 60 * 60);
+            if (diffHours <= liveHours && diffHours > 0) {
+                alerts.push({
+                    type: 'live_end',
+                    message: `Auction '${a.inventoryId.productName}' ending in ${Math.round(diffHours * 60)} minutes.`
+                });
+            }
+        });
+
+    return {
+        totalAuctions,
+        liveAuctions,
+        pendingAuctions,
+        endedAuctions,
+        closedAuctions,
+        alerts
+    };
+}

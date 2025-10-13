@@ -3,23 +3,30 @@ import Box from '@mui/material/Box';
 import SpeedDial from '@mui/material/SpeedDial';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
 import SpeedDialAction from '@mui/material/SpeedDialAction';
-import { AppsRounded, DeleteRounded, EditRounded, QrCode, RadioRounded } from '@mui/icons-material';
-
+import {PencilIcon, TrashIcon, QrCodeIcon, LayoutGridIcon} from 'lucide-react'
 
 
 export default function UpdateFloatingButton({editClick, deleteClick, featuredClick, qrClick}) {
     const actions = [
-        { icon: <EditRounded />, name: 'Edit', click: editClick },
-        { icon: <DeleteRounded />, name: 'Delete', click: deleteClick },
-        { icon: <QrCode />, name: 'Qr Code', click: qrClick },
+        { icon: <PencilIcon/>, name: 'Edit', click: editClick },
+        { icon: <TrashIcon />, name: 'Delete', click: deleteClick },
+        { icon: <QrCodeIcon />, name: 'Qr Code', click: qrClick },
     ];
     return (
         <Box sx={{ height: '100%', position: 'fixed', bottom: 10, right: 16, zIndex: 1000, transform: 'translateZ(0px)', flexGrow: 1 }}>
             <SpeedDial
                 ariaLabel="Tools"
-                FabProps={{color: 'secondary'}}
+                FabProps={{
+                    color: 'secondary',
+                    sx: {
+                    '&:active': {
+                        transform: 'scale(0.9)',
+                        transition: 'transform 0.1s ease',
+                    },
+                    },
+                }}
                 sx={{ position: 'fixed', bottom: 10, right: 16, }}
-                icon={<AppsRounded />}
+                icon={<LayoutGridIcon style={{color: 'white', fill: 'white'}}/>}
             >
                 {actions.map((action) => (
                 <SpeedDialAction

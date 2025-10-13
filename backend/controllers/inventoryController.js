@@ -210,3 +210,63 @@ export const deleteInventoryItem = async (req, res) => {
     }
 };
 
+
+/**
+ * Get inventory stats for reports
+ * @param {Object} options - optional filters
+ *   options.period: 'week' | 'month' | 'year' | {from: Date, to: Date} 
+ *   options.category: categoryId
+ *   options.status: 'available' | 'sold' | 'reserved'
+ *   options.condition: 'new' | 'like new' | 'used' | 'refurbished'
+ */
+
+// GET Inventory Overview
+export const getInventoryReportStats = async (options = {}) => {
+    const { period, category, status, condition } = options;
+
+    let filter = {};
+
+    if (category) filter.category = category;
+    if (status) filter.status = status;
+    if (condition) filter.condition = condition;
+
+    // Compute date range for period
+    if (period) {
+        const now = new Date();
+        let fromDate;
+        if (period === 'week') {
+            fromDate = new Date();
+            fromDate.setDate(now.getDate() - 7);
+        } else if (period === 'month') {
+            fromDate = new Date();
+            fromDate.setMonth(now.getMonth() - 1);
+        } else if (period === 'year') {
+            fromDate = new Date();
+            fromDate.setFullYear(now.getFullYear() - 1);
+        } else if (period.from && period.to) {
+            fromDate = new Date(period.from);
+            const toDate = new Date(period.to);
+            filter.updatedAt = { $gte: fromDate, $lte: toDate };
+        }
+
+        if (fromDate && !filter.updatedAt) {
+            filter.updatedAt = { $gte: fromDate };
+        }
+    }
+
+    const allItems = await Inventory.find(filter);
+
+    const totalProducts = allItems.length;
+
+    const activeListings = allItems.filter(item => item.status === 'available').length;
+
+    const soldItems = allItems.filter(item => item.status === 'sold').length;
+
+    return {
+        totalProducts,
+        activeListings,
+        soldItems,
+        filteredCount: allItems.length, // useful for frontend display
+    };
+};
+

@@ -20,10 +20,10 @@ export default function ConfirmDialog({
     color = 'error'
 }) {
     return (
-        <Dialog open={open} onClose={onCancel}>
-            <DialogTitle sx={{fontSize:20}}>{title}</DialogTitle>
-            <DialogContent sx={{maxWidth: 400, px: 4}}>
-                <DialogContentText sx={{fontSize:15}}>{content}</DialogContentText>
+        <Dialog open={open} onClose={onCancel} sx={{minWidth: 250}}>
+            <DialogTitle sx={{fontSize:20}} variant="body1">{title}</DialogTitle>
+            <DialogContent sx={{maxWidth: 400, minWidth: 200, px: 4}}>
+                <DialogContentText sx={{fontSize:15}} variant="body2">{content}</DialogContentText>
             </DialogContent>
             <DialogActions>
                 <Button onClick={onCancel} color="inherit">

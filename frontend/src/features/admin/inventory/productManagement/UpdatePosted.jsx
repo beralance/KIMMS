@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Box, TextField, Container, Button, MenuItem, Select, InputLabel, FormControl, Typography, CircularProgress, Collapse, ListItem, ListItemText, Stack, IconButton, FormControlLabel, Switch, ButtonGroup } from "@mui/material";
+import { Box, TextField, SwipeableDrawer, Container, Button, MenuItem, Select, InputLabel, FormControl, Typography, CircularProgress, Collapse, ListItem, ListItemText, Stack, IconButton, FormControlLabel, Switch, ButtonGroup, Divider } from "@mui/material";
 import { InventoryContext } from '../../../../contexts/InventoryContext';
 import PhysicalCodeDisplayer from '../components/PhysicalCodeDisplayer';
 import { useSnackbar } from '../../../../contexts/SnackbarContext'
@@ -13,6 +13,8 @@ import {Swiper, SwiperSlide} from 'swiper/react'
 import { formatNumber } from '../../../../utils/stringUtils';
 import { ProductContext } from '../../../../contexts/ProductContext';
 import UpdateFloatingButton from './UpdateFloatingButton';
+import {CircleCheckIcon, InfoIcon} from 'lucide-react'
+
 
 export default function ProductForm({productId, productData, onClose}) {
     // Product Data
@@ -23,10 +25,10 @@ export default function ProductForm({productId, productData, onClose}) {
     const {updateProduct, deleteProduct, updateProductHighlight} = useContext(ProductContext)
     const {showSnackbar} = useSnackbar()
 
-    const [statusLoading, setStatusLoading] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [isFeatured, setIsFeatured] = useState(productData.highlight === "featured");
-    
+    const [infoOpen, setInfoOpen] = useState(true)
+
     const [qrOpen, setQrOpen] = useState(false)
     const handleQrClose = () => setQrOpen(false)
     const handleQrOpen = () => setQrOpen(true)
@@ -82,6 +84,7 @@ export default function ProductForm({productId, productData, onClose}) {
             setIsFeatured(productData.highlight === "featured");
         } finally {
             setLoading(false);
+            setInfoOpen(false)
         }
     };
     const handleUpdate = async () => {
@@ -116,7 +119,6 @@ export default function ProductForm({productId, productData, onClose}) {
         }
     }
 
-    console.log('KAHSDF', productData)
     // remove
     const handleDeleteConfirmed = async () => {
         if (isFeatured) await updateProductHighlight(productData._id, "none");
@@ -124,16 +126,25 @@ export default function ProductForm({productId, productData, onClose}) {
         showSnackbar("Product deleted successfully", "success");
         setConfirmOpen(false);
     };
+
     return (
         <Container maxWidth='sm'>
-            <Stack>
-                <Stack>
-                    <Stack direction={'row'} px={1} alignItems={'center'}>
-                        <Typography variant="body1" fontWeight={'bold'} color={isFeatured ? "secondary" : 'grey'} sx={{display: 'flex', gap: .5, alignItems: 'center'}}>
-                            {isFeatured && <CheckRounded/>}
-                            Featured
-                        </Typography>
-                        <Switch color="secondary" checked={isFeatured} onChange={handleToggleFeatured} disabled={loading} />
+            <Stack sx={{mt: 1}}>
+                <Stack sx={{mb: 3}}>
+                    <Stack sx={{mb: 3}}>
+                        <Stack direction={'row'} justifyContent={'space-between'} px={1} alignItems={'center'}>
+                            <Typography variant="body1" fontWeight={'bold'} color={isFeatured ? "secondary" : 'grey'} sx={{display: 'flex', gap: 1, alignItems: 'center'}}>
+                                {isFeatured ? 'Featured' : 'Add to featured'}
+                                {isFeatured ? <CircleCheckIcon  style={{color: 'green'}}/> : <InfoIcon onClick={() => setInfoOpen((prev) => !prev)}/>}
+                            </Typography>
+                            <Switch color="secondary" checked={isFeatured} onChange={handleToggleFeatured} disabled={loading} />
+                        </Stack>
+                        <Collapse in={infoOpen}>
+                            <Typography variant="body2" color="grey" sx={{p: 1}}>
+                                Enabling this option will mark the product as Featured Product.<br />
+                                Featured products are highlighted on the homepage.
+                            </Typography>
+                        </Collapse>
                     </Stack>
                     <Swiper
                         slidesPerView={1}
@@ -160,7 +171,7 @@ export default function ProductForm({productId, productData, onClose}) {
                                     <img
                                         src={img}
                                         alt={`${productData.productName}`}
-                                        style={{ width: "100%", height: "100%", borderRadius: 10, boxShadow: '0px 0px 5px rgba(0, 0, 0, 0.6)', backgroundColor: 'white', objectFit: "cover", aspectRatio: '1/1' }}
+                                        style={{ width: "100%", height: "100%", borderRadius: 3, backgroundColor: 'white', objectFit: "cover", aspectRatio: '1/1' }}
                                     />
                                 </SwiperSlide>
                             ))
@@ -168,70 +179,146 @@ export default function ProductForm({productId, productData, onClose}) {
                     </Swiper>
                 </Stack>
 
-                {/*Product Update Field*/}
-                <Collapse in={open} ref={toEdit}>
-                    <Stack>
-                        <TextField
-                            label="Price"
-                            placeholder='PHP 0'
-                            type="text"
-                            value={price}
-                            onChange={handlePriceChange}
-                            required
-                            InputLabelProps={{ sx: { color: "#37353E" } }}
-                        />
-                        <TextField
-                            label="Details"
-                            placeholder='Product specification...'
-                            multiline
-                            rows={5}
-                            value={details}
-                            onChange={(e) => setDetails(e.target.value)}
-                            required
-                            InputLabelProps={{ sx: { color: "#37353E" } }}
-                        />
-                        <FormControl>
-                            <InputLabel>Condition</InputLabel>
-                            <Select
-                                value={condition}
-                                onChange={(e) => setCondition(e.target.value)}
-                                label="Condition"
-                            >
-                                <MenuItem value='used'>Used</MenuItem>
-                                <MenuItem value='refurbished'>Refurbished</MenuItem>
-                                <MenuItem value='new'>New</MenuItem>
-                                <MenuItem value='like new'>Like New</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Stack>
-                    <Button
-                        variant='contained'
-                        color='secondary'
-                        onClick={handleUpdate}
-                        disabled={loading}
-                    >
-                        {loading ? <CircularProgress size={24} /> : "Update Product"}
-                    </Button>
-                </Collapse>
-
-                {/*Collapsable Product Info*/}
                 <Stack>
-                    <Stack>
-                        <Typography variant="body1" color="initial">{productData.description}</Typography>
-                        <Typography variant="body1" color="initial">{productData.details}</Typography>
-                        <Typography variant="body1" color="initial">{productData.price}</Typography>
-                        <Typography variant="body1" color="initial">{productData.condition}</Typography>
-                        <Typography variant="body1" color="initial">{productData.category?.name}</Typography>
-                        <Typography variant="body1" color="initial">{productData.isLocal ? 'Local' : 'International'}</Typography>
-                        <Typography variant="body1" color="initial"> Date Posted: {dayjs(productData.createdAt).format('MMMM D, YYYY')}</Typography>
-                        <Typography variant="body1" color="initial"> Last Update: {dayjs(productData.updatedAt).format('MMMM D, YYYY')}</Typography>
+                    <Stack gap={3}>
+                        <Stack>
+                            <Stack>
+                                <Typography variant="body2" color="secondary" fontWeight={'bold'}>{productData.productName}</Typography>
+                            </Stack>
+                            <Stack direction={'row'}>
+                                <Typography variant="body2" noWrap color="secondary">Php {formatNumber(productData.price)}</Typography>
+                            </Stack>
+                        </Stack>
+
+                        <Divider/>
+
+                        <Stack gap={5}>
+                            <Stack gap={1}>
+                                <Typography variant="body2" color="secondary" fontWeight={'bold'}>Tags: </Typography>
+                                <Stack direction={'row'} gap={1} alignItems={'flex-start'} flexWrap={'wrap'}>
+                                    <Stack direction={'row'} sx={{border: '1px solid gray', width: 'auto', px: 2, py: .5, borderRadius: '999px'}} alignItems={'center'} gap={1}>
+                                        <Typography variant="body2" noWrap color="secondary">{productData.isLocal ? 'Local' : 'International'}</Typography>
+                                    </Stack>
+                                    <Stack direction={'row'} sx={{border: '1px solid gray', px: 2, py: .5, borderRadius: '999px'}} alignItems={'center'} gap={1}>
+                                        <Typography variant="body2" noWrap color="secondary">{productData.condition}</Typography>
+                                    </Stack>
+                                    <Stack direction={'row'} sx={{border: '1px solid gray', px: 2, py: .5, borderRadius: '999px'}} alignItems={'center'} gap={1}>
+                                        <Typography variant="body2" noWrap color="secondary">{productData.category?.name}</Typography>
+                                    </Stack>
+                                </Stack>
+                            </Stack>
+
+                            <Stack direction={'row'} justifyContent={'space-between'} sx={{maxWidth: 400}}>
+                                <Stack>
+                                    <Typography variant="body2" color="secondary" fontWeight={'bold'}> Date Posted:</Typography>
+                                    <Typography variant="body2" color="secondary"> {dayjs(productData.createdAt).format('MMMM D, YYYY')}</Typography>
+                                </Stack>
+                                <Stack>
+                                    <Typography variant="body2" color="secondary" fontWeight={'bold'}>Last Update:</Typography>
+                                    <Typography variant="body2" color="secondary"> {dayjs(productData.updatedAt).format('MMMM D, YYYY')}</Typography>
+                                </Stack>
+                            </Stack>
+
+                            <Stack>
+                                <Typography variant="body2" color="secondary" fontWeight={'bold'}>Description</Typography>
+                                <Typography variant="body2" color="secondary">{productData.description}</Typography>
+                            </Stack>
+                            <Stack>
+                                <Typography variant="body2" color="secondary" fontWeight={'bold'}>Details</Typography>
+                                <Typography variant="body2" color="secondary">{productData.details}</Typography>
+                            </Stack>
+                        </Stack>
                     </Stack>
                 </Stack>
             </Stack>
-            
-            <Box>
-                <FullScreenLoader open={loading} message='Updating product...'/>
-            </Box>
+            <>
+                <SwipeableDrawer
+                    anchor="bottom"
+                    open={open}
+                    onClose={() => setOpen(false)}
+                    onOpen={() => setOpen(true)}
+                    swipeAreaWidth={40}
+                    disableSwipeToOpen={false}
+                    sx={{display: {xs: 'bloc', md: 'none'}}}
+                    PaperProps={{
+                        sx: {
+                            borderRadius: '10px 10px 0px 0px',
+                            height: '60vh',
+                            minHeight: '10vh'
+                        },
+                    }}
+                >
+                    {/*Content*/}
+                    <Box
+                        sx={{
+                            px: 2,
+                            position: 'relative',
+                        }}
+                    >
+                        <Box sx={{position: 'sticky', p: .5, display: 'flex', justifyContent: 'center', top: 5, right: 0, left: 0, margin: '0 auto', width: '100%'}}>
+                            <Box sx={{width: 50, height: 2, borderRadius: '999px', bgcolor: 'gray', }}/>
+                        </Box>
+                        <Box sx={{mb: 1}}>
+                            <Typography variant="body1" color="initial" sx={{pt: 2}}>
+                                Update {productData.productName}
+                            </Typography>
+                        </Box>
+                        <Divider/>
+                        <Stack gap={2} sx={{overflowY: 'auto', my: 2, p: 1, height: '45vh'}}>
+                            <Stack gap={3} >
+                                <TextField
+                                    label="Price"
+                                    placeholder='PHP 0'
+                                    type="text"
+                                    value={price}
+                                    onChange={handlePriceChange}
+                                    required
+                                    InputLabelProps={{ sx: { color: "#37353E" } }}
+                                />
+                                <TextField
+                                    label="Details"
+                                    placeholder='Product specification...'
+                                    multiline
+                                    rows={5}
+                                    value={details}
+                                    onChange={(e) => setDetails(e.target.value)}
+                                    required
+                                    InputLabelProps={{ sx: { color: "#37353E" } }}
+                                />
+                                <FormControl>
+                                    <InputLabel>Condition</InputLabel>
+                                    <Select
+                                        value={condition}
+                                        onChange={(e) => setCondition(e.target.value)}
+                                        label="Condition"
+                                    >
+                                        <MenuItem value='used'>Used</MenuItem>
+                                        <MenuItem value='refurbished'>Refurbished</MenuItem>
+                                        <MenuItem value='new'>New</MenuItem>
+                                        <MenuItem value='like new'>Like New</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Stack>
+                            <Box>
+                                <Typography variant="body2" fontWeight={'bold'} color="gray">
+                                    Note:
+                                </Typography>
+                                <Typography variant="body2" color="gray">
+                                    Updating a published product will immediately apply your changes to the listing that the user are using.
+                                </Typography>
+                            </Box>
+                            <Button
+                                variant='contained'
+                                color='secondary'
+                                onClick={handleUpdate}
+                                disabled={loading}
+                            >
+                                {loading ? <CircularProgress size={24} /> : "Update Product"}
+                            </Button>
+                        </Stack>
+                    </Box>
+                </SwipeableDrawer>
+            </>
             <UpdateFloatingButton
                 qrClick={handleQrOpen}
                 editClick={open ? handleCollapseClose : handleCollapseOpen}
@@ -258,6 +345,7 @@ export default function ProductForm({productId, productData, onClose}) {
                 open={qrOpen} 
                 onClose={handleQrClose}
             />
+            <FullScreenLoader open={loading} message='Updating product...'/>
         </Container>
     );
 }
