@@ -7,40 +7,48 @@ import { createNotification } from "../controllers/auctionNotificationController
 export const auctionFinalizeCron = () => {
     cron.schedule("* * * * *", async () => {
         try {
+            const now = new Date()
+
+            // Find ended auctions that are past their cooldown period and not yet finalized
             const endedAuctions = await Auction.find({
                 status: "ENDED",
                 finalized: { $ne: true },
+                cooldownUntil: {$lte: now},
             });
 
             for (let auction of endedAuctions) {
                 try {
-                // Get all bids for auction
-                const bids = await Bid.find({ auctionId: auction._id })
-                    .sort({ amount: -1, createdAt: 1 })
-                    .populate("userId", "name");
+                    console.log(`Finalizing auction ${auction._id}...`)
+                    console.log(`Cooldown ended at ${auction.cooldownUntil?.toLocaleTimeString()}`)
+                    
+                    // Get all bids for auction
+                    const bids = await Bid.find({ auctionId: auction._id })
+                        .sort({ amount: -1, createdAt: 1 })
+                        .populate("userId", "name");
 
-                const winner = bids.length > 0 ? bids[0].userId._id : null;
+                
+                    const winner = bids.length > 0 ? bids[0].userId._id : null;
 
-                // Notify top 3 bidders
-                const topBidders = bids.slice(0, 3);
-                for (let i = 0; i < topBidders.length; i++) {
-                    const bid = topBidders[i];
-                    let message = "";
+                    // Notify top 3 bidders
+                    const topBidders = bids.slice(0, 3);
+                    for (let i = 0; i < topBidders.length; i++) {
+                        const bid = topBidders[i];
+                        let message = "";
 
-                    if (i === 0) {
-                        message =
-                            winner === bid.userId._id
-                            ? `You won the auction for item ${auction.inventoryId}! Please complete payment.`
-                            : "The winning item is not available. You lost.";
-                    } else {
-                        message =
-                            winner === bid.userId._id
-                            ? "You lost the auction, but may still get the item if the top bidder fails."
-                            : "You lost the auction, please try again next time.";
+                        if (i === 0) {
+                            message =
+                                winner === bid.userId._id
+                                ? `You won the auction for item ${auction.inventoryId}! Please complete payment.`
+                                : "The winning item is not available. You lost.";
+                        } else {
+                            message =
+                                winner === bid.userId._id
+                                ? "You lost the auction, but may still get the item if the top bidder fails."
+                                : "You lost the auction, please try again next time.";
+                        }
+
+                        await createNotification(bid.userId._id, auction._id, message);
                     }
-
-                    await createNotification(bid.userId._id, auction._id, message);
-                }
 
                 // Update auction
                 auction.winner = winner;

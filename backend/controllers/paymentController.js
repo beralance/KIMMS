@@ -11,7 +11,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
 export const createCheckoutSession = async (req, res) => {
     try {
-        const { amount, productIds, orderId } = req.body; // <-- include orderId
+        const { amount, productIds, orderId } = req.body;
 
         if (!amount || amount <= 0) return res.status(400).json({ error: "Invalid amount" });
         if (!productIds || !Array.isArray(productIds) || !productIds.length)

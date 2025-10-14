@@ -1,6 +1,8 @@
 import Order from "../models/Order.js";
 import Payment from "../models/Payment.js";
 import Product from "../models/Product.js";
+import Inventory from '../models/Inventory.js'
+import Cart from '../models/Cart.js'
 import mongoose from 'mongoose';
 
 // modified
@@ -18,16 +20,23 @@ const mapEventTypeToStatus = (type) => {
 export const handleWebhook = async (req, res) => {
     try {
         const event = req.body;
-        console.log("Parsed event:", JSON.stringify(event, null, 2));
-
+        //console.log("Parsed event:", JSON.stringify(event, null, 2));
         const eventId = event.data?.id;
         const type = event.data?.attributes?.type;
         const paymentData = event.data?.attributes?.data || {};
+        //console.log('PAYMENT DATA ((((((((((((((', paymentData)
         const paymongoId = paymentData.id;
         const paymentAttr = paymentData.attributes || {};
         const amount = paymentAttr.amount;
         const currency = paymentAttr.currency;
         const checkoutSessionId = paymentAttr.metadata?.checkoutSessionId;
+        const checkoutOrderId = paymentAttr.metadata?.orderId;
+
+        
+        console.log('ATTR 00', amount)
+        console.log('ATTR 01', amount)
+        console.log('ATTR 02', currency)
+        console.log('ATTR 03', checkoutSessionId)
 
         if (!paymongoId) {
             console.log("❌ No paymongoId found");
@@ -75,16 +84,21 @@ export const handleWebhook = async (req, res) => {
         }
 
         // skip if already paid/cancelled/failed
+        /*
         if (['paid', 'cancelled', 'failed'].includes(payment.status)) {
+            console.log('INSIDE CONDITIONAL')
             console.log(`Payment already ${payment.status}, skipping further events.`)
             return res.status(200).send(`payment already ${payment.status}`)
         }
+        */
 
         // only update if amount and currency exist
+        /*
         if (amount == null || !currency) {
             console.log('Missing amount or currency, skipping update')
             return res.status(200).send('missing amount/currency')
         }
+        */
 
         // Update existing payment
         payment.status = mapEventTypeToStatus(type);
@@ -92,7 +106,6 @@ export const handleWebhook = async (req, res) => {
         payment.currency = currency;
         payment.eventIds.push(eventId);
         await payment.save();
-    
 
         // Update products if payment is paid
         if (payment.status === "paid" && Array.isArray(payment.productIds) && payment.productIds.length) {
@@ -101,21 +114,54 @@ export const handleWebhook = async (req, res) => {
                 { _id: { $in: payment.productIds } },
                 { $set: { visibility: 'pending', purchaseStatus: "pending" } }
             );
-            console.log("Update result: ", result);
+
+            const prod = await Product.find({_id: {$in: payment.productIds}})
+            console.log('✅✅✅✅✅✅PRODUCT RESULT: ✅✅✅✅✅✅', prod);
+            console.log('✅✅✅✅✅✅INVENTORY ID USING PROD: ✅✅✅✅✅✅', prod.inventoryId);
+            
+            const inventoryIds = prod.map(p => p.inventoryId)
+            console.log('✅✅✅INVENTORY ID: ✅✅✅', inventoryIds);
+
+            await Inventory.updateMany(
+                {_id: {$in: inventoryIds}},
+                {$set: {status: 'sold'}},
+            )
+
+            console.log('CHECKOUR ORDER ID: ', checkoutOrderId)
+            const orderId = await Order.findById(checkoutOrderId)
+            console.log('ORDER ID IS', orderId)
+            
+            const userId = orderId.userId
+            console.log('USER ID', userId)
+
+            //
+            const userCart = await Cart.findOne({ userId });
+            if (!userCart) return res.status(404).json({ error: "Cart not found" });
+    
+            console.log('USER CART', userCart)
+            console.log('PAYMENT PRODUCT IDS', payment.productIds)
+            userCart.items = userCart.items.filter(
+                cartItemId => !payment.productIds.some(pid => pid.equals(cartItemId.productId))
+            );
+            await userCart.save();
+
+
+            
+            
 
             if (payment.orderId) {
                 console.log('! This is the payment.orderId: ', payment.orderId)
-                const order = await Order.findOne(payment.orderId) 
+                const order = await Order.findById(payment.orderId) 
                 console.log('! This is the found orderId: ', order)
 
 
                 if (order) {
-                    console.log('! This is the BEFORE update: ', order.paymentStatus)
                     order.paymentStatus = 'paid'
-                    console.log('! This is the AFTER update: ', order.paymentStatus)
-
+                    if (order.purchaseStatus === 'pending') {
+                        order.purchaseStatus = 'confirmed';
+                    }
                     await order.save()
-                    console.log('Order updated to paid:', order._id)
+                    console.log('Order marked as paid and confirmed:', order._id)
                 }
             }
         } 

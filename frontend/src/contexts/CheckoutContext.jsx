@@ -16,7 +16,7 @@ export const CheckoutProvider = ({ children }) => {
     const [totalAmount, setTotalAmount] = useState(0);
     const [isProcessing, setIsProcessing] = useState(false);
 
-    const backend = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+    const API_URL = import.meta.env.VITE_API_URL;
 
     // Update checkout items and total whenever cart changes
     useEffect(() => {
@@ -41,7 +41,7 @@ export const CheckoutProvider = ({ children }) => {
             setIsProcessing(true);
             // 1️⃣ Create an order first
             const orderResp = await axios.post(
-                `${backend}/api/orders`,
+                `${API_URL}/api/orders`,
                 {
                     userId: user.userId,
                     products: checkoutItems.map(item => ({
@@ -53,16 +53,15 @@ export const CheckoutProvider = ({ children }) => {
             );
 
             const order = orderResp.data;
+            const amountInCentavos = Math.round(order.totalPrice * 100)
+            console.log('NOT CONVERTED PRICE !!!!!!!!', order.totalPrice)
+            console.log('CONVERTED PRICE !!!!!!!!', amountInCentavos)
 
-            // the console in here works, so the error is probably below
-            console.log('this the data in order: ', order)
-            
-            // 2️⃣ Call payment controller to create PayMongo session
             const paymentResp = await axios.post(
-                `${backend}/api/payment/create-checkout-session`,
+                `${API_URL}/api/payment/create-checkout-session`,
                 {
                     orderId: order._id,
-                    amount: order.totalPrice,
+                    amount: amountInCentavos,
                     productIds: order.products.map(p => p.productId),
                 },
                 { headers: { Authorization: `Bearer ${token}` } }

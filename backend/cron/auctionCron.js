@@ -3,8 +3,9 @@ import Auction from "../models/Auction.js";
 
 /**
  * Cron job to automatically update auction statuses
- * PENDING → LIVE → ENDED
+ * PENDING → LIVE → ENDED (store cooldown)
  */
+
 export const auctionLifecycleCron = () => {
   // Runs every minute
     cron.schedule("* * * * *", async () => {
@@ -30,8 +31,35 @@ export const auctionLifecycleCron = () => {
             });
 
             for (let auction of liveAuctions) {
+
+                // set cooldown duration
+                const cooldownDuration = 60 * 1000;
+                const cooldownUntil = new Date(Date.now() + cooldownDuration)
+
                 auction.status = "ENDED";
+                auction.cooldownUntil = cooldownDuration;
+
                 await auction.save();
+
+                console.log(
+                    `⏳ Auction ${auction._id} has ENDED — cooldown active until ${cooldownUntil.toLocaleTimeString()}`
+                );
+
+                // Cooldown timer log
+                const interval = setInterval(() => {
+                    const remaining = auction.cooldownUntil - Date.now()
+                    if (remaining <= 0) {
+                        clearInterval(interval)
+                        console.log(
+                            `🧊 Auction ${auction._id} cooldown finished — ready for finalization.`
+                        )
+                    } 
+                    else {
+                        console.log(
+                            `🔄 Auction ${auction._id}: ${Math.ceil(remaining / 1000)}s remaining cooldown`
+                        )
+                    }
+                }, 10 * 1000);
                 console.log(`Auction ${auction._id} has ENDED`);
             }
         } catch (err) {

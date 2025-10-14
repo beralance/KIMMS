@@ -43,6 +43,10 @@ const auctionSchema = new mongoose.Schema(
             default: false,
         },
 
+        cooldownUntil: {
+            type: Date, default: null
+        },
+
         winner: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
