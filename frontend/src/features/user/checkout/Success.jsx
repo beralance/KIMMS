@@ -11,7 +11,6 @@ export default function Success() {
     const { refreshCart } = useCart();
     const { checkoutItems } = useCheckout();
     const API_URL = import.meta.env.VITE_API_URL;
-{
     const handleBack = () => {
         navigate('/'); // back to shop
     };
@@ -52,7 +51,7 @@ export default function Success() {
             clearPurchased(); // only run if logged in
         }
     }, [token]);
-*/}
+*/
     return (
         <Container sx={{ mt: 4 }}>
             <Typography variant="h4" gutterBottom>

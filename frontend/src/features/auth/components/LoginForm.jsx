@@ -176,105 +176,127 @@ export default function LoginForm({ onSuccess }) {
     return (
         <form onSubmit={handleLogin}>
             <Box sx={{ my: 0.5 }}>
-                <Box sx={{display: "flex", flexDirection: "column", gap: 2 }}>
+                <Box sx={{display: "flex", flexDirection: "column", gap: 2, mb: 5 }}>
                     <Fade in={true} timeout={800} mountOnEnter unmountOnExit>
-                    <TextField
-                        label="Email"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        fullWidth
-                        sx={{
-                            input: {color: 'white'},
-                            bgcolor: 'rgba(0, 0, 0, 0.5)',
-                            "& .MuiInputLabel-root": { color: error ? "red" : "white" },
-                            "& .MuiInputLabel-root.Mui-focused": { color: error ? "red" : "white" },
-                            '& .MuiOutlinedInput-root': {
-                                '& fieldset': {
-                                    borderColor: 'gray', // default border color
+                        <TextField
+                            label="Email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            fullWidth
+                            variant="standard"
+                            sx={{
+                                input: {color: 'white'},
+                                "& .MuiInputLabel-root": { color: error ? "red" : "rgba(255, 255, 255, 0.8)" },
+                                "& .MuiInputLabel-root.Mui-focused": { color: error ? "red" : "white" },
+                                "& .MuiInput-underline:before": {
+                                    borderBottomColor: "rgba(255, 255, 255, 0.5)",   // default / unfocused
                                 },
-                                '&:hover fieldset': {
-                                    borderColor: 'white', // hover border color
+                                "& .MuiInput-underline:hover:before": {
+                                    borderBottomColor: "white",  // hover
                                 },
-                                '&.Mui-focused fieldset': {
-                                    borderColor: 'white', // focused border color
+                                "& .MuiInput-underline:after": {
+                                    borderBottomColor: "white",   // focused
                                 },
-                            }
-                        }}
-                    />
+                            }}
+                        />
                     </Fade>
                     <Fade in={true} timeout={800} mountOnEnter unmountOnExit>
-                    <TextField
-                        label="Password"
-                        type={showPassword ? "text" : "password"}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        fullWidth
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton onClick={toggleShowPassword} edge="end">
-                                        {showPassword ? <VisibilityOff sx={{color: 'white'}}/> : <Visibility sx={{color: 'white'}}/>}
-                                    </IconButton>
-                                </InputAdornment>
-                            ),
-                        }}
-                        sx={{
-                            input: {color: 'white'},
-                            bgcolor: 'rgba(0, 0, 0, 0.5)',
-                            "& .MuiInputLabel-root": { color: error ? "red" : "white" },
-                            "& .MuiInputLabel-root.Mui-focused": { color: error ? "red" : "white" },
-                            '& .MuiOutlinedInput-root': {
-                                '& fieldset': {
-                                    borderColor: 'gray', // default border color
+                        <TextField
+                            label="Password"
+                            type={showPassword ? "text" : "password"}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            fullWidth
+                            variant="standard"
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        {password && 
+                                            <IconButton onClick={toggleShowPassword} edge="end">
+                                                {showPassword ? <VisibilityOff sx={{color: 'white'}}/> : <Visibility sx={{color: 'white'}}/>}
+                                            </IconButton>
+                                        }
+                                    </InputAdornment>
+                                ),
+                            }}
+                            sx={{
+                                input: {color: 'white'},
+                                "& .MuiInputLabel-root": { color: error ? "red" : "rgba(255, 255, 255, 0.8)" },
+                                "& .MuiInputLabel-root.Mui-focused": { color: error ? "red" : "white" },
+                                "& .MuiInput-underline:before": {
+                                    borderBottomColor: "rgba(255, 255, 255, 0.5)",   // default / unfocused
                                 },
-                                '&:hover fieldset': {
-                                    borderColor: 'white', // hover border color
+                                "& .MuiInput-underline:hover:before": {
+                                    borderBottomColor: "white",  // hover
                                 },
-                                '&.Mui-focused fieldset': {
-                                    borderColor: 'white', // focused border color
+                                "& .MuiInput-underline:after": {
+                                    borderBottomColor: "white",   // focused
                                 },
-                            }
-                        }}
-                    />
+                            }}
+                        />
                     </Fade>
+                    {error && 
+                        <Stack justifyContent={'center'}>
+                            <Typography 
+                                color="red" 
+                                variant="body2"
+                                align="center"
+                            >
+                                {error}
+                            </Typography>
+                        </Stack>
+                    }
                 </Box>
                 
-                {error && 
-                    <Typography 
-                        color="red" 
-                        sx={{
-                            my: 3,
-                            justifySelf: 'center' 
-                        }}
-                    >
-                        {error}
-                    </Typography>
-                }
+                
 
-                <Stack direction={'row'} justifyContent={'center'} gap={1} py={2}>
-                    <Box>
-                        <Button variant="contained" color="secondary" onClick={handleGoogleSignIn}>
-                            <Google/>
+                <Stack gap={2} sx={{my: 3}}>
+                    <Fade in={true} timeout={800} mountOnEnter unmountOnExit>
+                        <Button 
+                            type="submit" 
+                            variant="contained" 
+                            fullWidth 
+                            sx={{
+                                bgcolor: 'rgba(0, 0, 0, 0.2)',
+                                border: '1px solid white',
+                                py: 1.5, 
+                                borderRadius: '999px',
+                            }}
+                        >
+                            L O G I N
                         </Button>
-                    </Box>
+                    </Fade>
+                    <Stack direction={'row'} alignItems={'center'} gap={2}>
+                        <Box sx={{border: '1px solid white', height: 1, width: '100%'}}/>
+                        <Typography variant="body1" color="white"> or </Typography>
+                        <Box sx={{border: '1px solid white', height: 1, width: '100%'}}/>
+                    </Stack>
+                    <Stack alignItems={'center'} justifyContent={'center'}>
+                        <Button 
+                            variant="contained" 
+                            color="secondary" 
+                            onClick={handleGoogleSignIn}
+                            fullWidth
+                            sx={{
+                                bgcolor: 'rgba(0, 0, 0, 0.2)',
+                                border: '1px solid white',
+                                py: 1.5, 
+                                borderRadius: '999px',
+                                "&.Mui-disabled": {
+                                    backgroundColor: "rgba(255, 255, 255, 0.2)",
+                                    color: "grey",   
+                                    border: '2px solid grey'    
+                                },
+                            }}
+                        > 
+                            <Stack direction={'row'} alignItems={'center'} gap={1}>
+                                Sign in with
+                                <img src="/google-icon.svg" alt="google-icon" style={{width: 25, aspectRatio: '1/1'}} />
+                            </Stack>
+                        </Button>
+                    </Stack>
                 </Stack>
-                <Fade in={true} timeout={800} mountOnEnter unmountOnExit>
-                    <Button 
-                        type="submit" 
-                        variant="contained" 
-                        fullWidth 
-                        sx={{
-                            bgcolor: 'rgba(0, 0, 0, 0.2)',
-                            border: '1px solid white',
-                            py: 2, 
-                            borderRadius: '999px',
-                            my: error ? 0 : 3,
-                        }}
-                    >
-                        LOGIN
-                    </Button>
-                </Fade>
             </Box>
             <FullScreenLoader open={loading}/>
         </form>

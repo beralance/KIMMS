@@ -43,31 +43,18 @@ export default function Inventory() {
                     height: 'auto',
                     position: 'sticky',
                     width: '100%',
+                    
                 }}
             >
-                <Container sx={{p: 2, backdropFilter: 'blur(20px)', height: '100%'}}>
-                    <SearchBar 
-                        value={searchTerm}
-                        onChange={setSearchTerm}
-                        activeTab={value}
-                    />
-                    <Box sx={{p: 2, borderRadius: 5, py: 3, pb: 16}}>
-                        <Stack direction={'row'} alignItems={'center'}>
-                            <Typography variant="body1" color="white" fontWeight={'bold'}>
-                                Quick Overview 
-                            </Typography>
-                        </Stack>
-                        <Collapse in={openGuide}>
-                            <Typography variant="body2" color="white">
-                                <b>Inventory: </b> Storage area for all products. Items stay here until posted for sale or auction.
-                            </Typography>
-                            <Typography variant="body2" color="white">
-                                <b>Product: </b> Storefront where products from inventory are published and made visible for direct purchase.
-                            </Typography>
-                            <Typography variant="body2" color="white">
-                                <b>Auction: </b> Bidding section where items from inventory are listed with starting price, and duration.
-                            </Typography>
-                        </Collapse>
+                <Container sx={{p: 2, bgcolor: 'rgba(0, 0, 0, 0.5)', height: '100%'}}>
+                    <Box sx={{position: 'sticky', top: 70, m: 0, zIndex: 100, borderRadius: '999px', overflow: 'hidden'}}>
+                        <Box sx={{backdropFilter: 'blur(10px)', p: 1, bgcolor: 'rgba(0, 0, 0, 0.5)'}}>
+                            <SearchBar 
+                                value={searchTerm}
+                                onChange={setSearchTerm}
+                                activeTab={value}
+                            />
+                        </Box>
                     </Box>
                     <Box sx={{p: 2, borderRadius: 5, py: 3, pb: 16}}>
                         <Stack direction={'row'} alignItems={'center'}>
@@ -99,9 +86,9 @@ export default function Inventory() {
                     boxShadow: '0px 0px 20px 0px rgba(0, 0, 0, 0.2)',
                 }}
             >
-                <Box sx={{ borderBottom: 1, bgcolor: 'rgba(0, 0, 0, 0.5)', borderColor: '#FAFAFA', cursor: 'pointer'}}>
+                <Box sx={{position: 'sticky', top: 60, backdropFilter: 'blur(50px)', zIndex: 1000, bgcolor: 'rgba(0, 0, 0, 0.5)', borderColor: '#FAFAFA', cursor: 'pointer'}}>
                     <Tabs
-                        sx={{overflowX: 'auto', color: 'white', width: '100%', scrollBehavior: 'smooth'}}
+                        sx={{borderBottom: '5px solid #fafafa', overflowX: 'auto', color: 'white', width: '100%', scrollBehavior: 'smooth'}}
                         value={value}
                         variant='scrollable'
                         aria-label="basic tabs example"

@@ -50,6 +50,7 @@ const Dashboard = () => {
                 <Stack>
                     {reportData ? (
                         <Stack>
+                            {/*
                                 <Box>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <DateCalendar views={['day']} readOnly/>
@@ -93,6 +94,7 @@ const Dashboard = () => {
                                     </section>
                                 </div>
                             </Stack>
+                            */}
                         </Stack>
                         )
                         :

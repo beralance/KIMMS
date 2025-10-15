@@ -24,7 +24,7 @@ export default function Auth() {
         <Box>
             <Box 
                 sx={{
-                    backgroundImage: 'url(/modern-styled-entryway.jpg)',
+                    backgroundImage: 'url(/vase-wooden-sideboard-table.jpg)',
                     backgroundPosition: 'cover',
                     backgroundSize: '100%',
                     minHeight: '100vh',
@@ -38,7 +38,7 @@ export default function Auth() {
                     width: '100%',
                     height: '100%',
                     minHeight: '100vh',
-                    backdropFilter: 'blur(10px)',
+                    backdropFilter: 'blur(5px)',
                     bgcolor: 'rgba(0, 0, 0, 0.5)'
                 }}
             >
@@ -64,13 +64,13 @@ export default function Auth() {
                             </Box> 
                         </Grow>
                     </Stack>
-                    <Stack alignItems={'center'} sx={{my: 0}}>
+                    <Stack alignItems={'center'} sx={{my: 0, mb: 5}}>
                         <Tabs
                             value={value}
                             aria-label="auth tabs"
                             sx={{
-                                my: 3,
-                                bgcolor: 'rgba(255, 255, 255, 0.3)',
+                                bgcolor: 'rgba(0, 0, 0, 0.2)',
+                                border: '1px solid rgba(255, 255, 255, 0.9)',
                                 borderRadius: '5px',
                                 transition: 'all .5s ease',
                                 height: 10,

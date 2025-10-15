@@ -14,7 +14,13 @@ export function OrderProvider({ children }) {
     const fetchOrders = async () => {
         try {
             setIsLoading(true)
-            const res = await fetch(`${API_URL}/api/orders`, {
+
+            let url = `${API_URL}/api/orders`
+            if (user.role === 'user') {
+                url += `?userId=${user._id}`;
+            }
+
+            const res = await fetch(url, {
                 headers: {
                     'Content-Type' : 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -26,10 +32,8 @@ export function OrderProvider({ children }) {
             }
             const data = await res.json()
             console.log('% this is the DATA', data)
-            console.log('% this is the ORDERS', orders)
+
             setOrders(data)
-            console.log('% this is the DATA', data)
-            console.log('% this is the ORDERS', orders)
             return data
         } catch (err) {
             console.error("Failed to fetch orders:", err);
@@ -64,13 +68,17 @@ export function OrderProvider({ children }) {
         try {
             const res = await fetch(`${API_URL}/api/orders/${orderId}/status`, {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json" ,
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ purchaseStatus: newStatus }),
             });
             const updatedOrder = await res.json();
             if (res.ok) {
                 setOrders(prev => prev.map(o => (o._id === orderId ? updatedOrder : o)));
             }
+            fetchOrders()
             return updatedOrder;
         } catch (err) {
             console.error("Failed to update order status:", err);

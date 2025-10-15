@@ -92,7 +92,7 @@ const AdminAuctionMonitor = ({searchTerm}) => {
             <Box 
                 sx={{ 
                     position: 'sticky', 
-                    top: 70,
+                    top: 120,
                     minWidth: 100,
                     display: {xs: 'none', sm: 'inline-block' },
                     width: 'auto',
@@ -138,7 +138,7 @@ const AdminAuctionMonitor = ({searchTerm}) => {
             <Box 
                 sx={{ 
                     position: 'sticky', 
-                    top: 70,
+                    top: 120,
                     zIndex: 1000,
                     minWidth: 100,
                     display: {xs: 'inline-block', sm: 'none' },

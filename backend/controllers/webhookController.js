@@ -24,19 +24,26 @@ export const handleWebhook = async (req, res) => {
         const eventId = event.data?.id;
         const type = event.data?.attributes?.type;
         const paymentData = event.data?.attributes?.data || {};
-        //console.log('PAYMENT DATA ((((((((((((((', paymentData)
+        //console.log('✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅')
+        //console.log('✅✅✅✅✅✅PAYMENT DATA✅✅✅✅✅✅✅', paymentData)
         const paymongoId = paymentData.id;
+        
+        // Payment Attribute
         const paymentAttr = paymentData.attributes || {};
-        const amount = paymentAttr.amount;
-        const currency = paymentAttr.currency;
+        //console.log('✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅')
+        //console.log('✅✅✅✅✅✅PAYMENT ATTRIBUTES✅✅✅✅✅✅✅', paymentAttr)
         const checkoutSessionId = paymentAttr.metadata?.checkoutSessionId;
         const checkoutOrderId = paymentAttr.metadata?.orderId;
-
-        
-        console.log('ATTR 00', amount)
-        console.log('ATTR 01', amount)
-        console.log('ATTR 02', currency)
-        console.log('ATTR 03', checkoutSessionId)
+        const paymentMethod = paymentAttr.source?.type;
+    
+        // Payment Intent
+        const lineItems = paymentAttr?.line_items
+        const amount = lineItems?.[0]?.amount || 0;
+        const currency = lineItems?.[0]?.currency || 'PHP';
+        console.log(lineItems)
+        console.log('AMOUNT', amount)
+        console.log('THIS IS THE AMOUNT FROM LINE ITEMS', lineItems?.[0].amount)
+        console.log('THIS IS THE CURRENCY FROM LINE ITEMS', lineItems?.[0].currency)
 
         if (!paymongoId) {
             console.log("❌ No paymongoId found");
@@ -56,25 +63,10 @@ export const handleWebhook = async (req, res) => {
             }
         }
 
-        // If  not found, create fallback payment
+        // If  not found
         if (!payment) {
             console.log("❌ Payment not found for webhook", {checkoutSessionId, paymongoId});
             return res.status(400).send('Payment not found')
-    
-            {/* // fallback if no payment was found
-            payment = await Payment.create({
-                paymongoId,
-                paymongoEventIds: [],
-                amount,
-                currency: currency || "PHP",
-                status: mapEventTypeToStatus(type),
-                eventIds: [eventId],
-                productIds: [], // never reach here if metadata is used
-                orderId,
-                rawPayload: paymentData,
-            });
-            console.log("✅ Payment record created:", payment._id);
-            */}
         } 
         
         // Skip duplicate events
@@ -83,23 +75,6 @@ export const handleWebhook = async (req, res) => {
             return res.status(200).send("already processed");
         }
 
-        // skip if already paid/cancelled/failed
-        /*
-        if (['paid', 'cancelled', 'failed'].includes(payment.status)) {
-            console.log('INSIDE CONDITIONAL')
-            console.log(`Payment already ${payment.status}, skipping further events.`)
-            return res.status(200).send(`payment already ${payment.status}`)
-        }
-        */
-
-        // only update if amount and currency exist
-        /*
-        if (amount == null || !currency) {
-            console.log('Missing amount or currency, skipping update')
-            return res.status(200).send('missing amount/currency')
-        }
-        */
-
         // Update existing payment
         payment.status = mapEventTypeToStatus(type);
         payment.amount = amount;
@@ -107,66 +82,67 @@ export const handleWebhook = async (req, res) => {
         payment.eventIds.push(eventId);
         await payment.save();
 
+
+        const orderId = checkoutOrderId || payment.orderId
+
         // Update products if payment is paid
-        if (payment.status === "paid" && Array.isArray(payment.productIds) && payment.productIds.length) {
+        if (payment.status === "paid" && (checkoutOrderId || payment.orderId)) { // replaced: payment.status === "paid" && Array.isArray(payment.productIds) && payment.productIds.length
             console.log("Updating products:", payment.productIds);
-            const result = await Product.updateMany(
+
+            const order = await Order.findById(checkoutOrderId)
+            if (order) {
+                order.paymentStatus = 'paid';
+                order.purchaseStatus = 'confirmed';
+                order.checkoutSessionId = checkoutSessionId
+                order.paymentId = payment._id;
+                order.paymentMethod = paymentMethod //|| 'gcash'
+                order.transactionReference = paymongoId
+                order.isActive = true
+                await order.save();
+                console.log('order updated via webhook:', orderId )
+            }
+            else {
+                console.log('Order not found for order ID:', orderId)
+            }
+
+            await Product.updateMany(
                 { _id: { $in: payment.productIds } },
                 { $set: { visibility: 'pending', purchaseStatus: "pending" } }
             );
 
             const prod = await Product.find({_id: {$in: payment.productIds}})
-            console.log('✅✅✅✅✅✅PRODUCT RESULT: ✅✅✅✅✅✅', prod);
-            console.log('✅✅✅✅✅✅INVENTORY ID USING PROD: ✅✅✅✅✅✅', prod.inventoryId);
-            
-            const inventoryIds = prod.map(p => p.inventoryId)
-            console.log('✅✅✅INVENTORY ID: ✅✅✅', inventoryIds);
+            if (!prod.length) {
+                console.log('No Products found for payment')
+                return res.status(404).json({error: 'No products found'})
+            }
 
+            const inventoryIds = prod.map(p => p.inventoryId)
+            if (!inventoryIds.length) {
+                console.log('No inventory IDs found for these products')
+                return res.status(404).json({error: 'No inventory IDs found'})
+            }
             await Inventory.updateMany(
                 {_id: {$in: inventoryIds}},
                 {$set: {status: 'sold'}},
             )
 
-            console.log('CHECKOUR ORDER ID: ', checkoutOrderId)
-            const orderId = await Order.findById(checkoutOrderId)
-            console.log('ORDER ID IS', orderId)
-            
-            const userId = orderId.userId
-            console.log('USER ID', userId)
-
-            //
-            const userCart = await Cart.findOne({ userId });
-            if (!userCart) return res.status(404).json({ error: "Cart not found" });
-    
-            console.log('USER CART', userCart)
-            console.log('PAYMENT PRODUCT IDS', payment.productIds)
-            userCart.items = userCart.items.filter(
-                cartItemId => !payment.productIds.some(pid => pid.equals(cartItemId.productId))
-            );
-            await userCart.save();
-
-
-            
-            
-
-            if (payment.orderId) {
-                console.log('! This is the payment.orderId: ', payment.orderId)
-                const order = await Order.findById(payment.orderId) 
-                console.log('! This is the found orderId: ', order)
-
-
-                if (order) {
-                    order.paymentStatus = 'paid'
-                    if (order.purchaseStatus === 'pending') {
-                        order.purchaseStatus = 'confirmed';
-                    }
-                    await order.save()
-                    console.log('Order marked as paid and confirmed:', order._id)
-                }
+            const userCart = await Cart.findOne({ userId: order.userId });
+            if (userCart) {
+                userCart.items = userCart.items.filter(
+                    cartItemId => !payment.productIds.some(pid => pid.equals(cartItemId.productId))
+                );
+                await userCart.save();
             }
         } 
-        else if (!payment.productIds || payment.productIds.length === 0) {
-            console.log("No products to update for this payment.");
+        else if (['failed', 'cancelled'].includes(payment.status)) {
+            const order = await Order.findById(orderId)
+            if (order) {
+                order.paymentStatus = payment.status;
+                order.purchaseStatus = 'cancelled',
+                order.isActive = false;
+                await order.save()
+                console.log(`Order ${orderId} marked as ${payment.status}`)
+            }
         }
 
         res.status(200).send("ok");

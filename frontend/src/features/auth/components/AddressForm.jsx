@@ -46,14 +46,7 @@ const AddressForm = () => {
                 country: 'Philippines',
             }
         }
-
-        console.log('ADDRESS PAYLOAD', addressPayload)
-        console.log('ADDRESS PAYLOAD', regionCode)
-        console.log('ADDRESS PAYLOAD', province)
-        console.log('ADDRESS PAYLOAD', city)
-
-
-        console.log('^^^^^^^^TOKEN', token)
+    
         try {
             const data = await updateUserAddress(userId, addressPayload, token)
             

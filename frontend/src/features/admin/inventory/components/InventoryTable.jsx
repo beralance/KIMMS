@@ -341,7 +341,7 @@ export default function InventoryTable({ searchTerm }) {
         <>
             <TableContainer component={Paper} sx={{borderRadius: 2, maxHeight: '80vh', overflowY: 'auto'}}>
                 <Table aria-label="inventory table">
-                    <TableHead sx={{position: 'sticky', top: 0, zIndex: 1000, boxShadow: 5}}>
+                    <TableHead sx={{position: 'sticky', top: 0, zIndex: 500, boxShadow: 5}}>
                         <TableRow sx={{bgcolor: '#37353E'}}>
                             <TableCell/>
                             <TableCell sx={{ cursor: 'pointer'}} onClick={() => handleSort('productName')}>

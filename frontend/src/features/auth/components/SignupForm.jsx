@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, TextField, Button, Typography, InputAdornment, IconButton, Container, Stack, FormControl, InputLabel, Select, MenuItem, CircularProgress } from "@mui/material";
+import { Box, TextField, Button, Typography, InputAdornment, IconButton, Container, Stack, FormControl, InputLabel, Select, MenuItem, CircularProgress, Divider } from "@mui/material";
 import { Google, Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { signupUser } from "../../../utils/api"; // <- new import
@@ -165,8 +165,8 @@ export default function SignUpForm() {
     }
     return (
         <form onSubmit={handleSignup}>
-            <Box sx={{ my: 0.5, overflowY: 'auto', maxHeight: '45vh'}}>
-                <Stack justifyContent={'center'} sx={{ mb: 2, gap: 2 }}>
+            <Box sx={{ my: 0.5,}}>
+                <Stack justifyContent={'center'} sx={{ gap: 2, p: 2, pb: 4, mb: 3, bgcolor: 'rgba(0, 0, 0, 0.3)', borderRadius: 2 }}>
                     <TextField 
                         disabled={loading}  
                         label="Full Name" 
@@ -225,6 +225,7 @@ export default function SignUpForm() {
                     <TextField 
                         disabled={loading}  
                         label="Email" 
+                        fullWidth 
                         type="email" 
                         variant="standard" 
                         value={email} 
@@ -246,7 +247,7 @@ export default function SignUpForm() {
                             },
                             "&.Mui-focused": { color: "white" }
                         }}
-                    fullWidth />
+                    />
                     <TextField 
                         disabled={loading}  
                         label="Phone Number (optional)" 
@@ -346,26 +347,6 @@ export default function SignUpForm() {
                     />
                 </Stack>
 
-                <Button 
-                    variant="contained" 
-                    color="secondary" 
-                    onClick={handleGoogleSignup}
-                    sx={{
-                        width: 100,
-                        bgcolor: 'rgba(0, 0, 0, 0.2)',
-                        border: '1px solid white',
-                        py: 1, 
-                        borderRadius: '999px',
-                        my: 1,
-                        "&.Mui-disabled": {
-                            backgroundColor: "rgba(255, 255, 255, 0.2)",
-                            color: "grey",   
-                            border: '2px solid grey'    
-                        },
-                    }}
-                > 
-                    <img src="/google-icon.svg" alt="google-icon" style={{width: 25, aspectRatio: '1/1'}} />
-                </Button>
                 {error && (
                     <Box sx={{ display: "flex", justifyContent: "center", mb: 3 }}>
                         <Typography variant="body2" color="red">
@@ -374,44 +355,64 @@ export default function SignUpForm() {
                     </Box>
                 )}
 
-                <Button 
-                    type="submit" 
-                    variant="contained" 
-                    color="secondary" 
-                    fullWidth
-                    sx={{
-                        bgcolor: 'rgba(0, 0, 0, 0.2)',
-                        border: '1px solid white',
-                        py: 2, 
-                        borderRadius: '999px',
-                        my: 3,
-                        "&.Mui-disabled": {
-                            backgroundColor: "rgba(255, 255, 255, 0.2)",
-                            color: "grey",   
-                            border: '2px solid grey'    
-                        },
-                    }}
-                    disabled={
-                        loading ||
-                        !email ||
-                        !password ||
-                        !confirmPassword ||
-                        !fullName
-                    }
-                >
-                    {loading ? 
-                        <Box sx={{display: 'flex', gap: 1, alignItems: 'center'}}> 
-                            <Typography variant="body2" color="white">
-                                Signing Up
-                            </Typography>
-                            <CircularProgress color="secondary" size={20} sx={{color: 'white'}}/>
-                        </Box> 
-                        :
-                        <>
-                            SIGN  UP
-                        </>
-                    }
-                </Button>
+                <Stack gap={3} sx={{my: 2}}>
+                    <Button 
+                        type="submit" 
+                        variant="contained" 
+                        color="secondary" 
+                        fullWidth
+                        sx={{
+                            bgcolor: 'rgba(0, 0, 0, 0.2)',
+                            border: '1px solid white',
+                            py: 1.5, 
+                            borderRadius: '999px',
+                            "&.Mui-disabled": {
+                                backgroundColor: "rgba(255, 255, 255, 0.2)",
+                                color: "rgba(255, 255, 255, 0.5)",   
+                                border: '2px solid grey'    
+                            },
+                        }}
+                        disabled={
+                            loading ||
+                            !email ||
+                            !password ||
+                            !confirmPassword ||
+                            !fullName
+                        }
+                    >
+                        SIGN  UP
+                    </Button>
+
+                    <Stack direction={'row'} alignItems={'center'} gap={2}>
+                        <Box sx={{border: '1px solid white', height: 1, width: '100%'}}/>
+                        <Typography variant="body1" color="white"> or </Typography>
+                        <Box sx={{border: '1px solid white', height: 1, width: '100%'}}/>
+                    </Stack>
+                    <Stack alignItems={'center'} justifyContent={'center'}>
+                        <Button 
+                            variant="contained" 
+                            color="secondary" 
+                            onClick={handleGoogleSignup}
+                            fullWidth
+                            sx={{
+                                bgcolor: 'rgba(0, 0, 0, 0.2)',
+                                border: '1px solid white',
+                                py: 1.5, 
+                                borderRadius: '999px',
+                                "&.Mui-disabled": {
+                                    backgroundColor: "rgba(255, 255, 255, 0.2)",
+                                    color: "grey",   
+                                    border: '2px solid grey'    
+                                },
+                            }}
+                        > 
+                            <Stack direction={'row'} alignItems={'center'} gap={1}>
+                                Sign up with
+                                <img src="/google-icon.svg" alt="google-icon" style={{width: 25, aspectRatio: '1/1'}} />
+                            </Stack>
+                        </Button>
+                    </Stack>
+                </Stack>
             </Box>
             <FullScreenLoader open={loading} message="Creating account..."/>
         </form>

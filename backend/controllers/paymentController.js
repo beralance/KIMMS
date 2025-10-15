@@ -52,7 +52,6 @@ export const createCheckoutSession = async (req, res) => {
             orderId, // <-- link payment to the order
             rawPayload: session,
         });
-
         res.status(200).json({
             checkout_url: session.attributes.checkout_url,
             sessionId: payload.data.attributes.metadata.checkoutSessionId

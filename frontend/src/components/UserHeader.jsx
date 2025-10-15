@@ -218,7 +218,9 @@ export default function UserHeader() {
                     <Box sx={{ flexGrow: {md: 1}, display: { sm: "flex", xs: "none" }, color: showBg ? 'black' : 'white', justifyContent: "end" }}>
                         {navLinks.map(({ label, to }) => (
                             <Button key={label} component={NavLink} to={to} color="inherit">
-                                {label}
+                                <Typography variant="body1" color={showBg ? 'black' : 'white'}>
+                                    {label}    
+                                </Typography>
                             </Button>
                         ))}
                     </Box>
@@ -226,11 +228,11 @@ export default function UserHeader() {
                     {/* Desktop icons */}
                     <Box sx={{ display: { sm: "flex", xs: "none" },  mx: 2, gap: 2, flexGrow: {md: 1}, justifyContent: "end" }}>
                         <IconButton onClick={handleUserDrawerClick} sx={{ p: 0 }}>
-                            <UserRoundIcon color="secondary" style={{ fontSize: 22, color: showBg ? 'white' : 'black', }} />
+                            <UserRoundIcon style={{ fontSize: 22, color: showBg ? 'black' : 'white' }} />
                         </IconButton>
                         <Badge badgeContent={isLoggedIn ? cartItems.length : 0} color="error">
                             <IconButton component={NavLink} to='/cart' style={{ p: 0 }}>
-                                <ShoppingCartIcon color="secondary" style={{ fontSize: 22, color: showBg ? 'white' : 'black', }} />
+                                <ShoppingCartIcon style={{ fontSize: 22, color: showBg ? 'black' : 'white', }} />
                             </IconButton>
                         </Badge>
                     </Box>

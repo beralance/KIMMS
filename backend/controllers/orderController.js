@@ -28,7 +28,7 @@ export const createOrder = async (req, res) => {
             orderType,
             auctionId,
             priorityLevel,
-            purchaseStatus: "pending",
+            purchaseStatus: "pending",  
             paymentStatus: "pending",
         });
 
@@ -49,13 +49,13 @@ export const createOrder = async (req, res) => {
 export const getOrders = async (req, res) => {
     try {
         const { userId } = req.query;
-        let orders;
-
         const query = userId ? {userId} : {};
-        orders = await Order.find({ userId })
-            .populate("products.productId", 'productName images price category')
-            .populate("userId", 'fullName email role')
-            .populate('auctionId', 'endtime status')
+
+        const orders = await Order.find(query)
+            .populate("products.productId", 'productName physicalCode images price category price isLocal')
+            .populate("userId", 'fullName email address avatar phonenumber')
+            .populate('auctionId', 'endtime starttime status reservePrice startPrice')
+            .sort({createdAt: -1})
 
         res.status(200).json(orders);
     } catch (err) {
@@ -86,7 +86,7 @@ export const updateOrderStatus = async (req, res) => {
     try {
         const { purchaseStatus, paymentStatus, adminNote } = req.body;
 
-        const order = await Order.findById(req.params.id);
+        const order = await Order.findById(req.params.id)
         if (!order) return res.status(404).json({ message: "Order not found" });
 
         if (purchaseStatus) order.purchaseStatus = purchaseStatus;
@@ -95,6 +95,7 @@ export const updateOrderStatus = async (req, res) => {
 
         const updatedOrder = await order.save();
 
+        await updateOrderStatus.populate('user').populate('products')
         console.log(
             `Order ${order._id} updated: purchaseStatus=${order.purchaseStatus}, paymentStatus=${order.paymentStatus}`
         )

@@ -11,14 +11,12 @@ const orderSchema = new mongoose.Schema(
             },
         ],
 
-        // for linking auction based orders
         auctionId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Auction',
             default: null,
         },
 
-        // identify where the order comes from (auction, fixed)
         orderType: {
             type: String,
             enum: ['fixed', 'auction'],
@@ -26,8 +24,31 @@ const orderSchema = new mongoose.Schema(
             default: 'fixed',
         },
 
+        paymentId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Payment',
+            default: null,
+        },
 
-        totalPrice: { type: Number, required: true },
+        checkoutSessionId: {
+            type: String, 
+            default: null,
+        },
+        shippingInfo: {
+            address: {type: String},
+            contacNumber: {type: String},
+            recipientName: {type: String},
+            notes: {type: String},
+        },
+        transactionReference: {type: String, default: null},
+        paymentMethod: {
+            type: String, 
+            enum: ['gcash', 'card', 'cashOnDelivery', 'cashOnPickup'], 
+            default: 'gcash'
+        },
+        expiryDate: {type: Date, default: null},
+        isActive: {type: Boolean, default: true},
+        totalPrice: { type: Number, required: true, default: 0},
 
         // payment status tracking
         paymentStatus: {

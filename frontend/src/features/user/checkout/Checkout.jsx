@@ -55,6 +55,7 @@ export default function Checkout() {
                         color="secondary"
                         onClick={() => navigate("/cart")}
                         sx={{ p: 0, height: 50 }}
+                        disabled ={isProcessing}
                     >
                         <ChevronLeftRoundedIcon fontSize="large" />
                     </Button>
