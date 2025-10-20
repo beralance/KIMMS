@@ -47,7 +47,7 @@ function HideOnScroll ({children}) {
 
     const userLinks = [
         { label: 'Account', to: '/*', icon: < LockIcon style={{color: "black", width: 17}}/> },
-        { label: 'My Purchases', to: '/*', icon: < Package2Icon style={{color: "black", width: 17}}/> },
+        { label: 'My Purchases', to: '/my-purchases', icon: < Package2Icon style={{color: "black", width: 17}}/> },
         { label: 'Notification', to: '/*', icon: < BellIcon style={{color: "black", width: 17}}/> },
     ]
 
@@ -243,7 +243,7 @@ export default function UserHeader() {
                     <Slide in={navOpen} direction="right" timeout={500}>
                         <Box sx={{ display: { xs: "block", sm: "none",}}}>
                             <Fade in={navOpen} timeout={300}>
-                                <Box sx={{ display: "flex", flexDirection: "column", gap: 1, pb: navOpen ? 5 : 2 }}>
+                                <Box sx={{ display: "flex", flexDirection: "column", gap: 1, pb: navOpen ? showBg ? 1 : 5 : 2 }}>
                                     {navLinks.map(({ label, to, icon }) => (
                                     <Button
                                         key={label}

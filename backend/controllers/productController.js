@@ -1,6 +1,17 @@
 import Product from "../models/Product.js";
 import Inventory from "../models/Inventory.js";
 
+export const getProductsForPolling = async (req, res) => {
+    try {
+        const products = await Product.find().populate('category', 'name');
+        res.json(products);
+    }
+    catch (err) {
+        console.error(err)
+        res.status(500).json({error: 'Failed to fetch orders'})
+    }
+}
+
 // POST Inventory item to Products collection (publish to shop)
 export const postProduct = async (req, res) => {
     try {

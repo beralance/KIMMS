@@ -3,65 +3,62 @@ import React, { useContext, useEffect, useState } from "react";
 import { Box, Typography, Button, Container, Stack} from "@mui/material";
 import { OrderContext } from "../../../contexts/OrderContext";
 import { formatNumber, toTitleCase } from "../../../utils/stringUtils";
-
-import OrderCard from "./OrderCard";
+import FullScreenLoader from "../../../components/FullScreenLoader";
+import OrderTab from "./OrderTab";
 
 const statusOptions = ["Pending", "Confirmed", "Processing", "Out for Delivery", "Deliver", "Cancel"];
 
-export default function OrdersTable() {
+export default function OrdersTable({selectedOrder}) {
     const { orders, updateOrderStatus } = useContext(OrderContext);
     const [pendingOrders, setPendingOrders] = useState([]);
     const [isOnline, setIsOnline] = useState(true);
-
-    console.log('OR OR OR DER DER DER', orders)
+    const [loading, setLoading] = useState(false)
+    
 
     useEffect(() => {
         // add logic, if purchase status pending and payment status pending (cod, cop) display confirm order
         const filtered = orders.filter(o => {
-            if (o.isActive && o.orderType === 'fixed') {
-                if (o.paymentMethod === 'gcash' || o.paymentMethod === 'card') {
-                    setIsOnline(true)
-                    return o.paymentStatus?.toLowerCase() === "paid" &&
-                        o.purchaseStatus?.toLowerCase() !== "pending"
+            setLoading(true)
+            try {
+                if (o.isActive && o.orderType === 'fixed') {
+                    if (o.paymentMethod === 'gcash' || o.paymentMethod === 'card') {
+                        setIsOnline(true)
+                        return o.paymentStatus?.toLowerCase() === "paid" &&
+                            o.purchaseStatus?.toLowerCase() !== "pending"
+                    }
+                    else if (o.paymentMethod === 'cashOnPickup' || o.paymentMethod === 'cashOnDelivery') {
+                        setIsOnline(false)
+                        return o.paymentStatus?.toLowerCase() === 'pending' &&
+                            o.purchaseStatus?.toLowerCase() === 'pending'
+                    }
                 }
-                else if (o.paymentMethod === 'cashOnPickup' || o.paymentMethod === 'cashOnDelivery') {
-                    setIsOnline(false)
-                    return o.paymentStatus?.toLowerCase() === 'pending' &&
-                        o.purchaseStatus?.toLowerCase() === 'pending'
+                else {
+                    console.log(`Order ${o._id} is inactive`)
                 }
             }
-            else {
-                console.log(`Order ${o._id} is inactive`)
+            catch (err) {
+                console.error(err)
+            }
+            finally {
+                setLoading(false)
             }
         });
-        console.log('SAMPLE', filtered)
         setPendingOrders(filtered);
-    }, [orders]);
+        console.log('THIS IS PENDING ORDER', pendingOrders)
 
-    console.log('PENDING THIS', pendingOrders)
-    const handleUpdateStatus = async (orderId, newStatus) => {
-        const updated = await updateOrderStatus(orderId, newStatus);
-        if (!updated.error) {
-            setPendingOrders(prev =>
-                prev
-                    .map(o => (o._id === orderId ? updated : o))
-                    .filter(o => o.purchaseStatus.toLowerCase() === 'pending')
-            );
-        }
-    };
+    }, [orders]);
 
 	return (
         <>
             <Container>
                 <Typography variant="body1" color="initial" sx={{py: 2}}>Order List</Typography>
-                <Stack gap={2} >
-                    {pendingOrders.map(order =>
-                        <Box key={order._id}> 
-                            <OrderCard orderData={order}/>
-                        </Box>
-                    )}
+                <Stack>
+                    <Stack gap={2} sx={{mb: 2}}>
+                        <OrderTab orderData={pendingOrders} selectedOrder={selectedOrder}/>
+                    </Stack>
                 </Stack>
             </Container>
+            <FullScreenLoader open={loading}/>
         </>
 	);
 }

@@ -4,9 +4,9 @@ import { TextField, Box } from "@mui/material";
 export default function SearchBar({ value, onChange, activeTab }) {
     const getPlaceholder = () => {
         switch (activeTab) {
-            case 0: return "Search Inventory...";
-            case 1: return "Search Products...";
-            case 2: return "Search Auctions...";
+            case 'manage-inventory': return "Search Inventory...";
+            case 'manage-product': return "Search Products...";
+            case 'manage-auction': return "Search Auctions...";
             default: return "Search...";
         }
     };

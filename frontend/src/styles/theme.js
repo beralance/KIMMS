@@ -4,7 +4,8 @@ import { createTheme } from '@mui/material/styles'
 // Black 37353E
 // Component BG '#F0F0F0'
 // Dark White D3DAD9
-
+// Main White BG f0f0f0ff
+// gray shade 414141ff
 const theme = createTheme({
     // palette: colors system
     palette: { 

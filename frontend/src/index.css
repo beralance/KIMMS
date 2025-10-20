@@ -6,6 +6,11 @@ html {
 * {
   scrollbar-width: thin;
 }
+body {
+    background-color: #f0f0f0; /* or any color you like */
+    margin: 0;
+    font-family: sans-serif;
+}
 .lucide {
   color: #37353E;
   width: 20px;

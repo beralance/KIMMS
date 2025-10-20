@@ -18,10 +18,10 @@ export default function Home () {
     ScrollOnTop()
 
     return (
-        <React.Fragment>
+        <Box>
             <HomeHero/>
-            <Box sx={{bgcolor: 'white', py: 5}} >
-                <Container>
+            <Box sx={{bgcolor: 'white', py: 5}}>
+                <Container >
                     <section>
                         <Stack gap={2} sx={{pb: 15}} justifyContent={'center'}>
                             <Stack alignItems={'center'} justifyContent={'center'}>
@@ -103,7 +103,7 @@ export default function Home () {
                     </section>
                 </Container>
             </Box>
-        </React.Fragment>
+        </Box>
     )
 }
 

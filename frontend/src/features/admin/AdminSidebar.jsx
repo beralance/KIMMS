@@ -177,7 +177,7 @@ export default function AdminSidebar({ children }) {
     return (
         <Box sx={{ display: 'flex'}}>
             <CssBaseline />
-            <AppBar position="fixed" color='secondary' sx={{height: 60, justifyContent: 'center'}} open={open}>
+            <AppBar position="fixed" sx={{height: 60, justifyContent: 'center', bgcolor: '#414141ff'}} open={open}>
                 <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <IconButton
                         color="inherit"
@@ -300,11 +300,9 @@ export default function AdminSidebar({ children }) {
                 </Box>
             </Drawer>
 
-            <Box component="main" sx={{width: '100%' }}>
+            <Box component={'main'} sx={{width: '100%' }}>
                 <DrawerHeader />
-                <Stack>
-                    {children}
-                </Stack>
+                {children}
                 <AdminBottomNav />
             </Box>
 

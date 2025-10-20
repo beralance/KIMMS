@@ -1,9 +1,13 @@
 import React from 'react'
 import {} from '@mui/icons-material'
-import { Box, Button, Stack } from '@mui/material'
+import { Box, Button, Stack, Typography, Container } from '@mui/material'
 import AuctionListing from './AuctionListing'
 import AuctionHistory from './AuctionHistory'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import AuctionHero from './AuctionHero'
+import AuctionHistoryPreview from './AuctionHistoryPreview'
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
+
 
 const Auction = () => {
     const navigate = useNavigate()
@@ -11,16 +15,35 @@ const Auction = () => {
 
     return (
         <Box>
-            <Stack>
-                <Stack>
-                    <Button onClick={() => navigate( location.pathname === '/auction/listing' ? '/auction/history' : '/auction/listing')}>
-                        {location.pathname === '/auction/listing' ? 'History' : 'Listing'}
-                    </Button>
-                </Stack>
-            </Stack>
-            <Box>
-                <Outlet/>
-            </Box>
+            <AuctionHero>
+                <Container>
+                    <Stack gap={5}>
+                        {location.pathname === '/auction/listing' ? 
+                            <Stack>
+                                <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
+                                    <Typography variant="body1" color="initial">
+                                        Check auction history
+                                    </Typography>
+                                    <Button onClick={() => navigate('/auction/history')}>
+                                        <ChevronRightIcon/>
+                                    </Button>
+                                </Stack>
+                                <AuctionHistoryPreview/>
+                            </Stack>
+                            :
+                            <Stack direction={'row'}>
+                                <Button onClick={() => navigate('/auction/listing')}>
+                                    View Listing <ChevronLeftIcon/>
+                                </Button>
+                            </Stack>
+                        }
+                        {/*MAIN content*/}
+                        <Stack>
+                            <Outlet/>
+                        </Stack>
+                    </Stack>
+                </Container>
+            </AuctionHero>
         </Box>
     )
 }

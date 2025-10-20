@@ -4,19 +4,16 @@ import React, { useState, useEffect, useContext } from "react";
 import ShopPagination from "./ShopPagination";
 import ShopFilters from "./ShopFilter";
 import Container from "@mui/material/Container";
-import AutoSlideCarousel from "../../../components/AutoSlideCarousel";
 import { useCart } from "../../../contexts/CartContext";
 import { ProductContext } from "../../../contexts/ProductContext"; // import context
 import { ScrollOnTop } from "../../../utils/ScrollOnTop";
 import { useLocation, useParams } from "react-router-dom";
 
-const PAGE_SIZE = 6;
 
 function Shop() {
     const [page, setPage] = useState(1);
     const [sort, setSort] = useState("default");
     const [category, setCategory] = useState("all");
-    
     const { addToCart } = useCart();
     const { products, fetchProducts } = useContext(ProductContext); // get products from context
     const [filteredProducts, setFilteredProducts] = useState([]);
@@ -24,6 +21,7 @@ function Shop() {
     const location = useLocation()
     const queryParams = new URLSearchParams(location.search)
     const categoryId = queryParams.get('category')
+    const PAGE_SIZE = 6;
 
     ScrollOnTop()
 
@@ -56,10 +54,10 @@ function Shop() {
             tempProducts.sort((a, b) => b.price - a.price);
         }
 
-         if (categoryId) {
-            const matched = products.find((p) => p.category?._id === categoryId);
-            setCategoryName(matched ? matched.category.name : "All");
-         }
+        if (categoryId) {
+        const matched = products.find((p) => p.category?._id === categoryId);
+        setCategoryName(matched ? matched.category.name : "All");
+        }
 
         setFilteredProducts(tempProducts);
     }, [products, category, sort, categoryId]);
@@ -81,8 +79,7 @@ function Shop() {
     };
 
     return (
-        <Box>
-            <AutoSlideCarousel />
+        <Box sx={{bgcolor:'#fafafa'}}>
             <Container maxWidth="lg">
                 <Typography variant="h5" color="initial" sx={{ m: 1, mb: 5 }}>
                     Welcome! One of a kind find are waiting for you!

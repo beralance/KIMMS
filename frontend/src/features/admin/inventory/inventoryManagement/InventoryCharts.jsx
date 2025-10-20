@@ -11,11 +11,6 @@ const InventoryChart = () => {
     const [selectedCategory, setSelectedCategory] = useState('all')
     const [selectedStatus, setSelectedStatus] = useState('all')
 
-    console.log('INVENTORY ITEMS', inventoryItems)
-    console.log('ALL INVENTORY ITEMS', allInventoryItems)
-    console.log('category INVENTORY &&&&&&', allInventoryItems._id)
-    
-
     const filteredItems = useMemo(() => {
         if (selectedStatus === "all") return allInventoryItems;
         return allInventoryItems.filter(item => item.status === selectedStatus);

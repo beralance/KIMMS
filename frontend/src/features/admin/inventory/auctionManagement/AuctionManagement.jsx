@@ -3,9 +3,9 @@ import AuctionMonitor from './AuctionMonitor'
 import { useOutletContext } from 'react-router-dom'
 import { Box, Button, ButtonGroup, Stack, Typography } from '@mui/material' 
 
+
 const AuctionManagement = () => {
     const {searchTerm, setSearchTerm} = useOutletContext()
-    
     return (
         <Box>
             <Stack>

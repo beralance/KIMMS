@@ -10,25 +10,38 @@ import Typography from '@mui/material/Typography'
 import { Box, Grid, Stack } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import {ScrollSectionLeft, ScrollSectionRight} from '../../../components/SectionTransitionX';
+import { useAuth } from '../../../contexts/AuthContext';
 
 export default function CategoriesList() {
     const [categories, setCategories] = useState([]);
     const [topCategories, setTopCategories] = useState([]);
+    const {user} = useAuth()
     const navigate = useNavigate()
 
+    const fetchAndSetCategories = async () => {
+        try {
+            const data = await fetchCategoriesFromProducts();
+            setCategories(data);
+
+            const sorted = [...data].sort((a, b) => b.count - a.count);
+            const newTop = sorted.slice(0, 2)
+            
+            const isSame = 
+                topCategories.length === newTop.length &&
+                topCategories.every((cat, i) => cat._id === newTop[0]._id)
+
+            if (!isSame) {
+                setTopCategories(newTop)
+            }
+        } catch (err) {
+            console.error('Cannot fetch categories:', err);
+        }
+    };
+
     useEffect(() => {
-        fetchCategoriesFromProducts()   // your existing API call
-            .then(data => {
-                console.log("Fetched categories:", data);
-                setCategories(data);
-
-                // sort descending by count
-                const sorted = [...data].sort((a, b) => b.count - a.count);
-
-                // get highest and second highest
-                setTopCategories(sorted.slice(0, 2));
-            })
-    .catch(err => console.error(err));
+        fetchAndSetCategories();
+        const timer = setInterval(fetchAndSetCategories, 15000);
+        return () => clearInterval(timer);
     }, []);
 
     return (

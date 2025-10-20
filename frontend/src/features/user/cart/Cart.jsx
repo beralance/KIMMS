@@ -6,6 +6,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import BottomActionBar from "../../../components/BottomActionBar";
 import {DeleteRounded, DoneAllRounded, KeyboardArrowDownRounded, KeyboardArrowUpRounded, RemoveDoneRounded } from '@mui/icons-material'
 import { toTitleCase, formatNumber } from '../../../utils/stringUtils'
+
 export default function Cart() {
     const { cartItems, removeFromCart } = useCart();
     const { setCheckoutItems } = useCheckout();

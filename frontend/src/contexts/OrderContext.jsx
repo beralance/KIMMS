@@ -10,6 +10,25 @@ export function OrderProvider({ children }) {
     const { user, token } = useAuth()
     const API_URL = import.meta.env.VITE_API_URL;
 
+    useEffect(() => {
+        const fetchLatestOrders = async () => {
+            try {
+                const res = await fetch(`${API_URL}/api/orders/polling`)
+                const data = await res.json()
+                setOrders(data)
+
+                console.log('🔄 Orders REFETCHED from ORDER_CONTEXT')
+            }
+            catch (err) {
+                console.error('Polling orders error:', err)
+            }
+        }
+        fetchLatestOrders()
+        const timer = setInterval(fetchLatestOrders, 15000)
+
+        return () => clearInterval(timer);
+    }, [])
+    
     // 1️⃣ Fetch all orders (admin) or optionally filter by userId
     const fetchOrders = async () => {
         try {
@@ -17,7 +36,7 @@ export function OrderProvider({ children }) {
 
             let url = `${API_URL}/api/orders`
             if (user.role === 'user') {
-                url += `?userId=${user._id}`;
+                url += `?userId=${user.userId}`;
             }
 
             const res = await fetch(url, {
@@ -31,7 +50,6 @@ export function OrderProvider({ children }) {
                 throw new Error('Failed to fetch orders')
             }
             const data = await res.json()
-            console.log('% this is the DATA', data)
 
             setOrders(data)
             return data
@@ -86,6 +104,28 @@ export function OrderProvider({ children }) {
         }
     };
 
+    const searchOrder = async (orderId) => {
+        try {
+            const res = await fetch(`${API_URL}/api/orders/search?orderId=${orderId}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                }
+            })
+
+            if (!res.ok) {
+                if (res.status === 404) return {error: 'Order not found'}
+                throw new Error('Failed to search order')
+            }
+
+            const data = await res.json()
+            return data;
+        }
+        catch (err) {
+            console.error('Failed to search order:', err)
+            return {error: err.message}
+        }
+    }
     useEffect(() => {
         // Optionally fetch all orders on mount (e.g., admin)
         if(token) {
@@ -98,6 +138,7 @@ export function OrderProvider({ children }) {
             value={{
                 orders,
                 isLoading,
+                searchOrder,
                 fetchOrders,
                 createOrder,
                 updateOrderStatus,

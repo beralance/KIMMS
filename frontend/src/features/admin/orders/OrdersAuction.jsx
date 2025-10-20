@@ -43,7 +43,6 @@ export default function OrdersTable() {
                 console.log(`Order ${o._id} is inactive`)
             }
         });
-        console.log('SAMPLE', filtered)
         setPendingOrders(filtered);
     }, [orders]);
 

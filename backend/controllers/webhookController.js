@@ -133,6 +133,9 @@ export const handleWebhook = async (req, res) => {
                 );
                 await userCart.save();
             }
+
+            req.io.emit('productSold', prod)
+
         } 
         else if (['failed', 'cancelled'].includes(payment.status)) {
             const order = await Order.findById(orderId)

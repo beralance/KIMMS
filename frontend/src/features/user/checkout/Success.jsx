@@ -1,68 +1,35 @@
 import React, { useEffect } from 'react';
-import { Container, Typography, Button } from '@mui/material';
+import { Container, Typography, Button, Box, Stack } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '../../../contexts/CartContext';
-import { useAuth } from '../../../contexts/AuthContext';
-import { useCheckout } from '../../../contexts/CheckoutContext';
 
 export default function Success() {
     const navigate = useNavigate();
-    const { token } = useAuth();
-    const { refreshCart } = useCart();
-    const { checkoutItems } = useCheckout();
-    const API_URL = import.meta.env.VITE_API_URL;
-    const handleBack = () => {
-        navigate('/'); // back to shop
-    };
-/*
-    useEffect(() => {
-        const clearPurchased = async () => {
-            const order = JSON.parse(localStorage.getItem('pendingPurchase')); // ✅ fix typo
-            if (!order) {
-                console.log('⚠️ No pendingPurchase found in localStorage.');
-                return;
-            }
 
-            const purchasedIds = order.products.map(p => p.productId);
-            console.log("🟡 Sending request to clear purchased items...", purchasedIds);
-
-            try {
-                const res = await fetch(`${API_URL}/api/cart/remove-purchased`, {
-                    method: "DELETE",
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                        "Content-Type": "application/json" // ✅ important
-                    },
-                    body: JSON.stringify({ removeIds: purchasedIds }),
-                });
-
-                const data = await res.json();
-                console.log("✅ Response from server:", data);
-
-                localStorage.removeItem('pendingPurchase'); // ✅ cleanup
-                refreshCart();
-            }
-            catch (err) {
-                console.error("❌ Failed to clear purchased items", err);
-            }
-        };
-
-        if (token) {
-            clearPurchased(); // only run if logged in
-        }
-    }, [token]);
-*/
     return (
-        <Container sx={{ mt: 4 }}>
-            <Typography variant="h4" gutterBottom>
-                Payment Successful!
-            </Typography>
-            <Typography sx={{ mb: 3 }}>
-                Thank you for your purchase.
-            </Typography>
-            <Button variant="contained" onClick={handleBack}>
-                Back to Shop
-            </Button>
+        <Container>
+            <Stack justifyContent={'center'} alignItems={'center'}  sx={{pb: 20, height: '100vh'}}>
+                <Box>
+                    <img 
+                        src={'/box-celebration-gift.svg'}
+                        style={{
+                            display: 'block',
+                            width: '150px',
+                            height: '150px',
+                        }}
+                    />
+                </Box>
+                <Stack>
+                    <Typography variant="h4" align='center'>
+                        Payment Successful!
+                    </Typography>
+                    <Typography variant='body2' sx={{ mb: 3 }} align='center'>
+                        Thank you for your purchase.
+                    </Typography>
+                </Stack>
+                <Button variant="contained" color='secondary' sx={{borderRadius: '999px', px: 3}} onClick={() => navigate('/shop')}>
+                    Back to Shop
+                </Button>
+            </Stack>
         </Container>
     );
 }

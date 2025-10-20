@@ -98,10 +98,12 @@ export const addToCart = async (req, res) => {
 
 // REMOVE single item from cart
 export const removeFromCart = async (req, res) => {
+
     try {
         const userId = req.user.id;
         const { productId } = req.params;
 
+        // Find one using this userId inside CART collection
         const cart = await Cart.findOne({ userId });
         if (!cart) return res.status(404).json({ error: "Cart not found" });
 
@@ -110,7 +112,8 @@ export const removeFromCart = async (req, res) => {
 
         await cart.populate("items.productId", "productName category images price description");
         res.json(cart);
-    } catch (err) {
+    } 
+    catch (err) {
         console.error(err);
         res.status(500).json({ error: "Failed to remove item" });
     }

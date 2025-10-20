@@ -3,7 +3,7 @@ import Inventory from '../models/Inventory.js';
 import {generatePhysicalCode, generateProductId } from '../utils/generatedIds.js'
 import {v4 as uuidv4} from 'uuid'
 import { incrementProductCount, decrementProductCount } from './categoryController.js';
-
+import { io } from '../server.js';
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
 

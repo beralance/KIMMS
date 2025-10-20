@@ -16,6 +16,8 @@
 - firebase
 - @react-oauth/google
 - @mui/x-date-picker
+- escpos //remove
+- @manhnd/esc-pos-encoder
 
 
 

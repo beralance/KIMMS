@@ -22,7 +22,7 @@ export const createCheckoutSession = async (req, res) => {
             data: {
                 attributes: {
                     line_items: [{ name: "Purchase", amount, currency: "PHP", quantity: 1 }],
-                    payment_method_types: ["gcash", "card"],
+                    payment_method_types: ["gcash"],
                     success_url: `${FRONTEND_URL}/success`,
                     cancel_url: `${FRONTEND_URL}/cancel`,
                     metadata: {

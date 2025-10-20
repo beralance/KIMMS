@@ -3,7 +3,9 @@ import express from "express";
 import {
     createOrder,
     getOrders,
+    searchOrder,
     getOrder,
+    getOrdersForPolling,
     updateOrderStatus,
 } from "../controllers/orderController.js";
 import { verifyToken, requireRole } from "../middleware/authMiddleware.js";
@@ -25,6 +27,9 @@ router.post("/", verifyToken, createOrder);
 // - If admin: all orders
 // - If user: only their orders
 router.get("/", verifyToken, getOrders);
+router.get('/polling', getOrdersForPolling)
+// Search by orderId
+router.get('/search', verifyToken, requireRole(['admin', 'staff']), searchOrder)
 
 // Get a single order (must be owner or admin)
 router.get("/:id", verifyToken, getOrder);

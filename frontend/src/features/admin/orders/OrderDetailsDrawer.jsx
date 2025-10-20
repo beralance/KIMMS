@@ -8,12 +8,17 @@ import {
   Button,
   Stack,
   CircularProgress,
+  Divider,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import StatusStepper from './StatusStepper'
 import { OrderContext } from "../../../contexts/OrderContext";
-import { ChevronsRightIcon } from "lucide-react";
-import { toTitleCase } from "../../../utils/stringUtils";
+import { useSnackbar } from "../../../contexts/SnackbarContext";
+import { ChevronsRightIcon, PrinterIcon } from "lucide-react";
+import { toTitleCase, formatNumber } from "../../../utils/stringUtils";
+import {generateOrderSlip} from "../../../utils/printReceipt";
+import dayjs from 'dayjs'
+
 
 const statusSwitch = {
     pending: {next: 'confirmed', label: 'Confirm'},
@@ -24,9 +29,14 @@ const statusSwitch = {
 }
 export default function OrderDetailsDrawer({open, onClose, orderData}) {
     const {updateOrderStatus} = React.useContext(OrderContext)
+    const {showSnackbar} = useSnackbar()
     const [status, setStatus] = React.useState(orderData.purchaseStatus)
     const [disabled, setDisabled] = React.useState(false)
     const [loading, setLoading] = React.useState(false);
+
+    const email = orderData.userId?.email
+    const address = orderData.userId?.address
+    const filteredEmail = email.replace(/@.*/, '')
 
     const current = statusSwitch[status];
 
@@ -72,8 +82,76 @@ export default function OrderDetailsDrawer({open, onClose, orderData}) {
                     <CloseIcon sx={{color: 'gray'}}/>
                 </IconButton>
             </Box>
-            <Stack sx={{ mt: 5}}>
-                <StatusStepper orderStatus={status}/>
+            <Stack sx={{ mt: 1, p: 1}}>
+                <Stack sx={{mb: 2}}>
+                    <Typography variant="h6" color="secondary">
+                        {filteredEmail}
+                    </Typography>
+                </Stack>
+                <Stack>
+                    <StatusStepper orderStatus={status}/>
+                </Stack>
+                <Divider/>
+                <Stack sx={{p: 2}}>
+                    <Typography variant="body1" color="secondary" fontWeight={'bold'}>Order Information</Typography>
+                    {orderData.products.map(product => {
+                        <Stack key={product._id}>
+                            <Typography variant="body1" color="initial">{product.productName}</Typography>
+                        </Stack>
+                    })}
+                    <Typography variant="body1" color="initial">{orderData.auctionId}</Typography>
+                    <Typography variant="body1" color="initial">{orderData.orderType}</Typography>
+                    <Typography variant="body1" color="initial">{orderData.checkoutSessionId}</Typography>
+                    <Typography variant="body1" color="initial" fontWeight={'bold'}>{orderData.orderId}</Typography>
+                    <Typography variant="body1" color="initial">{orderData.transactionReference}</Typography>
+                    <Typography variant="body1" color="initial">{orderData.paymentMethod}</Typography>
+                    <Typography variant="body1" color="initial">{orderData.totalPrice}</Typography>
+                    <Typography variant="body1" color="initial">{orderData.paymentStatus}</Typography>
+                    <Typography variant="body1" color="initial">{orderData.purchaseStatus}</Typography>
+                    <Typography variant="body1" color="initial">{dayjs(orderData.createdAt).format('MMMM D, YYYY')}</Typography>
+                    <Typography variant="body1" color="initial">{dayjs(orderData.createdAt).format('h:mm A')}</Typography>
+                    <Typography variant="body1" color="initial">{orderData.userId?.email}</Typography>
+                    <Stack direction={'row'}>
+                        <Typography variant="body1" color="initial">
+                            {`
+                                ${address.region},
+                                ${address.province},
+                                ${address.city},
+                                ${address.street},
+                                ${address.country}
+                                ${address.postalCode}
+                            `}
+                        </Typography>
+                    </Stack>
+                    <Typography variant="body1" color="initial">{orderData.userId?.number}</Typography>
+                    <Typography variant="body1" color="initial">{orderData.userId?.isLocal}</Typography>
+                    <Typography variant="body1" color="initial">{orderData.userId?.fullName}</Typography>
+                    <Box>
+                        <img 
+                            src={orderData.userId?.avatar} 
+                            alt={`${filteredEmail}-avatar`} 
+                            style={{
+                                width: '40px',
+                                height: '40px',
+                                aspectRatio: '1/1',
+                                display: 'block',
+                            }}
+                        />
+                    </Box>
+                </Stack>
+                {(orderData.purchaseStatus === 'confirmed' || orderData.purchaseStatus === 'processing') &&
+                    <Stack direction={'row'} gap={1} alignItems={'center'}>
+                        <Typography variant="body1" color="initial">Print Receipt</Typography>
+                        <IconButton onClick={() => {
+                            const commands = generateOrderSlip(orderData)
+                            console.log('ESC/POS Commands:', commands)
+                            showSnackbar('Order slip generated!', 'success')
+                            
+                        }}>
+                            <PrinterIcon/>
+                        </IconButton>
+                    </Stack>
+                }
                 <Button variant={disabled ? 'text' : "outlined"} sx={{mx: 4, my: 2}} color="secondary" onClick={() => handleClick({orderId: orderData._id})}
                     disabled={disabled || !current?.next}    
                 >

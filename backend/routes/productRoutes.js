@@ -8,6 +8,7 @@ import {
     deleteProduct,
     searchProducts,
     getProductsByHighlight,
+    getProductsForPolling,
     updateProductHighlight,
     incrementProductViews,
     getNewestProducts,
@@ -27,6 +28,9 @@ router.get("/search/query", searchProducts);
 
 // GET products by highlight (featured, mostViewed, none)
 router.get("/highlight/:type", getProductsByHighlight);
+
+// GET products for polling 
+router.get("/polling", getProductsForPolling);
 
 // GET all products
 router.get("/", getProducts);

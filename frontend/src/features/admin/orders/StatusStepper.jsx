@@ -18,7 +18,7 @@ export default function StatusStepper({orderStatus}) {
     console.log('UNDEFINED', orderStatus)
     return (
         <Stack sx={{p: 1}}>
-            <Box sx={{overflowY: 'auto', width: '100%', pb: 1 }}>
+            <Box sx={{overflowY: 'auto', scrollbarColor: 'transparent transparent', width: '100%', pb: 1 }}>
                 <Stepper activeStep={activeStep} alternativeLabel>
                     {steps.map((step) => (
                         <Step key={step.status}>

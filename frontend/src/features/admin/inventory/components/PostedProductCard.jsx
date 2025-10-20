@@ -78,7 +78,7 @@ export default function ProductCard({ product, onEdit, onDelete }) {
                 <Box sx={{position: 'relative'}}>
                     <Box onClick={handleUpdateOpen} sx={{cursor: 'pointer', boxShadow: 5, borderRadius: 1, overflow: 'hidden'}}>
                         <img 
-                            src={`${product.images[1]}`} 
+                            src={`${product.images[0]}`} 
                             alt={product.productName}
                             onError={(e) => (handleImageError(e))}
                             style={{

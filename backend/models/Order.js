@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { generateOrderId } from "../utils/generateOrderId.js";
+
 
 const orderSchema = new mongoose.Schema(
     {
@@ -10,7 +12,12 @@ const orderSchema = new mongoose.Schema(
                 priceAtPurchase: {type: Number},
             },
         ],
-
+        orderId: {
+            type: String,
+            default: generateOrderId,
+            unique: true,
+            required: true,
+        },
         auctionId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Auction',

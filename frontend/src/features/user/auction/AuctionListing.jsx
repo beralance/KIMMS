@@ -3,14 +3,11 @@ import { Box, Card, CardContent, Typography, Button, Grid } from "@mui/material"
 import { Link } from "react-router-dom";
 import axios from "axios";
 import AuctionPreviewCard from "./components/AuctionPreviewCard";
-import {ScrollOnTop} from '../../../utils/ScrollOnTop'
 
 const AuctionListing = () => {
     const [auctions, setAuctions] = useState([]);
     const [tick, setTick] = useState(0)
     const API_URL = import.meta.env.VITE_API_URL;
-
-    ScrollOnTop()
 
     useEffect(() => {
         const fetchAuctions = async () => {
@@ -44,7 +41,7 @@ const AuctionListing = () => {
     };
 
     return (
-        <Box sx={{ p: 3 }}>
+        <Box>
             <Typography variant="h5" gutterBottom>
                 Live Auctions
             </Typography>

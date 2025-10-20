@@ -35,40 +35,22 @@ import { Server } from 'socket.io'
 
 const app = express()
 const server = http.createServer(app)
-const io = new Server(server, {
+export const io = new Server(server, {
     cors: {
         origin: [
-            'http://localhost:5173',
-            "https://kimms-furniture-and-merchandise-mai-seven.vercel.app"
+            process.env.FRONTEND_URL
         ],
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
-
     }
 })
-
-
 app.use((req, res, next) => {
-  //console.log("Incoming request:", req.method, req.url, "Origin:", req.headers.origin);
-  next();
-});
+    req.io = io
+    next();
+})
 
-// Middleware
 app.use(cors())
-/*
-app.use(cors({
-    origin: [
-        "http://localhost:5173",
-        "https://kimms-furniture-and-merchandise-mai-seven.vercel.app"
-    ],
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true
-}))
-*/
 app.use(express.json())
 app.use("/uploads", express.static(path.join(process.cwd(), "/uploads"))); // serve image
-
-
 
 // Routes
 app.use('/api/payment', paymentRoutes)
@@ -85,24 +67,12 @@ app.use('/api/staff-permissions', staffPermissionRoutes)
 app.use('/api/categories', categoryRoutes)
 app.use('/api/reports', reportsRoutes)
 
-
-
-
-
-// hash password match testing
 const testPassword = async () => {
     const hashed = '$2b$10$nL7l300trZVegcJFiQOpQ.J9I5oocqll71.rWqyxawvlPj9a.wWdC'
     const match = await bcrypt.compare('test', hashed)
     console.log(match)
 }
 
-
-
-
-// password hash comparing function
-// testPassword()
-
-// One time admin account creation
 const createAdmin = async () => {
     const existingAdmin = await User.findOne({ email: process.env.ADMIN_EMAIL });
     if (!existingAdmin) {
@@ -123,8 +93,6 @@ const createAdmin = async () => {
 };
 
 
-
-
 // MongoDB + Server
 const PORT = process.env.PORT || 5000
 mongoose.connect(process.env.MONGO_URI) // removed: connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -143,13 +111,22 @@ mongoose.connect(process.env.MONGO_URI) // removed: connect(process.env.MONGO_UR
 .catch(err => console.error(err))
 
 
-
-
-
 // socket.io connection for debugging
 io.on('connection', (socket) => {
     console.log('New client connected', socket.id)
 
+    socket.on('testMessage', (msg) => {
+        console.log('📩 Received from client:', msg, 'on socket', socket.id)
+        socket.emit('serverMessage', 'Hello from server! ✅')
+    })
+    socket.on('testInv', (msg) => {
+        console.log('📩 Client says:', msg)
+        socket.emit('logbet', 'betlog mo maliit client')
+    })
+    socket.on('postedProductDelete', (id) => {
+        console.log('📩 Receives deleted product id:', id)
+        socket.broadcast.emit('postedProductDelete', id)
+    })
     socket.on('disconnect', () => {
         console.log('Client disconnected:', socket.id)
     })

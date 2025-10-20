@@ -36,7 +36,7 @@ const InventoryChart = ({ data, onClick }) => {
                                         Products: 
                                     </Typography>
                                     {data.productName.map(product => (
-                                        <Typography component={'div'} variant="body2" color="grey">
+                                        <Typography key={product._id} component={'div'} variant="body2" color="grey">
                                             <ul style={{paddingLeft: 20, margin: 0}}>
                                                 <li>
                                                     {product}

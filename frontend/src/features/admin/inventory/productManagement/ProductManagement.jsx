@@ -41,17 +41,14 @@ function ProductManagement() {
         loadProducts()
     }, []);
 
-    // 🏷️ Extract categories dynamically
     const categories = useMemo(() => [...new Set(products.map((p) => p.category?.name))], [products]);
 
-    // ✅ Filtered products
     const finalProducts = useMemo(() => {
         return products
             .filter(p => p.visibility !== 'inactive')
             .filter((p) => 
             {
 
-            // Search filter
             if (searchTerm) {
                 const s = searchTerm.toLowerCase();
                 if (
@@ -62,10 +59,7 @@ function ProductManagement() {
                 return false;
             }
 
-            // Category filter
             if (category !== "all" && p.category?.name !== category) return false;
-
-            // Highlight filter
             if (highlight !== "all") {
                 if (highlight === "featured" && p.highlight !== "featured") return false;
                 if (highlight === "none" && p.highlight !== "none") return false;

@@ -7,7 +7,6 @@ import { Collapse, Stack, IconButton } from '@mui/material';
 import InventoryCharts from './InventoryCharts';
 import { InfoRounded } from '@mui/icons-material';
 
-
 const InventoryManagement = () => {
     const {searchTerm, setSearchTerm} = useOutletContext()
     const [note, setNote] = useState(false)

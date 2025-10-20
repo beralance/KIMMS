@@ -4,15 +4,14 @@ import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
-import SearchBar from "./SearchBar"; // adjust path if needed
 import Typography from "@mui/material/Typography";
 import { Stack, List, ListItem, ListItemButton, Divider, Container, Grow, Fade } from "@mui/material";
 import { ProductContext } from "../contexts/ProductContext"; // adjust path
 import { useContext, useState } from "react";
-import ProductCardSimple from './ProductCardSimple'
 import { useNavigate } from 'react-router-dom'
-import SearchRecommended from './SearchRecommended'
-import CategoriesList from '../features/user/home/CategoriesList'
+import SearchCategories from './SearchCategories'
+import SearchBar from "./SearchBar"; // adjust path if needed
+
 
 export default function SearchDrawer({ open, onClose, anchor = "top" }) {
     const { searchProducts, products } = useContext(ProductContext);
@@ -139,7 +138,7 @@ export default function SearchDrawer({ open, onClose, anchor = "top" }) {
                                 Categories
                             </Typography>
                             <Box>
-                                <CategoriesList/>
+                                <SearchCategories open={open} onClose={onClose}/>
                             </Box>
                         </Box>
                     </Stack>

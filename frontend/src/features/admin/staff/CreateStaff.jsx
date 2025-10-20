@@ -80,8 +80,8 @@ const CreateStaff = ({ open, onClose, onStaffCreated }) => {
             allowedModules.includes("inventory") &&
             !allowedModules.some((m) =>
                 nestedInventoryModules.map((tab) => tab.name).includes(m)
-        )
-        ) {
+        )) 
+        {
             setError("Please select at least one tab for Inventory");
             setLoading(false);
             return;

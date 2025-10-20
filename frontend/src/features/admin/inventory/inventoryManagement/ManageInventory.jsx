@@ -35,6 +35,7 @@ export default function ProductForm({productId, onClose}) { // <-- accept callba
     const [isEnabled, setIsEnabled] = useState(false)
     const [mode, setMode] = useState(productId ? 'edit' : 'create')
 
+
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     

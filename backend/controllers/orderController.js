@@ -1,7 +1,31 @@
 // backend/controllers/orderController.js
 import Order from "../models/Order.js";
-
+import { sendEmail } from '../utils/sendEmail.js'
 // ✅ Create a new order
+
+
+export const getOrdersForPolling = async (req, res) => {
+    try {
+        const orders = await Order.find()
+            .populate({
+                path: "products.productId", 
+                select: 'productName physicalCode images price category condition price isLocal',
+                populate:{
+                    path: 'category',
+                    select: 'name',
+                }
+            })
+            .populate("userId", 'fullName email address avatar phonenumber')
+            .populate('auctionId', 'endtime starttime status reservePrice startPrice')
+            .sort({createdAt: -1})
+        res.json(orders);
+    }
+    catch (err) {
+        console.error(err)
+        res.status(500).json({error: 'Failed to fetch orders'})
+    }
+}
+
 export const createOrder = async (req, res) => {
     try {
         const { 
@@ -52,7 +76,14 @@ export const getOrders = async (req, res) => {
         const query = userId ? {userId} : {};
 
         const orders = await Order.find(query)
-            .populate("products.productId", 'productName physicalCode images price category price isLocal')
+            .populate({
+                path: "products.productId", 
+                select: 'productName physicalCode images price category condition price isLocal',
+                populate:{
+                    path: 'category',
+                    select: 'name',
+                }
+            })
             .populate("userId", 'fullName email address avatar phonenumber')
             .populate('auctionId', 'endtime starttime status reservePrice startPrice')
             .sort({createdAt: -1})
@@ -64,11 +95,37 @@ export const getOrders = async (req, res) => {
     }
 };
 
+// ✅ Search Order
+export const searchOrder = async (req, res) => {
+    try {
+        const {orderId} = req.query
+        if (!orderId) return res.status(400).json({message: 'Order ID required'})
+        
+        const order = await Order.findOne({orderId})
+            .populate('userId', 'email fullName address number')
+
+        if (!order) return res.status(400).json({message: 'Order not found'})
+
+        res.status(200).json(order)
+    }
+    catch (err) {
+        console.error('Error searching orders:', err)
+        res.status(500).json({message: 'Failed to search order'})
+    }
+}
+
 // ✅ Get single order
 export const getOrder = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id)
-            .populate("products.productId", 'productName images prices category')
+            .populate({
+                path: "products.productId", 
+                select: 'productName images prices category isLocal condition',
+                populate: {
+                    path: 'category',
+                    select: 'name',
+                }
+            })
             .populate("userId", 'fullName email role')
             .populate('auctionId', 'endTime status')
 
@@ -95,10 +152,43 @@ export const updateOrderStatus = async (req, res) => {
 
         const updatedOrder = await order.save();
 
-        await updateOrderStatus.populate('user').populate('products')
+        await updatedOrder.populate('userId')
+        await updatedOrder.populate('products')
+        
         console.log(
             `Order ${order._id} updated: purchaseStatus=${order.purchaseStatus}, paymentStatus=${order.paymentStatus}`
         )
+
+        //send email to user based on status
+        if (updatedOrder.userId && updatedOrder.userId.email) {
+            await sendEmail({
+                to: updatedOrder.userId.email,
+                subject: `Update on your order: ${updatedOrder.orderId}`,
+                text: (
+                    `
+                        Hi ${updatedOrder.userId.fullName},
+
+                        OrderID: ${updatedOrder.purchaseStatus}
+                        Purchase Status: ${updatedOrder.purchaseStatus}
+                        Payment Status: ${updatedOrder.paymentStatus}
+
+                        Clicking the link below to view your order
+                        ${process.env.FRONTEND_URL}/my-purchases
+                    `
+                ),
+                html: 
+                    `
+                        <h2>Order Update</h2>
+                        <p>Hi ${updatedOrder.userId.fullName},</p>
+                        <p>Your order <strong>#${updatedOrder.orderId}</strong> has been updated:</p>
+                        <ul>
+                            <li><strong>Purchase Status:</strong> ${updatedOrder.purchaseStatus}</li>
+                            <li><strong>Payment Status:</strong> ${updatedOrder.paymentStatus}</li>
+                        </ul>
+                        <p><a href="${process.env.FRONTEND_URL}/my-purchases">Click here to view your order</a></p>
+                    `,
+            })
+        }
 
         res.status(200).json(updatedOrder);
     } catch (err) {

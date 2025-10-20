@@ -14,7 +14,7 @@ import { formatNumber } from '../../../../utils/stringUtils';
 import { ProductContext } from '../../../../contexts/ProductContext';
 import UpdateFloatingButton from './UpdateFloatingButton';
 import {CircleCheckIcon, InfoIcon} from 'lucide-react'
-
+import { useSocket } from '../../../../contexts/SocketContext';
 
 export default function ProductForm({productId, productData, onClose}) {
     // Product Data
@@ -37,6 +37,7 @@ export default function ProductForm({productId, productData, onClose}) {
     const [success, setSuccess] = useState(false)
     const [open, setOpen] = useState(false)
     const toEdit = useRef(null)
+    const socket = useSocket()
 
     const scrollToEdit = () => {
         toEdit.current?.scrollIntoView({behavior: 'smooth'})
@@ -50,6 +51,7 @@ export default function ProductForm({productId, productData, onClose}) {
 
     const handleDelete = async (id) => {
         await deleteProduct(id);
+        socket.emit('postedProductDelete', {id})
     };
     useEffect(() => {
         setDetails(productData.details  || '');

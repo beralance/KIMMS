@@ -1,7 +1,7 @@
 // src/context/ProductContext.jsx
 import { createContext, useState, useEffect, use } from "react";
 import {useAuth} from '../contexts/AuthContext'
-
+import {useSocket} from '../contexts/SocketContext'
 export const ProductContext = createContext();
 
 export function ProductProvider({ children }) {
@@ -9,35 +9,58 @@ export function ProductProvider({ children }) {
     const [inventory, setInventory] = useState([]);
     const [newProducts, setNewProducts] = useState([])
     const API_URL = import.meta.env.VITE_API_URL;
-    //const API_URL = "http://localhost:5000/api/products";
     const INVENTORY_URL = `${API_URL}/api/inventory`;
     const {user, token} = useAuth()
+    const socket = useSocket()
+
+    useEffect(() => {
+        if (!socket) return
+        console.log('Products from CONTEXT', products)
+        socket.on('serverMessage', (msg) => {
+            console.log('Server says:', msg)
+        })
+        socket.on('postedProductDelete', (data) => {
+            console.log('📢 Posted product ID removed', data.id)
+            setProducts((prev) => prev.filter((p) => p._id !== data.id))
+        })
+        socket.on('productSold', (data) => {
+            console.log('📢📢📢📢Data from server webhook', data)
+            const productsToRemove = Array.isArray(data) ? data.map(d => d._id) : [];
+            setProducts(prev => prev.filter(p => !productsToRemove.includes(p._id)));
+        })
+        
+        if (!socket.emittedTestMessage) {
+            socket.emit("testMessage", "Hello from client!");
+            socket.emittedTestMessage = true;
+        }
+
+        return ()  => {
+            socket.off('serverMessage')
+            socket.off('postedProductDelete')
+        }
+    }, [])
+
 
     // Fetch all products
     const fetchProducts = async () => {
         try {
             const res = await fetch(`${API_URL}/api/products`)
             const data = await res.json();
-            console.log('Products from API: ', data)
 
-            console.log('USER', user)
             const visibleProducts = user
                 ? (user.role === 'admin' || user.role === 'staff')
                     ? data
                     : data.filter((product) => !product.isLocal || user.isLocal)
                 : data;
 
-            console.log('VISIBLE PRODUCTS', visibleProducts)
+            //console.log('VISIBLE PRODUCTS', visibleProducts)
             if (user) {
                 console.log('IS USER LOCAL', user.isLocal);
             } else {
                 console.log('Guest mode (no user)');
             }
             
-
             setProducts(visibleProducts);
-            console.log('!PRODUCTS', products)
-
 
         } catch (err) {
             console.error("Error fetching products:", err);
@@ -53,8 +76,9 @@ export function ProductProvider({ children }) {
         } catch (err) {
             console.error("Error fetching inventory:", err);
         }
-    };
-    
+    }; 
+
+
     // Fetch new products
     const fetchNewProducts = async () => {
         try {
@@ -73,6 +97,25 @@ export function ProductProvider({ children }) {
             console.error('Error fetching newest products.')
         }
     }
+
+    // POLLING: Product polling on new products
+    useEffect(() => {
+        const fetchAllData = async () => {
+            try {
+                await fetchProducts();
+                await fetchNewProducts();
+                console.log('🔄 Data REFETCHED from PRODUCT_CONTEXT')
+            }
+            catch (err) {
+                console.error('Error fetching data:', err)
+            }
+        }
+
+        fetchAllData()
+        const timer = setInterval(fetchAllData, 15000);
+
+        return () => clearInterval(timer)
+    }, [user])
 
     const addProduct = async (inventoryId) => {
         try {

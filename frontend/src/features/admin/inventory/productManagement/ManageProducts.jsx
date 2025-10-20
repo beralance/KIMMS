@@ -26,7 +26,7 @@ export default function ManageProducts() {
     const [search, setSearch] = useState("");
     const [selectedItems, setSelectedItems] = useState([]);
     const [loading, setLoading] = useState(false)
-
+    
     const availableInventory = inventoryItems.filter(
         (item) =>
             item.status === "available" &&
@@ -69,8 +69,9 @@ export default function ManageProducts() {
             await addProduct(id);
         }
         setSelectedItems([]);
+        fetchInventoryItems();
         setLoading(false)
-        fetchInventoryItems(); // refresh inventory state
+
     };
 
     const handleRefresh = async () => {

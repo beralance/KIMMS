@@ -21,6 +21,8 @@ import AuctionListing from "../features/user/auction/AuctionListing";
 import AuctionHistory from '../features/user/auction/AuctionHistory'
 import AuctionHistoryDetails from '../features/user/auction/AuctionHistoryDetails'
 import AuctionProductPreview from '../features/user/auction/AuctionProductPreview'
+import UserOrders from '../features/user/orders/UserOrders'
+
 // Admin Pages
 import Dashboard from '../features/admin/dashboard/Dashboard'
 import Inventory from '../features/admin/inventory/Inventory' // change Inventory to inventory  soon
@@ -49,6 +51,7 @@ import AdminLayout from '../layout/AdminLayout'
 import UserLayout from '../layout/UserLayout'
 import CartLayout from "../layout/CartLayout";
 import AuctionLayout from "../layout/AuctionLayout";
+import UserOrdersLayout from "../layout/UserOrdersLayout";
 
 
 export default function AppRoutes() {
@@ -74,6 +77,14 @@ export default function AppRoutes() {
                     <Checkout/>
                 </UserProtectedRoute>
             }/>
+
+            <Route element={<UserOrdersLayout/>}>
+                <Route path='/my-purchases' element={
+                    <UserProtectedRoute>
+                        <UserOrders/>
+                    </UserProtectedRoute>
+                }/>
+            </Route>
 
             <Route path='/success' element={
                 <UserProtectedRoute>

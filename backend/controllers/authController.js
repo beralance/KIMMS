@@ -460,6 +460,7 @@ export const createStaff = async (req, res) => {
             email,
             password,
             fullName,
+            isVerfied: isVerfied = true,
             role: 'staff',
         });
 
