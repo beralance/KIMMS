@@ -3,6 +3,7 @@ import { Box, TextField, Button, Typography, Stack } from "@mui/material";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext";
 import { verifyEmail, resendCode } from "../../../utils/api";
+import FullScreenLoader from "../../../components/FullScreenLoader";
 
 export default function VerifyForm() {
     const location = useLocation();
@@ -16,14 +17,18 @@ export default function VerifyForm() {
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const inputsRef = useRef([]);
+    const [loading, setLoading] = useState(false)
+
 
     useEffect(() => {
         if (inputsRef.current[0]) {
             inputsRef.current[0].focus()
         }
     }, [])
+
     const handleVerify = async (e) => {
         e.preventDefault();
+        setLoading(true)
         setError("");
         if (!email) {
             setError('Email not provided. Please go back to signup.')
@@ -39,7 +44,6 @@ export default function VerifyForm() {
                 role: data.role,
                 token: data.token,
                 address: data.address,
-                isLocal: data.isLocal,
                 avatar: data.avatar
             });
 
@@ -53,7 +57,11 @@ export default function VerifyForm() {
         } catch (err) {
             setError(err.message);
         }
+        finally {
+            setLoading(false)
+        }
     };
+
     const handleChange = (index, value) => {
         if (/^\d?$/.test(value)) { // allow only one digit
             const newCodes = [...codes];
@@ -74,6 +82,7 @@ export default function VerifyForm() {
     };
 
     const handleResend = async () => {
+        setLoading(true);
         setError("");
         setMessage("");
         try {
@@ -81,6 +90,9 @@ export default function VerifyForm() {
             setMessage("Verification code resent. Check your email.");
         } catch (err) {
             setError(err.message);
+        }
+        finally {
+            setLoading(false)
         }
     };
     
@@ -91,7 +103,7 @@ export default function VerifyForm() {
         <Box>
             <Box 
                 sx={{
-                    backgroundImage: 'url(/modern-styled-entryway.jpg)',
+                    backgroundImage: 'url(/vase-wooden-sideboard-table.jpg)',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
                     backgroundSize: 'cover',

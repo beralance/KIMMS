@@ -64,7 +64,10 @@ export default function LoginForm({ onSuccess }) {
                 userId: data.userId,
                 isLocal: data.isLocal,
                 address: data.address,
-                avatar: data.avatar
+                avatar: data.avatar,
+                phoneNumber: data.phoneNumber,
+                email: data.gender,
+                gender: data.gender,
             })
 
             if (onSuccess) onSuccess(data);
@@ -82,24 +85,6 @@ export default function LoginForm({ onSuccess }) {
         }
         finally {
             setLoading(false)
-        }
-    }
-
-    {/*Sign in with google*/}
-    const handleFacebookLogin = async () => {
-        try {
-            const result = await signInWithPopup(auth, facebookProvider)
-            const user = user.user;
-
-            console.log('Facebook user: ', user)
-            /*
-            await axios.post('api/users/oauth', {
-                uid: user.uid,
-            })
-            */ 
-        }
-        catch (error) {
-            console.error('Facebook login error:', error)
         }
     }
 
@@ -154,7 +139,10 @@ export default function LoginForm({ onSuccess }) {
                 fullName: data.fullName,
                 userId: data.userId,
                 isLocal: data.isLocal,
+                email: data.email,
+                gender: data.gender,
                 address: data.address,
+                phoneNumber: data.phoneNumber,
                 avatar: data.avatar
             });
 

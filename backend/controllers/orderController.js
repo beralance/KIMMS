@@ -9,7 +9,7 @@ export const getOrdersForPolling = async (req, res) => {
         const orders = await Order.find()
             .populate({
                 path: "products.productId", 
-                select: 'productName physicalCode images price category condition price isLocal',
+                select: 'productName physicalCode images price category details description condition price isLocal',
                 populate:{
                     path: 'category',
                     select: 'name',
@@ -78,7 +78,7 @@ export const getOrders = async (req, res) => {
         const orders = await Order.find(query)
             .populate({
                 path: "products.productId", 
-                select: 'productName physicalCode images price category condition price isLocal',
+                select: 'productName physicalCode images price details description category condition price isLocal',
                 populate:{
                     path: 'category',
                     select: 'name',
@@ -120,7 +120,7 @@ export const getOrder = async (req, res) => {
         const order = await Order.findById(req.params.id)
             .populate({
                 path: "products.productId", 
-                select: 'productName images prices category isLocal condition',
+                select: 'productName images prices details description category isLocal condition',
                 populate: {
                     path: 'category',
                     select: 'name',

@@ -8,18 +8,18 @@ import { Box, Button, CardActions, IconButton } from '@mui/material';
 
 export default function ProductCartRecommendation ({ product, onNavigate }) { 
     return (
-        <Card sx={{ boxShadow: 'none', width: 200, borderRadius: 2}}>
+        <Card sx={{ boxShadow: 2, width: 200, borderRadius: 1,}}>
             <CardMedia
                 onClick={onNavigate}
-                sx={{ minHeight: 100, maxHeight: 500, height: '100%', aspectRatio: '9/10'}}
+                sx={{ cursor: 'pointer', borderRadius: 0, minHeight: 100, maxHeight: 500, height: '100%', aspectRatio: '9/10'}}
                 image={product.images[0]}
                 title={product.name}
             />
             <CardContent sx={{ flexGrow: 1, px: 1, py: 2 }}>
-                <Typography noWrap sx={{ fontWeight: 'bold', fontSize: {xs: 18, md: 25, xl: 30, }, mb: 1 }}>
+                <Typography noWrap variant='body1'>
                     {product.productName}
                 </Typography>
-                <Typography sx={{ color: 'secondary.main', fontSize: {xs: 15, md: 22, xl: 27, }, }}>
+                <Typography variant='body2' color='secondary'>
                     <span style={{fontWeight: 'bold'}}>PHP</span> {product.price.toLocaleString()}
                 </Typography>
             </CardContent>

@@ -46,7 +46,7 @@ function HideOnScroll ({children}) {
     ];
 
     const userLinks = [
-        { label: 'Account', to: '/*', icon: < LockIcon style={{color: "black", width: 17}}/> },
+        { label: 'Account', to: '/account', icon: < LockIcon style={{color: "black", width: 17}}/> },
         { label: 'My Purchases', to: '/my-purchases', icon: < Package2Icon style={{color: "black", width: 17}}/> },
         { label: 'Notification', to: '/*', icon: < BellIcon style={{color: "black", width: 17}}/> },
     ]

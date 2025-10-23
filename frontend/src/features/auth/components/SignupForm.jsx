@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Box, TextField, Button, Typography, InputAdornment, IconButton, Container, Stack, FormControl, InputLabel, Select, MenuItem, CircularProgress, Divider } from "@mui/material";
-import { Google, Visibility, VisibilityOff } from "@mui/icons-material";
+import { DataArray, Google, Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { signupUser } from "../../../utils/api"; // <- new import
 import phData from '../../../data/phData.json'
@@ -76,8 +76,6 @@ export default function SignUpForm() {
             return
         }
 
-        
-
         // avatar
         const genderValue = gender || 'other'
         let avatar;
@@ -98,7 +96,21 @@ export default function SignUpForm() {
         try {
             setLoading(true)
             const data = await signupUser(payload)
-            if (onRegisterSuccess) onRegisterSuccess({userId: data.userId, email: data.email})
+            if (onRegisterSuccess) {
+                login({
+                    userId: data.userId,
+                    fullName: data.fullName,
+                    role: data.role,
+                    token: data.token,
+                    address: data.address,
+                    isLocal: data.isLocal,
+                    avatar: data.avatar,
+                    gender: data.gender,
+                    phoneNumber: data.phoneNumber,
+                    email: data.email,
+                }) 
+                onRegisterSuccess({userId: data.userId, email: data.email})
+            }
         } 
         catch (err) {
             let message = 'Signup failed'
@@ -115,9 +127,6 @@ export default function SignUpForm() {
         setLoading(true)
         try {
             const firebaseData = await signupWithGoogle();
-            
-            console.log('')
-            console.log('FIREBASE DATA ', firebaseData)
 
             const payload = {
                 email: firebaseData.email,
@@ -128,18 +137,12 @@ export default function SignUpForm() {
                 gender: 'other',
             }
 
-            console.log('PAYLOAD ', firebaseData)
-            console.log('PAYLOAD ', payload)
-
             if (!payload.email || !payload.fullName || !payload.googleId) {
                 showSnackbar("Google signup data is incomplete", "error");
                 return;
             }
 
             const backendData = await signupUser(payload)
-
-            console.log('BACKEND DATA', backendData)
-            console.log('BACKEND DATA googleID', backendData.userId)
 
             if (onRegisterSuccess) {
                 login({
@@ -148,8 +151,11 @@ export default function SignUpForm() {
                     role: backendData.role,
                     token: backendData.token,
                     address: backendData.address,
+                    gender: backendData.gender,
+                    phoneNumber: backendData.phoneNumber,
                     isLocal: backendData.isLocal,
-                    avatar: backendData.avatar
+                    avatar: backendData.avatar,
+                    email: backendData.email,
                 });
                 showSnackbar(backendData.message, 'success')
                 navigate(`/auth/signup/address?id=${backendData.userId}`);

@@ -14,6 +14,7 @@ const DEFAULT_AVATARS = {
     female: 'https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-female-01.svg.svg',
     other: 'https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-male-01.svg',
 }
+
 // SIGN UP (user)
 export const signup = async (req, res) => {
     try {
@@ -28,7 +29,9 @@ export const signup = async (req, res) => {
         if (!googleId && (!password || typeof password !== 'string' || password.length < 6)) {
             return res.status(400).json({error: 'Password is required for local signup (min 6 chars)'})
         }
-
+        if (phoneNumber && !/^09\d{9}$/.test(phoneNumber)) {
+           return res.status(400).json({ error: 'Invalid phone number format' });
+        }
         const orCondition = [{email}]
         if (googleId) orCondition.push({googleId})
         // check if user already exists
@@ -80,16 +83,13 @@ export const signup = async (req, res) => {
             });
         }
 
-        console.log('IS NEW USER LOCAL FROM AUTH, this should be true', newUser)
-        console.log('IS NEW USER LOCAL FROM AUTH, this should be true', newUser.isLocal)
+        const token = jwt.sign(
+            { id: newUser._id, role: newUser.role, isLocal: newUser.isLocal },
+            process.env.JWT_SECRET,
+            {expiresIn: '12h'}
+        )
 
         if (isGoogle) {
-            const token = jwt.sign(
-                { id: newUser._id, role: newUser.role, isLocal: newUser.isLocal },
-                process.env.JWT_SECRET,
-                {expiresIn: '12h'}
-            )
-
             return res.status(201).json({
                 message: 'Google signup successful',
                 token,
@@ -98,13 +98,24 @@ export const signup = async (req, res) => {
                 address: newUser.address,
                 fullName: newUser.fullName,
                 isLocal: newUser.isLocal,
-                avatar: newUser.avatar
+                email: newUser.email,
+                avatar: newUser.avatar,
+                gender: newUser.gender || '',
+                phoneNumber: newUser.phoneNumber || '',
             })
         }
         res.status(201).json({
             message: 'Signup successful. Please verify your email.',
+            token,
             userId: newUser._id,
+            role: newUser.role,
+            address: newUser.address,
+            fullName: newUser.fullName,
+            isLocal: newUser.isLocal,
+            avatar: newUser.avatar,
             email: newUser.email,
+            gender: newUser.gender || '',
+            phoneNumber: newUser.phoneNumber || '',
         });
     } catch (err) {
         console.error('Signup error deatils: ', err)
@@ -121,18 +132,8 @@ export const updateAddress = async (req, res) => {
         return res.status(400).json({error: 'Address is required'})
     }
 
-    console.log('USER ID', userId)
-    console.log('ADDRESS', address)
-    console.log(address)
-
     try {
-        //const isLocal = address?.region === '05'
-        console.log('BACKEND IS LOCAL REGION 5 CHECK', address.address?.region)
-        console.log('BACKEND IS LOCAL REGION 5 CHECK', address?.region)
-        console.log('BACKEND IS LOCAL REGION 5 CHECK', address?.region === '05')
-
         const isLocal = address.region === '05'
-        console.log('BACKEND IS LOCAL REGION 5 CHECK', isLocal)
 
         const user = await User.findByIdAndUpdate(
             userId,
@@ -169,8 +170,6 @@ export const verifyEmail = async (req, res) => {
     try {
         const { email, code } = req.body;
         const user = await User.findOne({ email });
-        console.log('user', user, email)
-        const isLocal = user.address.region === '05'
 
         if (!user) return res.status(400).json({ error: 'User not found' });
         if (user.isVerified) return res.status(400).json({ error: 'Already verified' });
@@ -190,7 +189,8 @@ export const verifyEmail = async (req, res) => {
 
         // generate token after verification
         const token = jwt.sign(
-            { id: user._id, role: user.role, isLocal},
+            { id: user._id, role: user.role},
+
             process.env.JWT_SECRET,
             { expiresIn: '12h' }
         );
@@ -199,10 +199,11 @@ export const verifyEmail = async (req, res) => {
             message: 'Email verified successfully',
             token,
             userId: user._id,
+            gender: user.gender,
             role: user.role,
             address: user.address,
+            phoneNumber: user.phoneNumber,
             fullName: user.fullName,
-            isLocal,
             avatar: user.avatar
         });
     } catch (err) {
@@ -284,6 +285,9 @@ export const login = async (req, res) => {
             role: user.role,
             fullName: user.fullName,
             address: user.address,
+            email: user.email,
+            phoneNumber: user.phoneNumber,
+            gender: user.gender,
             isLocal,
             allowedModules,
             avatar: user.avatar,
@@ -329,6 +333,7 @@ export const googleLogin = async (req, res) => {
             userId: user._id,
             fullName: user.fullName,
             role: user.role,
+            email: user.email,
             isLocal: user.isLocal,
             address: user.address,
             avatar: user.avatar
@@ -345,7 +350,7 @@ export const updateUserProfile = async (req, res) => {
     try {
         const userId = req.user.id;
         const { fullName, gender, phoneNumber, address } = req.body;
-
+        console.log('USER', phoneNumber)
         // Ensure at least one field is provided
         if (!fullName && !gender && !phoneNumber && !address) {
             return res.status(400).json({ error: 'No field to update' });
@@ -357,7 +362,13 @@ export const updateUserProfile = async (req, res) => {
         // Update fields if provided
         if (fullName) user.fullName = fullName.trim();
         if (gender) user.gender = gender;
-        if (phoneNumber) user.phoneNumber = phoneNumber;
+        if (phoneNumber && !/^09\d{9}$/.test(phoneNumber)) {
+           return res.status(400).json({ error: 'Invalid phone number format' });
+        }
+        user.phoneNumber = phoneNumber;
+        if (address && typeof address !== 'object') {
+            return res.status(400).json({error: 'Invlid address format'})
+        }
 
         if (address && typeof address === 'object') {
             user.address = {
@@ -368,10 +379,12 @@ export const updateUserProfile = async (req, res) => {
 
         await user.save();
 
+        console.log('user user', user)
         res.status(200).json({
             message: 'Profile updated successfully',
             user: {
                 id: user._id,
+                googleId: user.googleId,
                 email: user.email,
                 fullName: user.fullName,
                 gender: user.gender,
@@ -386,6 +399,127 @@ export const updateUserProfile = async (req, res) => {
         res.status(500).json({ error: 'Server error: failed to update profile' });
     }
 };
+
+// Update user password
+export const updatePassword = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const {currentPassword, newPassword} = req.body;
+
+        console.log('BODY', req.body)
+        console.log('User', userId)
+        const user = await User.findById(userId)
+        if (!user) return res.status(404).json({error: 'User not found'});
+
+        if (user.googleId) {
+            return res.status(400).json({error: 'Google user cannot change password'})
+        }
+        console.log('_____________________________')
+        console.log('DEBUG - currentPassword:', currentPassword)
+        console.log('DEBUG - currentPassword:', newPassword)
+        console.log('DEBUG - user.password:', user.password)
+        const isMatch = await bcrypt.compare(currentPassword, user.password)
+        console.log('MATCH ', isMatch)
+        if (!isMatch) return res.status(400).json({error: 'Current password is incorrect'});
+
+        user.password = newPassword
+        await user.save()
+
+        res.status(200).json({message: 'Password updates successfully'})
+    }
+    catch (err) {
+        console.error('Error updating password:', err)
+        res.status(500).json({error: 'Server error: failed to update password'})
+    }
+}
+
+// Update user email
+export const updateEmail = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { newEmail, currentPassword } = req.body;
+
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        // Restrict Google users
+        if (user.googleId) {
+            return res.status(400).json({ error: 'Google user cannot change email here' });
+        }
+
+        // Verify current password for security
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ error: 'Current password is incorrect' });
+        }
+
+        // Check if new email already exists
+        const existingUser = await User.findOne({ email: newEmail });
+        if (existingUser) {
+            return res.status(400).json({ error: 'Email already in use' });
+        }
+
+        // Generate verification code & expiry (same as signup)
+        const code = generateCode(6);
+        const expiry = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
+
+        // Store temporary verification data
+        user.pendingEmail = newEmail;
+        user.verificationCode = code;
+        user.verificationExpiry = expiry;
+        await user.save();
+
+        // Send verification email
+        await sendEmail({
+            to: newEmail,
+            subject: 'Verify Your New Email Address',
+            text: `Your verification code is ${code}`,
+            html: `<p>Your verification code is <b>${code}</b>. It will expire in 10 minutes.</p>`,
+        });
+
+        res.status(200).json({
+            message: 'Verification code sent to your new email. Please verify to complete the update.',
+        });
+    } catch (err) {
+        console.error('Error updating email:', err);
+        res.status(500).json({ error: 'Server error: failed to update email' });
+    }
+};
+
+export const verifyNewEmail = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { code } = req.body;
+
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        // Check if there's a pending email
+        if (!user.pendingEmail)
+        return res.status(400).json({ error: 'No pending email to verify' });
+
+        // Verify code and expiry
+        if (user.verificationCode !== code)
+        return res.status(400).json({ error: 'Invalid verification code' });
+
+        if (Date.now() > user.verificationExpiry)
+        return res.status(400).json({ error: 'Verification code expired' });
+
+        // ✅ Update actual email and clear temp fields
+        user.email = user.pendingEmail;
+        user.pendingEmail = undefined;
+        user.verificationCode = undefined;
+        user.verificationExpiry = undefined;
+
+        await user.save();
+
+        res.status(200).json({ message: 'Email updated successfully' });
+    } catch (err) {
+        console.error('Error verifying new email:', err);
+        res.status(500).json({ error: 'Server error: failed to verify email' });
+    }
+};
+
 
 export const updateUserAvatar = async (req, res) => {
     try {

@@ -22,6 +22,7 @@ import AuctionHistory from '../features/user/auction/AuctionHistory'
 import AuctionHistoryDetails from '../features/user/auction/AuctionHistoryDetails'
 import AuctionProductPreview from '../features/user/auction/AuctionProductPreview'
 import UserOrders from '../features/user/orders/UserOrders'
+import SoldProductDetails from '../features/user/shop/SoldProductDetails'
 
 // Admin Pages
 import Dashboard from '../features/admin/dashboard/Dashboard'
@@ -43,8 +44,14 @@ import Auth from '../features/auth/Auth'
 import SignupForm from '../features/auth/components/SignupForm'
 import LoginForm from '../features/auth/components/LoginForm'
 import VerifyForm from '../features/auth/components/VerifyForm'
-import AddressForm from "../features/auth/components/AddressForm";
-import AccountDelete from '../features/auth/components/AccountDelete'
+import AccountDelete from '../features/auth/accountUpdate/AccountDelete'
+import AccountPreview from '../features/auth/accountUpdate/AccountPreview'
+import AddressForm from '../features/auth/accountUpdate/AddressForm'
+import UpdateAccount from '../features/auth/accountUpdate/UpdateAccount'
+import UpdateGeneral from '../features/auth/accountUpdate/UpdateGeneral'
+import UpdateEmail from '../features/auth/accountUpdate/UpdateEmail'
+import UpdatePassword from '../features/auth/accountUpdate/UpdatePassword'
+
 
 // Layouts
 import AdminLayout from '../layout/AdminLayout'
@@ -52,7 +59,7 @@ import UserLayout from '../layout/UserLayout'
 import CartLayout from "../layout/CartLayout";
 import AuctionLayout from "../layout/AuctionLayout";
 import UserOrdersLayout from "../layout/UserOrdersLayout";
-
+import AccountLayout from "../layout/AccountLayout";
 
 export default function AppRoutes() {
     return (
@@ -63,14 +70,29 @@ export default function AppRoutes() {
                 <Route path='signup' element={<SignupForm/>}/>
             </Route>
             <Route path="/auth/signup/verify" element={<VerifyForm/>}/>
-            <Route path="/auth/signup/address" element={<AddressForm/>}/> {/*Use only when user doesnt have an address*/}
-            <Route path="/auth/account-deletion" element={<AccountDelete/>}/>
+            <Route path="/auth/signup/address" element={<AddressForm/>}/>
+            <Route element={<AccountLayout/>}>
+                <Route path="/account" element={<AccountPreview/>}/>
+                <Route path="/account/update" element={<UpdateAccount/>}/>
+                <Route path="/account/update-information" element={<UpdateGeneral/>}/>
+                <Route path="/account/update-email" element={<UpdateEmail/>}/>
+                <Route path="/account/update-address" element={<AddressForm/>}/>
+                <Route path="/account/update-password" element={<UpdatePassword/>}/>
+                <Route path="/account/account-deletion" element={<AccountDelete/>}/>
+            </Route>
             {/*
             <Route path='/auth/login' element={<Auth/>}/>
             <Route path='/auth/signup' element={<Auth/>}/>
             <Route path="/auth/signup/verify" element={<VerifyForm/>}/>
             */}
+
             <Route path="/product/:id" element={<ProductDetails/>}/>
+
+            <Route path="/product/sold/:id" element={
+                <UserProtectedRoute>
+                    <SoldProductDetails/>
+                </UserProtectedRoute>
+            }/>
                 
             <Route path='/checkout' element={
                 <UserProtectedRoute>

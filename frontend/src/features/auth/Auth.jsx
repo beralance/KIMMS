@@ -17,6 +17,7 @@ export default function Auth() {
     }, [location.pathname])
 
     const onRegisterSuccess = (user) => {
+        console.log('useaskfhlaskdjflkajsdkljf', user)
         navigate(`/auth/signup/verify?email=${encodeURIComponent(user.email)}&id=${user.userId}`);
     };
 

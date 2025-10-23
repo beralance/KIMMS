@@ -97,8 +97,8 @@ export default function ProfilePicker({ open, handleClose, avatar, userId, token
 
                     {uploadPreview && (
                         <>
-                            <Box sx={{ textAlign: "center", my: 5, display: 'flex', justifyContent: 'center'}}>
-                                <Box sx={{width: 150, height: 150, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', borderRadius: '999px'}}>
+                            <Box sx={{ textAlign: "center", py: 5, display: 'flex', justifyContent: 'center'}}>
+                                <Box sx={{width: 150, height: 150, display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative', alignItems: 'center', borderRadius: '999px'}}>
                                     <img
                                         src={uploadPreview}
                                         style={{width: '100%', marginBottom: 5, height: '100%', objectFit: 'cover', aspectRatio: '1/1'}}

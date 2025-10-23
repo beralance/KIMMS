@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
         enum: ['male', 'female', 'other'],
         default: 'other'
     },
+    pendingEmail: {type: String},
     
     // OAuth info
     googleId: { type: String, unique: true, sparse: true},

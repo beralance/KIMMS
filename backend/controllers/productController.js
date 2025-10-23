@@ -203,11 +203,11 @@ export const getProductsByHighlight = async (req, res) => {
         if (type === 'mostViewed') {
             products = await Product.find({ visibility: 'active' })
                                     .sort({ views: -1 })
-                                    .limit(5); // limit max 20: change 5 to 20
+                                    .limit(10); // limit max 20: change 5 to 20
         } else if (type === 'featured') {
             products = await Product.find({ visibility: 'active', highlight: type })
                                     .sort({ createdAt: -1 })
-                                    .limit(5)
+                                    .limit(10)
                                     .populate('category', 'name');
         } else {
             products = await Product.find({ visibility: 'active', highlight: type })
@@ -234,7 +234,7 @@ export const updateProductHighlight = async (req, res) => {
         // Enforce limit only for featured or mostViewed
         if (highlight === 'featured' || highlight === 'mostViewed') {
             const count = await Product.countDocuments({ highlight });
-            if (count >= 5) { // max 20
+            if (count >= 10) { // max 20
                 return res.status(400).json({ message: `${highlight} limit reached (max 5)` });
             }
         }

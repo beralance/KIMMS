@@ -106,7 +106,7 @@ const theme = createTheme({
             textTransform: 'none'
         },
         subtitle1: {
-            fontFamily: [
+           fontFamily: [
                 'Poppins', 
                 'Helvetica Neue', 
                 'Segoe UI', 
@@ -115,8 +115,9 @@ const theme = createTheme({
                 'Verdana', 
                 'sans-serif'
             ].join(','),
-            fontWeight: 'thin',
+            fontWeight: 380,
             lineHeight: 1.7,
+            fontSize: '1.1rem',
             letterSpacing: '0.02em',
         },
         subtitle2: {
@@ -129,8 +130,9 @@ const theme = createTheme({
                 'Verdana', 
                 'sans-serif'
             ].join(','),
-            fontWeight: 'thin',
+            fontWeight: 350,
             lineHeight: 1.7,
+            fontSize: '1rem',
             letterSpacing: '0.02em',
         },
     },
