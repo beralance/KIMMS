@@ -24,7 +24,7 @@ import AuctionHistoryDetails from '../features/user/auction/AuctionHistoryDetail
 import AuctionProductPreview from '../features/user/auction/AuctionProductPreview'
 import UserOrders from '../features/user/orders/UserOrders'
 import SoldProductDetails from '../features/user/shop/SoldProductDetails'
-import Notification from "../features/user/notification/notification";
+import Notification from "../features/user/Notification/notification";
 
 
 // Admin Pages
