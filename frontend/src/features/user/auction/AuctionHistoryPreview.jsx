@@ -24,55 +24,31 @@ const AuctionHistoryPreview = () => {
     }, []);
     return (
         <Stack direction={'row'} gap={2} sx={{overflowX: 'auto', scrollBehavior: 'smooth', bgcolor: '#f0f0f0', borderRadius: 1, p: 1}}>
-            <Swiper
-                effect={'coverflow'}
-                grabCursor={true}
-                centeredSlides={true}
-                slidesPerView={'auto'}
-                loop={true}
-                coverflowEffect={{
-                    rotate: 50,
-                    stretch: 0,
-                    depth: 200,
-                    modifier: 1,
-                    slideShadows: true,
-                }}
-                style={{
-                    paddingBlock: '.5rem',
-                    paddingInline: '1.5rem',
-                }}
-                modules={[EffectCoverflow]}
-                className="mySwiper"
-            >     
-                {auctions.slice(0, 5).map((auction) => (
-                    <SwiperSlide key={auction._id}>
-                        <Stack bgcolor={'white'} sx={{p: 1, borderRadius: 1, boxShadow: 2}}>
-                            <Box sx={{height: 360}}>
-                                <img 
-                                    src={auction.inventoryId?.images[0]} 
-                                    style={{
-                                        width: '100%', 
-                                        height: '100%', 
-                                        display: 'block', 
-                                        objectFit: 'cover',
-                                        borderRadius: '2px',
-                                    }}
-                                />
-                            </Box>
-                            <Stack sx={{my: 1}}>
-                                <Box sx={{overflow: 'hidden', maxWidth: '100%'}}>
-                                    <Typography variant="body2" align='center' noWrap color="secondary" sx={{textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{auction.inventoryId?.productName}</Typography>
-                                </Box>
-                                <Box>
-                                    <Typography variant="body2" align='center' color="gray">{auction.inventoryId?.condition}</Typography>
-                                </Box>
-                            </Stack>
-                        </Stack>
-                    </SwiperSlide>
-                ))}
-            </Swiper>
+            {auctions.slice(0, 5).map((auction) => (
+                <Stack key={auction._id} bgcolor={'white'} sx={{p: 1, borderRadius: 1, boxShadow: 2}}>
+                    <Box sx={{width: 150, height: 200}}>
+                        <img 
+                            src={auction.inventoryId?.images[0]} 
+                            style={{
+                                width: '100%', 
+                                height: '100%', 
+                                display: 'block', 
+                                objectFit: 'cover',
+                                borderRadius: '2px',
+                            }}
+                        />
+                    </Box>
+                    <Stack sx={{my: 1}}>
+                        <Box sx={{overflow: 'hidden', maxWidth: '100%'}}>
+                            <Typography variant="body2" align='center' noWrap color="secondary" sx={{textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{auction.inventoryId?.productName}</Typography>
+                        </Box>
+                        <Box>
+                            <Typography variant="body2" align='center' color="gray">{auction.inventoryId?.condition}</Typography>
+                        </Box>
+                    </Stack>
+                </Stack>
+            ))}
         </Stack>
-
     )
 }
 

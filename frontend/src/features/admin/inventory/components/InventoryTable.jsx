@@ -339,33 +339,33 @@ export default function InventoryTable({ searchTerm }) {
 
     return (
         <>
-            <TableContainer component={Paper} sx={{borderRadius: 2, maxHeight: '80vh', overflowY: 'auto'}}>
+            <TableContainer component={Paper} sx={{borderRadius: 2, minHeight: '40vh', maxHeight: '80vh', overflowY: 'auto'}}>
                 <Table aria-label="inventory table">
                     <TableHead sx={{position: 'sticky', top: 0, zIndex: 500, boxShadow: 5}}>
                         <TableRow sx={{bgcolor: '#37353E'}}>
                             <TableCell/>
                             <TableCell sx={{ cursor: 'pointer'}} onClick={() => handleSort('productName')}>
-                                <Typography fontWeight='bold' variant="subtitle2" color="white" noWrap width={120}>
+                                <Typography fontWeight='bold' variant="body2" color="white" noWrap width={120}>
                                     Product {sortConfig.key === 'productName' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
                                 </Typography>
                             </TableCell>
                             <TableCell sx={{fontWeight: 'bold', cursor: 'pointer'}} onClick={() => handleSort('physicalCode')}>
-                                <Typography fontWeight='bold' variant="subtitle2" color="white" noWrap width={120}>
+                                <Typography fontWeight='bold' variant="body2" color="white" noWrap width={120}>
                                     Physical Code {sortConfig.key === 'physicalCode' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
                                 </Typography>
                             </TableCell>
                             <TableCell sx={{fontWeight: 'bold', cursor: 'pointer'}} onClick={() => handleSort('category')}>
-                                <Typography fontWeight='bold' variant="subtitle2" color="white" noWrap width={120}>
+                                <Typography fontWeight='bold' variant="body2" color="white" noWrap width={120}>
                                     Category {sortConfig.key === 'category' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
                                 </Typography>
                             </TableCell>
                             <TableCell sx={{fontWeight: 'bold', cursor: 'pointer'}} onClick={() => handleSort('price')}>
-                                <Typography fontWeight='bold' variant="subtitle2" color="white" noWrap width={120}>
+                                <Typography fontWeight='bold' variant="body2" color="white" noWrap width={120}>
                                     Price {sortConfig.key === 'price' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
                                 </Typography>
                             </TableCell>
                             <TableCell sx={{fontWeight: 'bold', cursor: 'pointer'}} onClick={() => handleSort('createdAt')}>
-                                <Typography fontWeight='bold' variant="subtitle2" color="white" noWrap width={120}>
+                                <Typography fontWeight='bold' variant="body2" color="white" noWrap width={120}>
                                     Date Created {sortConfig.key === 'createdAt' && (sortConfig.direction === 'asc' ? '▲' : '▼')}
                                 </Typography>
                             </TableCell>
@@ -388,8 +388,15 @@ export default function InventoryTable({ searchTerm }) {
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={5} align="center">
-                                    No results found.
+                                <TableCell colSpan={7} align="center">
+                                    <Box sx={{ width: '100%', py: 2}}>
+                                        <Typography variant="subtitle2" color="secondary">
+                                            No Product listed
+                                        </Typography>
+                                        <Typography variant="body2" color="gray">
+                                            Click the "+" button to add.
+                                        </Typography>
+                                    </Box>
                                 </TableCell>
                             </TableRow>
                         )}

@@ -1,20 +1,45 @@
-import React, { useState } from 'react'
-import { Box, Button, ButtonGroup, CircularProgress, Container, Skeleton, Stack, Typography } from '@mui/material'
-import AdminAutoSlideCarousel from '../../../components/AdminAutoSlideCarousel'
+import React, { useEffect, useState } from 'react'
+import {Box, Grid, Typography, Card, CardContent, Button, Divider, Stack, ButtonGroup, Container,} from "@mui/material";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend,} from "recharts";
 import { useNavigate } from 'react-router-dom'
-import AdminHero from './AdminHero'
-import {LocalizationProvider} from '@mui/x-date-pickers'
-import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs'
-import {DateCalendar} from '@mui/x-date-pickers'
-import {fetchCombinedReport} from '../../../utils/reportsApi'
-import dayjs from 'dayjs'
-import { useEffect } from 'react'
+import { useReport } from '../../../contexts/ReportContext';
+import AdminHero from './components/AdminHero'
+import BasicDataSection from './components/BasicDataSection'
+import ChartSection from './components/ChartSection'
+import OrdersSection from './components/OrdersSection'
+import CardUpdates from './components/CardUpdates'
+import SectionWrapper from '../../../components/SectionWrapper'
+import CalendarWidget from './components/CalendarWidget';
+import { CalendarPlusIcon, ChevronRightIcon, PackagePlusIcon, SquarePlusIcon } from 'lucide-react';
 
 
 const Dashboard = () => {
     const navigate = useNavigate()
-    const [reportData, setReportData] = useState(null)
-    const [loading, setLoading] = useState(false)
+    const {
+        fetchReports,
+        totalProducts,
+        totalRevenue,
+        liveAuctions,
+        activeListings,
+        newAddedItem,
+        categoryBreakdown,
+        recentlySold,
+        pendingProducts,
+        mostViewed,
+        pendingOrders,
+        confirmedOrders,
+        processingOrders,
+        outForDeliveryOrders,
+        newPostedProduct,
+        inventoryItems,
+        alerts,
+        auctionOrders,
+        fixedOrders,
+        paidOrders,
+        pendingPayments,
+        totalOrders,
+        conditionBreakdown,
+    } = useReport()
 
     const goToAddInventory = () => {
         navigate('/admin/inventory/manage-inventory', {state: {openDialog: true}})
@@ -26,112 +51,122 @@ const Dashboard = () => {
         navigate('/admin/inventory/manage-auction', {state: {openDialog: true}})
     }
 
+    const categoryData = Object.entries(categoryBreakdown).map(([name, value]) => ({
+        name,
+        value,
+    }))
+
+    const conditionData = Object.entries(conditionBreakdown).map(([name, value]) => ({
+        name,
+        value,
+    }))
+
 
     useEffect(() => {
-        const loadReport = async () => {
-            try {
-                const data = await fetchCombinedReport({period: 'month'})
-                setReportData(data)
-            }
-            catch(error) {
-                console.error('Failed to load report:', error)
-            }
-        }
-        loadReport()
-    }, [])
+        fetchReports({ period: "week" });
+    }, []);
 
 
     return (
-        <>
-            <Box >
-                <AdminHero/>
-            </Box>
-            <Stack sx={{pb: 20}}>
-                <Stack>
-                    {reportData ? (
-                        <Stack>
-                            {/*
-                                <Box>
-                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                        <DateCalendar views={['day']} readOnly/>
-                                    </LocalizationProvider>
-                                </Box>
-                                <Stack>
-                                <div className="dashboard">
-                                    <section className="inventory-cards">
-                                        <div className="card">Total Products: {reportData.inventory.totalProducts}</div>
-                                        <div className="card">Active Listings: {reportData.inventory.activeListings}</div>
-                                        <div className="card">Sold This Week: {reportData.inventory.soldThisWeek}</div>
-                                        <div className="card">Total Sold: {reportData.inventory.soldItems}</div>
-                                    </section>
-
-                                    <section className="auctions-cards">
-                                        <div className="card">Total Auctions: {reportData.auctions.totalAuctions}</div>
-                                        <div className="card">Live: {reportData.auctions.liveAuctions}</div>
-                                        <div className="card">Pending: {reportData.auctions.pendingAuctions}</div>
-                                    </section>
-
-                                    <Stack sx={{bgcolor: '#f0f0f0', p: 2, borderRadius: 5, my: 5}} gap={2}>
-                                        <section className="auctions-cards">
-                                            {reportData.auctions.alerts.map((upcoming, index) => (
-                                                <div key={index}>
-                                                    <div className="card" style={{fontWeight: 'bold'}}>Type: {upcoming.type}</div>
-                                                    <div className="card">Upcoming Auction: {upcoming.message}</div>
-                                                </div>
-                                            ))}
-                                        </section>
-                                    </Stack>
-
-                                    <div className="card">Live: {reportData.auctions.liveAuctions}</div>
-                                    <div className="card">Pending: {reportData.auctions.pendingAuctions}</div>
-                                    <section className="alerts">
-                                        <h3>System Alerts</h3>
-                                        <ul>
-                                            {reportData.auctions.alerts.map((alert, i) => (
-                                                <li key={i}>{alert.message}</li>
-                                            ))}
-                                        </ul>
-                                    </section>
-                                </div>
-                            </Stack>
-                            */}
-                        </Stack>
-                        )
-                        :
-                        (
-                            <Box>
-                                <Typography variant="body1" component={'div'} color="initial">
-                                    <CircularProgress/>
-                                    Getting Data...
-                                </Typography>
-                            </Box>
-                        )
-                    }
+        <Box sx={{bgcolor: '#f0f0f0ff', height: '100%', minHeight: '95vh'}}>
+            <Container>
+                <Stack sx={{mb: 3}}>
+                    <AdminHero/>
                 </Stack>
-                <Container>
-                    <Box>
-                        {/*Move quick actions to new component*/}
+                <Stack sx={{gap: 3}}>
+                    <SectionWrapper>
+                        <CalendarWidget/>
+                    </SectionWrapper>
+                    {/*QUICK actions*/}
+                    <SectionWrapper sx={{gap: 2}}>
                         <Stack>
-                            <Typography variant="body1" color="initial">
-                                Quick Actions
-                            </Typography>
+                            <Typography variant="subtitle2" color="initial" >Quick Actions</Typography>
+                            <Typography variant="body2" color="gray" >Jump straight to adding items, posting products, or creating auctions</Typography>
                         </Stack>
-                        <ButtonGroup>
-                            <Button onClick={goToAddInventory}>
-                                Add Inventory
-                            </Button>
-                            <Button onClick={goToPostProduct}>
-                                Post Product
-                            </Button>
-                            <Button onClick={goToCreateAuction}>
-                                Create Auction
-                            </Button>
-                        </ButtonGroup>
+                        <Stack gap={1}>
+                            <Stack>
+                                <Button fullWidth variant='outlined' color='secondary' sx={{display: 'flex', height: 70, alignItems: 'center', justifyContent: 'space-between'}} onClick={goToAddInventory}> 
+                                    <Stack direction={'row'} alignItems={'center'} gap={2}>
+                                        <PackagePlusIcon/>
+                                        Add Inventory
+                                    </Stack>
+                                    <ChevronRightIcon/>
+                                </Button>
+                            </Stack>
+                            <Stack>
+                                <Button fullWidth variant='outlined' color='secondary' sx={{display: 'flex', height: 70, alignItems: 'center', justifyContent: 'space-between'}} onClick={goToPostProduct}> 
+                                    <Stack direction={'row'} alignItems={'center'} gap={2}>
+                                        <SquarePlusIcon/>
+                                        Post Product
+                                    </Stack>
+                                    <ChevronRightIcon/>
+                                </Button>
+                            </Stack>
+                            <Stack>
+                                <Button fullWidth variant='outlined' color='secondary' sx={{display: 'flex', height: 70, alignItems: 'center', justifyContent: 'space-between'}} onClick={goToCreateAuction}> 
+                                    <Stack direction={'row'} alignItems={'center'} gap={2}>
+                                        <CalendarPlusIcon/>
+                                        Create Auction
+                                    </Stack>
+                                    <ChevronRightIcon/>
+                                </Button>
+                            </Stack>
+                        </Stack>
+                    </SectionWrapper>
+
+                    {/* BASIC data section*/}
+                    <SectionWrapper sx={{gap: 2}}>
+                        <Stack>
+                            <Typography variant="subtitle2" color="initial" >Shop Overview</Typography>
+                            <Typography variant="body2" color="gray" >Quick insights into sales, stock, and active products</Typography>
+                        </Stack>
+                        <BasicDataSection totalProducts={totalProducts} inventoryItems={inventoryItems} totalOrders={totalOrders} totalRevenue={totalRevenue} liveAuctions={liveAuctions} activeListings={activeListings}/>
+                    </SectionWrapper>
+
+                    {/* ORDER data section*/}
+                    <SectionWrapper sx={{gap: 2}}>
+                        <Stack>
+                            <Typography variant="subtitle2" color="initial">Orders Overview</Typography>
+                            <Typography variant="body2" color="gray">Track the total number of orders and their current progress</Typography>
+                        </Stack>
+                        <OrdersSection pendingOrders={pendingOrders} confirmedOrders={confirmedOrders} processingOrders={processingOrders} outForDeliveryOrders={outForDeliveryOrders} totalOrders={totalOrders}/>
+                    </SectionWrapper>
+                    
+                    <Box>
+                        <ChartSection categoryData={categoryData} conditionData={conditionData} totalRevenue={totalRevenue}/>
                     </Box>
-                </Container>
-            </Stack>
-        </>
-    )       
+                    <SectionWrapper sx={{gap: 2}}>
+                        <Stack>
+                            <Typography variant="subtitle2" color="initial" >Most Viewed</Typography>
+                            <Typography variant="body2" color="gray" >Items catching the most attention from shoppers recently</Typography>
+                        </Stack>
+                        <CardUpdates data={mostViewed}/>
+                    </SectionWrapper>
+                    <SectionWrapper sx={{gap: 2}}>
+                        <Stack>
+                            <Typography variant="subtitle2" color="initial" >Recently Sold</Typography>
+                            <Typography variant="body2" color="gray" >Products that have been recently purchased</Typography>
+                        </Stack>
+                        <CardUpdates data={recentlySold}/>
+                    </SectionWrapper>
+                    <SectionWrapper sx={{gap: 2}}>
+                        <Stack>
+                            <Typography variant="subtitle2" color="initial" >Newly Added in Inventory</Typography>
+                            <Typography variant="body2" color="gray" >Latest product added inside inventory and ready for sale</Typography>
+                        </Stack>
+                        <CardUpdates data={newAddedItem}/>
+                    </SectionWrapper>
+                    <SectionWrapper sx={{gap: 2}}>
+                        <Stack>
+                            <Typography variant="subtitle2" color="initial" >Newly Posted Products</Typography>
+                            <Typography variant="body2" color="gray" >Latest products updloaded to the platform for browsing</Typography>
+                        </Stack>
+                        <CardUpdates data={newPostedProduct}/>
+                    </SectionWrapper>
+                </Stack>
+            </Container>
+        </Box>
+    );      
 }
 
 export default Dashboard

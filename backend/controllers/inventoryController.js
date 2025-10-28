@@ -13,6 +13,9 @@ export const createInventoryItem = async (req, res) => {
         const files = req.files;
         if (!files || files.length === 0) return res.status(400).json({error: 'No files uploaded'})
 
+        const addedBy = req.user?.id
+        console.log('ADDED BY', addedBy)
+        console.log('ADDED BY', req.user)
         const uploadedFiles = [];
 
         for (const file of files) {
@@ -55,6 +58,7 @@ export const createInventoryItem = async (req, res) => {
             category,
             isLocal,
             tags,
+            addedBy: addedBy,
             status: 'available',
             images: uploadedFiles,
         });
@@ -254,18 +258,20 @@ export const getInventoryReportStats = async (options = {}) => {
         }
     }
 
-    const allItems = await Inventory.find(filter);
+    const allItems = await Inventory.find(filter).populate('category', 'name');
+    const newAddedItem = allItems.sort((a, b) => b.createdAt - a.createdAt).slice(0, 5)
 
-    const totalProducts = allItems.length;
-
-    const activeListings = allItems.filter(item => item.status === 'available').length;
-
+    const totalProducts = allItems.filter(item => item.status === 'available' || item.status === 'reserved').length;
+    const inventoryItems = allItems.filter(item => item.status === 'available').length;
+    const activeListings = allItems.filter(item => item.status === 'reserved').length;
     const soldItems = allItems.filter(item => item.status === 'sold').length;
 
     return {
         totalProducts,
         activeListings,
+        inventoryItems,
         soldItems,
+        newAddedItem,
         filteredCount: allItems.length, // useful for frontend display
     };
 };

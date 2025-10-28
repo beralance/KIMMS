@@ -17,6 +17,7 @@ import { ProductContext } from "../../../../contexts/ProductContext";
 import ProductCard from "../components/PostedProductCard";
 import { useOutletContext } from "react-router-dom"; 
 import FullScreenLoader from "../../../../components/FullScreenLoader";
+import SectionWrapper from "../../../../components/SectionWrapper";
 
 function ProductManagement() {
     const { products, fetchProducts } = useContext(ProductContext);
@@ -70,9 +71,9 @@ function ProductManagement() {
     }, [products, searchTerm, category, highlight]);
 
     return (
-        <>
-            <Box sx={{ pb: 4 }}>
-                <Typography variant="h6" color="secondary" sx={{ fontWeight: 'bold' }} gutterBottom>
+        <Stack gap={3}>
+            <Box>
+                <Typography variant="subtitle1" color="secondary" sx={{ fontWeight: 'bold' }} gutterBottom>
                     Posted Products
                 </Typography>
                 {finalProducts.length > 0 &&
@@ -83,77 +84,79 @@ function ProductManagement() {
             </Box>
 
             {/* Filters */}
-            <Stack sx={{bgcolor: '#F0F0F0', borderRadius: 5, p: 2, boxShadow: 3}}>
-                <Stack sx={{mb: 2}}>
-                    {products.length > 0 &&
-                        <Stack direction={'row'} sx={{gap: 2, mt: 2, width: '100%'}}>
-                            <FormControl sx={{width: {xs: '100%'}}}>
-                                <InputLabel>Category</InputLabel>
-                                <Select
-                                    variant="filled"
-                                    value={category}
-                                    label="Category"
-                                    onChange={(e) => setCategory(e.target.value)}
-                                    sx={{
-                                        maxHeight: 50,
-                                        bgcolor: 'transparent',
-                                    }}
-                                >
-                                    <MenuItem value="all">All</MenuItem>
-                                    {categories.map((cat) => (
-                                        <MenuItem key={cat} value={cat}>{cat}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+            <Stack>
+                <SectionWrapper sx={{boxShadow: 4}}>
+                    <Stack sx={{mb: 3}}>
+                        {products.length > 0 &&
+                            <Stack direction={'row'} sx={{gap: 2, mt: 2, width: '100%'}}>
+                                <FormControl sx={{width: {xs: '100%'}}}>
+                                    <InputLabel>Category</InputLabel>
+                                    <Select
+                                        variant="filled"
+                                        value={category}
+                                        label="Category"
+                                        onChange={(e) => setCategory(e.target.value)}
+                                        sx={{
+                                            maxHeight: 50,
+                                            bgcolor: 'transparent',
+                                        }}
+                                    >
+                                        <MenuItem value="all">All</MenuItem>
+                                        {categories.map((cat) => (
+                                            <MenuItem key={cat} value={cat}>{cat}</MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
 
-                            <FormControl sx={{width: {xs: '100%', borderRadius: '999px'}}}>
-                                <InputLabel>Highlight</InputLabel>
-                                <Select
-                                    value={highlight}
-                                    variant="filled"
-                                    label="Highlight"
-                                    onChange={(e) => setHighlight(e.target.value)}
-                                    sx={{
-                                        bgcolor: 'transparent',
-                                        maxHeight: 50,
-                                    }}
-                                >
-                                    <MenuItem value="all">All</MenuItem>
-                                    <MenuItem value="featured">Featured</MenuItem>
-                                    <MenuItem value="none">None</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Stack>
-                    }
-                </Stack>
-                {/* Products Grid */}
-                <Grid container spacing={{ xs: 2, md: 2, lg: 3, xl: 2}} sx={{display: 'flex', justifyContent: 'flex-start'}}>
-                    {finalProducts.length > 0 ? (
-                        finalProducts.map((product) => (
-                            <Grid key={product._id} size={{ xs: 6, sm: 4, md: 3, lg: 3, xl: 2.4}} sx={{ display: 'flex', justifyContent: 'center' }}>
-                                <ProductCard
-                                    product={product}
-                                    onEdit={(id) => console.log("Edit product:", id)}
-                                />
-                            </Grid>
-                        ))
-                    ) : (
-                        <Stack sx={{display: 'flex', width: '100%', mt: 5, justifyContent: 'center', alignItems: 'center'}}>
-                            <Grow in={true} mountOnEnter unmountOnExit timeout={600}>
-                                <img src="/confused.svg" alt="confused" style={{width: 60, opacity: .8, marginBottom: 10}}/>
-                            </Grow>
-                            <Typography variant="body1" color="secondary">
-                                No products found.
-                            </Typography>
-                            <Typography variant="body2" color="grey">
-                                You can post products using the + button
-                            </Typography>
-                        </Stack>
-                    )}
-                </Grid>
+                                <FormControl sx={{width: {xs: '100%', borderRadius: '999px'}}}>
+                                    <InputLabel>Highlight</InputLabel>
+                                    <Select
+                                        value={highlight}
+                                        variant="filled"
+                                        label="Highlight"
+                                        onChange={(e) => setHighlight(e.target.value)}
+                                        sx={{
+                                            bgcolor: 'transparent',
+                                            maxHeight: 50,
+                                        }}
+                                    >
+                                        <MenuItem value="all">All</MenuItem>
+                                        <MenuItem value="featured">Featured</MenuItem>
+                                        <MenuItem value="none">None</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Stack>
+                        }
+                    </Stack>
+                    {/* Products Grid */}
+                    <Grid container spacing={{ xs: 2, md: 2, lg: 3, xl: 2}} sx={{display: 'flex', justifyContent: 'flex-start'}}>
+                        {finalProducts.length > 0 ? (
+                            finalProducts.map((product) => (
+                                <Grid key={product._id} size={{ xs: 6, sm: 4, md: 3, lg: 3, xl: 2.4}} sx={{ display: 'flex', justifyContent: 'center' }}>
+                                    <ProductCard
+                                        product={product}
+                                        onEdit={(id) => console.log("Edit product:", id)}
+                                    />
+                                </Grid>
+                            ))
+                        ) : (
+                            <Stack sx={{display: 'flex', width: '100%', mt: 5, justifyContent: 'center', alignItems: 'center'}}>
+                                <Grow in={true} mountOnEnter unmountOnExit timeout={600}>
+                                    <img src="/confused.svg" alt="confused" style={{width: 60, opacity: .8, marginBottom: 10}}/>
+                                </Grow>
+                                <Typography variant="body1" color="secondary">
+                                    No products found.
+                                </Typography>
+                                <Typography variant="body2" color="grey">
+                                    You can post products using the + button
+                                </Typography>
+                            </Stack>
+                        )}
+                    </Grid>
+                </SectionWrapper>
             </Stack>
             <FullScreenLoader open={loading} message="Getting posted products..."/>
-        </>
+        </Stack>
     );
 }
 

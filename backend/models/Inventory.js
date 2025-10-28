@@ -19,6 +19,7 @@ const inventorySchema = new mongoose.Schema(
         },
         tags: [{type: String}],
         isLocal: {type: Boolean, default: true},
+        addedBy: {type: mongoose.Schema.Types.ObjectId, required: false},
         createdAt: {type: Date, default: Date.now},
     },
     { timestamps: true }

@@ -10,6 +10,7 @@ import {Swiper, SwiperSlide} from 'swiper/react'
 import {EffectFade, Autoplay, Navigation, Pagination} from 'swiper/modules'
 import {ScrollSectionLeft, ScrollSectionRight} from '../../../components/SectionTransitionX'
 import ScrollSection from '../../../components/SectionTransition'
+import { formatNumber } from '../../../utils/stringUtils'
 
 const AuctionProductPreview = () => {
     const [auction, setAuctions] = useState([]);
@@ -36,7 +37,6 @@ const AuctionProductPreview = () => {
                     setIsLive(false)
                     return
                 }
-                console.log('$$$$$$$$Live Auction', liveAuctions)
                 setAuctions(liveAuctions);
             } catch (err) {
                 console.error("Failed to fetch auctions:", err);
@@ -158,11 +158,11 @@ const AuctionProductPreview = () => {
 
                                 <Stack direction={'row'} alignItems={'center'} gap={1} sx={{position: 'absolute', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.3)', zIndex: 1, bottom: 0, left: 0, px: 4, py: 1, m: 2, bgcolor: '#f8f8f8', borderRadius: '999px'}}>
                                     <Typography 
-                                        variant="body1" 
+                                        variant="subtitle2" 
                                         color="secondary"
                                         fontWeight={'bold'}
                                     >
-                                        PHP {auction.reservePrice}
+                                        PHP {formatNumber(auction.reservePrice)}
                                     </Typography>
                                 </Stack>
                             </Swiper>

@@ -9,6 +9,7 @@ import SearchBar from './components/SearchBar';
 import { Collapse, Container, IconButton, Stack, Typography } from '@mui/material';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import {Outlet} from 'react-router-dom'
+import ListingOverview from './component/ListingOverview';
 
 export default function Inventory() {
     const [searchTerm, setSearchTerm] = React.useState('')
@@ -35,7 +36,7 @@ export default function Inventory() {
         <Box>
             <Box
                 sx={{
-                    backgroundImage: 'url(/modern-styled-entryway.jpg)',
+                    backgroundImage: 'url(/modern-clean-interior-design.jpg)',
                     backgroundPosition: 'center',
                     backgroundSize: 'cover',
                     backgroundRepeat: 'no-repeat',
@@ -43,7 +44,6 @@ export default function Inventory() {
                     height: 'auto',
                     position: 'sticky',
                     width: '100%',
-                    
                 }}
             >
                 <Container sx={{p: 2, bgcolor: 'rgba(0, 0, 0, 0.5)', height: '100%'}}>
@@ -56,13 +56,13 @@ export default function Inventory() {
                             />
                         </Box>
                     </Box>
-                    <Box sx={{p: 2, borderRadius: 5, py: 3, pb: 16}}>
+                    <Stack gap={2} sx={{p: 2, borderRadius: 5, py: 3, pb: 30}}>
                         <Stack direction={'row'} alignItems={'center'}>
-                            <Typography variant="body1" color="white" fontWeight={'bold'}>
+                            <Typography variant="subtitle2" color="white" fontWeight={'bold'}>
                                 Quick Overview 
                             </Typography>
                         </Stack>
-                        <Collapse in={openGuide}>
+                        <Stack>
                             <Typography variant="body2" color="white">
                                 <b>Inventory: </b> Storage area for all products. Items stay here until posted for sale or auction.
                             </Typography>
@@ -72,8 +72,11 @@ export default function Inventory() {
                             <Typography variant="body2" color="white">
                                 <b>Auction: </b> Bidding section where items from inventory are listed with starting price, and duration.
                             </Typography>
-                        </Collapse>
-                    </Box>
+                        </Stack>
+                        <Stack>
+                            <ListingOverview/>
+                        </Stack>
+                    </Stack>
                 </Container>
             </Box>
             <Box 
@@ -86,7 +89,7 @@ export default function Inventory() {
                     boxShadow: '0px 0px 20px 0px rgba(0, 0, 0, 0.2)',
                 }}
             >
-                <Box sx={{position: 'sticky', top: 60, backdropFilter: 'blur(50px)', zIndex: 1000, bgcolor: 'rgba(0, 0, 0, 0.5)', borderColor: '#FAFAFA', cursor: 'pointer'}}>
+                <Box sx={{position: 'sticky', top: 60, backdropFilter: 'blur(50px)', zIndex: 1000, bgcolor: 'rgba(0, 0, 0, 0.5)', borderColor: '#f0f0f0', cursor: 'pointer'}}>
                     <Tabs
                         sx={{borderBottom: '5px solid #fafafa', overflowX: 'auto', color: 'white', width: '100%', scrollBehavior: 'smooth'}}
                         value={value}
@@ -144,7 +147,7 @@ export default function Inventory() {
                     </Tabs>
                 </Box>
                 <Box sx={{bgcolor: '#fafafa'}}>
-                    <Container maxWidth={'lg'} sx={{pt: 3, pb: 30, bgcolor: '#FAFAFA'}}>
+                    <Container maxWidth={'lg'} sx={{pt: 3, pb: 30, bgcolor: '#fafafa'}}>
                         <Outlet context={{searchTerm, setSearchTerm}}/>
                     </Container>
                 </Box>

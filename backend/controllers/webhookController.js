@@ -107,7 +107,7 @@ export const handleWebhook = async (req, res) => {
 
             await Product.updateMany(
                 { _id: { $in: payment.productIds } },
-                { $set: { visibility: 'pending', purchaseStatus: "pending" } }
+                { $set: { visibility: 'sold', purchaseStatus: "sold" } }
             );
 
             const prod = await Product.find({_id: {$in: payment.productIds}})

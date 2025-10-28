@@ -39,17 +39,7 @@ function HideOnScroll ({children}) {
         )
     }
 
-    const navLinks = [
-        { label: "Home", to: "/", icon: <HouseIcon style={{color: "white", width: 17}}/> },
-        { label: "Shop", to: "/shop", icon: <ShoppingBagIcon style={{color: "white", width: 17}}/> },
-        { label: "Auction", to: "/auction/listing", icon: <TagIcon style={{color: "white", width: 17}} /> },
-    ];
-
-    const userLinks = [
-        { label: 'Account', to: '/account', icon: < LockIcon style={{color: "black", width: 17}}/> },
-        { label: 'My Purchases', to: '/my-purchases', icon: < Package2Icon style={{color: "black", width: 17}}/> },
-        { label: 'Notification', to: '/*', icon: < BellIcon style={{color: "black", width: 17}}/> },
-    ]
+    
 
 export default function UserHeader() {
     const [userDrawerOpen, setUserDrawerOpen] = useState(false);
@@ -68,6 +58,19 @@ export default function UserHeader() {
     const isSm = useMediaQuery(theme.breakpoints.up('sm'))
     const [query, setQuery] = useState("");
     
+
+    const navLinks = [
+        { label: "Home", to: "/", icon: <HouseIcon style={{color: showBg ? 'black': 'white', width: 17}}/> },
+        { label: "Shop", to: "/shop", icon: <ShoppingBagIcon style={{color: showBg ?  'black': 'white', width: 17}}/> },
+        { label: "Auction", to: "/auction/listing", icon: <TagIcon style={{color: showBg ?  'black': 'white', width: 17}} /> },
+    ];
+
+    const userLinks = [
+        { label: 'Account', to: '/account', icon: < LockIcon style={{color: "black", width: 17}}/> },
+        { label: 'My Purchases', to: '/my-purchases', icon: < Package2Icon style={{color: "black", width: 17}}/> },
+        { label: 'Notification', to: '/notification', icon: < BellIcon style={{color: "black", width: 17}}/> },
+    ]
+
     useEffect(() => {
             if (isSm && searchDrawerOpen) setSearchDrawerOpen(false);
         })

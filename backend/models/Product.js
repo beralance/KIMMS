@@ -57,7 +57,7 @@ const productSchema = new mongoose.Schema(
             ref: "User", 
             default: null 
         },
-
+        addedBy: {type: mongoose.Schema.Types.ObjectId, required: false},
         postedAt: { type: Date, default: Date.now }
     },
     { timestamps: true }

@@ -19,9 +19,9 @@ const Auction = () => {
                 <Container>
                     <Stack gap={5}>
                         {location.pathname === '/auction/listing' ? 
-                            <Stack>
+                            <Stack gap={1}>
                                 <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
-                                    <Typography variant="body1" color="initial">
+                                    <Typography variant="subtitle2" color="initial">
                                         Check auction history
                                     </Typography>
                                     <Button onClick={() => navigate('/auction/history')}>
@@ -31,9 +31,12 @@ const Auction = () => {
                                 <AuctionHistoryPreview/>
                             </Stack>
                             :
-                            <Stack direction={'row'}>
+                            <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
+                                <Typography variant="subtitle2" color="initial">
+                                    View Listing 
+                                </Typography>
                                 <Button onClick={() => navigate('/auction/listing')}>
-                                    View Listing <ChevronLeftIcon/>
+                                    <ChevronRightIcon/>
                                 </Button>
                             </Stack>
                         }

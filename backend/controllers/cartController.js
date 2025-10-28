@@ -11,7 +11,7 @@ export const getCart = async (req, res) => {
         let cart = await Cart.findOne({ userId })
             .populate({
                 path: 'items.productId',
-                select: "productName category images price status description",
+                select: "productName category images price status description condition",
                 match: {purchaseStatus: "available"},
                 populate: {
                     path: 'category',
@@ -24,8 +24,12 @@ export const getCart = async (req, res) => {
             cart = await Cart.create({ userId, items: [] });
             cart = await cart.populate({
                 path: 'items.productId',
-                select: "productName category images price status description",
-                match: {purchaseStatus: "available"}
+                select: "productName category images price status description condition",
+                match: {purchaseStatus: "available"},
+                populate: {
+                    path: 'category',
+                    select: 'name createdAt'
+                }
             });
         }
 
@@ -50,10 +54,6 @@ export const addToCart = async (req, res) => {
         if (!product) return res.status(404).json({error: 'Product not found'})
 
         // backend restriction, block local only items for non local user
-        console.log('IS USER', req.user)
-        console.log('IS USER LOCAL', req.user.isLocal)
-        console.log('IS PRODUCT LOCAL', product.isLocal)
-        console.log('COMPARE', product.isLocal && !req.user.isLocal)
         if (product.isLocal && !req.user.isLocal) {
             console.log('RESULT', product.isLocal && !req.user.isLocal)
 
@@ -66,7 +66,7 @@ export const addToCart = async (req, res) => {
             
             cart = await cart.populate({
                 path: 'items.productId',
-                select: "productName category images price status description",
+                select: "productName category images price status description condition",
                 match: {purchaseStatus: "available"},
                 populate: {
                     path: 'category',
@@ -85,7 +85,7 @@ export const addToCart = async (req, res) => {
 
         await cart.populate({
             path: "items.productId",
-            select: "productName category images price description",
+            select: "productName category images price description condition",
             populate: {path: 'category', select: 'name createdAt'}
         });
 
@@ -137,7 +137,6 @@ export const clearCart = async (req, res) => {
 };
 // cartController.js
 export const removePurchased = async (req, res) => {
-    console.log('✅✅✅✅✅remove purchase is being called ✅✅✅✅✅')
     try {
         const userId = req.user.id;
         const { removeIds } = req.body; // ✅ this matches what frontend sends

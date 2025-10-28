@@ -37,7 +37,7 @@ export const auctionLifecycleCron = () => {
                 const cooldownUntil = new Date(Date.now() + cooldownDuration)
 
                 auction.status = "ENDED";
-                auction.cooldownUntil = cooldownDuration;
+                auction.cooldownUntil = cooldownUntil;
 
                 await auction.save();
 

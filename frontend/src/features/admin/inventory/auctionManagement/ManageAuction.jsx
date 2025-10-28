@@ -32,11 +32,44 @@ const ManageAuction = () => {
     const { token } = useAuth()
     const [loading, setLoading] = useState(false)
     const [fixedAmount, setFixedAmount] = useState(0)
+    const [duration, setDuration] = useState('')
     const [search, setSearch] = useState('')
     const {showSnackbar} = useSnackbar()
     const { inventoryItems, fetchInventoryItems} = useContext(InventoryContext)
     const API_URL = import.meta.env.VITE_API_URL;
 
+    useEffect(() => {
+        if (startTime && endTime) {
+            const start = new Date(startTime);
+            const end = new Date(endTime)
+
+            if (end > start) {
+                const diffMs = end - start;
+                const diffHours = diffMs / (1000 * 60 * 60)
+                const days = Math.floor(diffHours / 24);
+                const hours = Math.floor(diffHours % 24)
+                const minutes = Math.round((diffHours * 60) % 60)
+
+                let durationStr = ''
+                if (days > 0) durationStr += `${days} day${days > 1 ? 's ' : ' '}`
+                if (hours > 0) durationStr += `${hours} hour${hours > 1 ? 's ' : ' '}`
+                if (minutes > 0) durationStr += `${minutes} min${minutes > 1 ? 's ' : ' '}`
+                
+                setDuration(durationStr.trim())
+            }
+            else {
+                setDuration('')
+            }
+        }
+        else {
+            setDuration('')
+        }
+    }, [startTime, endTime])
+    
+    useEffect(() => {
+        fetchInventoryItems()
+    }, [])
+    
     useEffect(() => {
         if (selectedItem) {
             const item = inventoryItems.find(i => i._id === selectedItem);
@@ -58,18 +91,43 @@ const ManageAuction = () => {
     });
 
     const validate = () => {
-        const errs = {};
+        const errs = {};    
+        const now = new Date();
+        const fiveMinFromNow = new Date(now.getTime() + 1 * 60 * 1000); // change to 5 min
+        const minDurationMs = 1 * 60 * 1000; // change to 1 hour
+        const maxDurationMs = 7 * 24 * 60 * 60 * 1000; // 7 days
+
         if (!selectedItem) errs.selectedItem = "Select an inventory item.";
         if (!startPrice || startPrice <= 0) errs.startPrice = "Starting price must be greater than 0.";
         if (!reservePrice || reservePrice <= 0) {
             errs.reservePrice = "Reserve price must be greater than 0.";
+        } else if (reservePrice < startPrice) {
+            errs.reservePrice = `Reserve price must be at least Php ${startPrice}`;
         }
-        else if (reservePrice < startPrice) {
-            errs.reservePrice = `Reserve price must be at least Php ${startPrice}`
-        }
+
         if (!startTime) errs.startTime = "Start time is required.";
         if (!endTime) errs.endTime = "End time is required.";
-        if (startTime && endTime && new Date(startTime) >= new Date(endTime)) errs.endTime = "End time must be after start time.";
+
+        if (startTime && new Date(startTime) < new Date())
+            errs.startTime = "Start time cannot be in the past.";
+
+        if (startTime && new Date(startTime) < fiveMinFromNow)
+            errs.startTime = "Start time must be at least 5 minutes from now.";
+
+        if (startTime && endTime) {
+            const start = new Date(startTime);
+            const end = new Date(endTime);
+            const duration = end - start;
+
+            if (start >= end) {
+                errs.endTime = "End time must be after start time.";
+            } else if (duration < minDurationMs) {
+                errs.endTime = "Auction duration must be at least 1 hour.";
+            } else if (duration > maxDurationMs) {
+                errs.endTime = "Auction duration cannot exceed 7 days.";
+            }
+        }
+
         return errs;
     };
 
@@ -246,6 +304,13 @@ const ManageAuction = () => {
                     error={!!errors.endTime}
                     helperText={errors.endTime}
                 />
+                {duration && (
+                    <Stack>
+                        <Typography variant="body2" color="secondary" sx={{ml: .5}}>
+                            <b>Duration:</b> {duration}
+                        </Typography>
+                    </Stack>
+                )}
                 <TextField
                     label="Description(optional)"
                     placeholder="You may provide additional auction-related details about the product here..."

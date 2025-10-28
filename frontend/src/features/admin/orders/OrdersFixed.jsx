@@ -20,21 +20,16 @@ export default function OrdersTable({selectedOrder}) {
         const filtered = orders.filter(o => {
             setLoading(true)
             try {
-                if (o.isActive && o.orderType === 'fixed') {
-                    if (o.paymentMethod === 'gcash' || o.paymentMethod === 'card') {
-                        setIsOnline(true)
-                        return o.paymentStatus?.toLowerCase() === "paid" &&
-                            o.purchaseStatus?.toLowerCase() !== "pending"
+                const filtered = orders.filter(o => {
+                    if (o.isActive && o.orderType === 'fixed') {
+                        return true;
                     }
-                    else if (o.paymentMethod === 'cashOnPickup' || o.paymentMethod === 'cashOnDelivery') {
-                        setIsOnline(false)
-                        return o.paymentStatus?.toLowerCase() === 'pending' &&
-                            o.purchaseStatus?.toLowerCase() === 'pending'
+                    else {
+                        console.log(`Order ${o._Id} is inactive or not fixed `);
+                        return false
                     }
-                }
-                else {
-                    console.log(`Order ${o._id} is inactive`)
-                }
+                })
+                setPendingOrders(filtered);
             }
             catch (err) {
                 console.error(err)
@@ -43,8 +38,6 @@ export default function OrdersTable({selectedOrder}) {
                 setLoading(false)
             }
         });
-        setPendingOrders(filtered);
-        console.log('THIS IS PENDING ORDER', pendingOrders)
 
     }, [orders]);
 

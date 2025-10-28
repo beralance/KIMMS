@@ -9,7 +9,7 @@ const CartHeader = () => {
     const navigate = useNavigate();
 
     return (
-        <AppBar position="fixed" color="secondary">
+        <AppBar position="fixed" color="secondary" sx={{height: '60px'}}>
             <Toolbar sx={{display: 'flex', justifyContent: 'space-between'}}>
                 {/* Back button */}
                 <IconButton

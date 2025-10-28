@@ -3,11 +3,26 @@ import React from 'react'
 import ConfirmDialog from '../../../../components/ConfirmDialog'
 import { useNavigate } from 'react-router-dom'
 import { CloseRounded } from '@mui/icons-material'
-
+import {useAuth} from '../../../../contexts/AuthContext'
+import {useSnackbar} from '../../../../contexts/SnackbarContext'
 
 const RequirementDrawer = ({open, onClose, productId, productName, links = [], anchor = "top"}) => {
     const [openDialog, setOpenDialog] = React.useState(false)
     const navigate = useNavigate()
+    const {user} = useAuth()
+    const {showSnackbar} = useSnackbar()
+
+    const handleUserInfo = () => {
+        if (!user.address?.region || !user.address?.street || !user.address?.province || !user.address?.city || !user.address?.postalCode){
+            showSnackbar('Please complete your address inorder to proceed', 'warning')
+            return
+        }
+        if (!user.email || !user.fullName || !user.phoneNumber){
+            showSnackbar('Please complete your account informations first inorder to proceed', 'warning')
+            return
+        }
+        setOpenDialog(true)
+    }
     return (
         <Box>
             <Drawer 
@@ -49,7 +64,7 @@ const RequirementDrawer = ({open, onClose, productId, productName, links = [], a
                         variant='contained' 
                         color='secondary' 
                         fullWidth 
-                        onClick={() => setOpenDialog(true)}
+                        onClick={handleUserInfo}
                         sx={{
                             borderRadius: '999px'
                         }}

@@ -59,7 +59,14 @@ export const createAuction = async (req, res) => {
 export const getAuctions = async (req, res) => {
     try {
         const auctions = await Auction.find()
-            .populate("inventoryId", "productName price status description images")
+            .populate({
+                path: "inventoryId", 
+                select: "productName price status description details condition images",
+                populate: {
+                    path: 'category',
+                    select: 'name',
+                }
+            })
             .sort({ createdAt: -1 });
 
         // attach top 3 bids for each auction
@@ -68,12 +75,17 @@ export const getAuctions = async (req, res) => {
                 const topBids = await Bid.find({ auctionId: auction._id })
                     .sort({ amount: -1, createdAt: 1 })
                     .limit(3)
-                    .populate("userId", "name email");
+                    .populate({
+                        path: "userId",
+                        select: "fullName email"
+                    });
 
                 return {
                     ...auction.toObject(),
                     topBidders: topBids.map((bid) => ({
-                        userId: bid.userId.name || bid.userId._id,
+                        userId: bid.userId._id,
+                        userName: bid.userId.fullName,
+                        email: bid.userId.email,
                         amount: bid.amount,
                     })),
                 };
@@ -110,6 +122,35 @@ export const getAuctionById = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+export const deletePendingAuction = async (req, res) => {
+    try {
+        const {id} = req.params;
+
+        const auction = await Auction.findById(id).populate('inventoryId')
+
+        console.log('Auction found', auction)
+        if (!auction) {
+            return res.status(404).json({message: 'Auction not found'})
+        }
+
+        if (auction.status !== 'PENDING') {
+            return res.status(400).json({message: 'Only pending auctions can be deleted.'})
+        }
+
+        if (auction.inventoryId) {
+            auction.inventoryId.status = 'available';
+            await auction.inventoryId.save();
+        }
+
+        await Auction.findByIdAndDelete(id)
+
+        res.json({message: 'Auction deleted successfully'})
+    }
+    catch (err) {
+        res.status(500).json({error: err.message})
+    }
+}
 
 /**
  * Finalize auction (mark as closed & sold if winner exists)
@@ -238,24 +279,28 @@ export const getAuctionReportStats = async (options = {}) => {
     filteredAuctions
         .filter(a => a.status === 'PENDING')
         .forEach(a => {
-            const diffHours = (new Date(a.startTime) - now) / (1000 * 60 * 60);
-            if (diffHours <= pendingHours && diffHours > 0) {
+            const diffMs = new Date(a.startTime) - now;
+            if (diffMs > 0 && diffMs <= pendingHours * 60 * 60 * 1000) {
+                const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
                 alerts.push({
                     type: 'pending_start',
-                    message: `Auction '${a.inventoryId.productName}' starts in ${Math.round(diffHours)} hours.`
+                    message: `Auction '${a.inventoryId.productName}' starts in ${diffHours}h ${diffMinutes}m.`
                 });
             }
         });
 
-    // Live auctions ending soon
+   // Live auctions ending soon
     filteredAuctions
         .filter(a => a.status === 'LIVE')
         .forEach(a => {
-            const diffHours = (new Date(a.endTime) - now) / (1000 * 60 * 60);
-            if (diffHours <= liveHours && diffHours > 0) {
+            const diffMs = new Date(a.endTime) - now;
+            if (diffMs > 0 && diffMs <= liveHours * 60 * 60 * 1000) {
+                const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
                 alerts.push({
                     type: 'live_end',
-                    message: `Auction '${a.inventoryId.productName}' ending in ${Math.round(diffHours * 60)} minutes.`
+                    message: `Auction '${a.inventoryId.productName}' ending in ${diffHours}h ${diffMinutes}m.`
                 });
             }
         });

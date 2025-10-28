@@ -24,38 +24,17 @@ const AuctionHistory = () => {
 
     return (
         <Box sx={{ p: 3 }}>
-            <Typography variant="h5" gutterBottom>
+            <Typography variant="subtitle1" gutterBottom>
                 History Gallery
             </Typography>
             <Grid container spacing={2}>
                 {auctions.map((auction) => (
                     <Grid size={{xs: 12, sm: 6}} key={auction._id}>
-                        <Stack sx={{position: 'relative',  border: '1px solid rgba(0, 0, 0, .4)', borderRadius: 2, overflow: 'hidden'}}>
-                            {/*
-                            <Stack direction={'row'}>
-                                <Stack>
-                                    <Typography variant="h6">
-                                        {auction.inventoryId?.productName || "Unnamed Item"}
-                                    </Typography>
-                                    <Typography variant="h6">
-                                        {auction.status}
-                                    </Typography>
-                                    <Typography>Top Bidders:</Typography>
-                                    {auction.topBidders?.length > 0 ? (
-                                        auction.topBidders.map((bid, idx) => (
-                                            <Typography key={idx}>
-                                                {idx + 1}. {bid.userId?.name} - ₱{bid.amount}
-                                            </Typography>
-                                        ))
-                                    ) : (
-                                        <Typography>No bids</Typography>
-                                    )}
-                                </Stack>
-                            </Stack>
-                                */}
+                        <Stack sx={{position: 'relative', borderRadius: 2, overflow: 'hidden'}}>
+                           
                             <Box
                                 sx={{
-                                    background: "linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0))",
+                                    background: "linear-gradient(to right, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.2) 50%)",
                                     width: '100%',
                                     position: 'absolute',
                                     height: '100%',
@@ -63,22 +42,30 @@ const AuctionHistory = () => {
                                     zIndex: 1000,
                                 }}
                             >
-                                <Stack sx={{m: 4}} gap={1}>
+                                <Stack sx={{m: 4, justifyContent: 'flex-end', maxWidth: '40%', height: '100%', pb: 10}} gap={2}>
                                     <Stack>
-                                        <Typography variant="h6">
+                                        <Typography variant="subtitle2" fontWeight={'bold'}>
                                             {auction.inventoryId?.productName || "Unnamed Item"}
                                         </Typography>
-                                        <Typography variant="body1">
+                                        <Typography variant="body2" sx={{textDecoration: ''}}>
                                             Php {auction.reservePrice}
                                         </Typography>
                                     </Stack>
                                     <Stack>
-                                        <Typography variant="h6">
-                                            {auction.status}
-                                        </Typography>
-                                        <Typography variant="subtitle2" color="grey">
-                                            {`${auction.inventoryId?.category?.name} | ${auction.inventoryId?.condition}`}
-                                        </Typography>
+                                        <Stack>
+                                            <ul>
+                                                <li>
+                                                    <Typography variant="subtitle2" color="black">
+                                                        {`${auction.inventoryId?.category?.name}`}
+                                                    </Typography>
+                                                </li>
+                                                <li>
+                                                    <Typography variant="subtitle2" color="black">
+                                                        {`${auction.inventoryId?.condition}`}
+                                                    </Typography>
+                                                </li>
+                                            </ul>
+                                        </Stack>
                                         <Typography variant="subtitle2" color="grey" sx={{ maxWidth: '70%'}}>
                                             {auction.inventoryId?.description}
                                         </Typography>

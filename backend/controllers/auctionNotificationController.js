@@ -13,8 +13,9 @@ export const createNotification = async (userId, auctionId, message) => {
 
 // Get notifications for a user
 export const getUserNotifications = async (req, res) => {
+    console.log('USER ID', req.user.id )
     try {
-        const notifications = await Notification.find({ userId: req.user._id }).sort({ createdAt: -1 });
+        const notifications = await Notification.find({ userId: req.user.id }).sort({ createdAt: -1 });
         res.json(notifications);
     } catch (err) {
         res.status(500).json({ error: err.message });

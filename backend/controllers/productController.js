@@ -16,6 +16,7 @@ export const getProductsForPolling = async (req, res) => {
 export const postProduct = async (req, res) => {
     try {
         const { inventoryId } = req.body;
+        const addedBy = req.user?.id;
 
         // Find the inventory item
         const inventoryItem = await Inventory.findById(inventoryId);
@@ -40,6 +41,7 @@ export const postProduct = async (req, res) => {
             isLocal: inventoryItem.isLocal,
             physicalCode: inventoryItem.physicalCode,
             visibility: "active",
+            addedBy: addedBy,
             // add physical code here
         });
 
@@ -125,8 +127,6 @@ export const updateProduct = async (req, res) => {
         const updates = req.body;
         const product = await Product.findByIdAndUpdate(req.params.id, updates, { new: true }).populate('category', 'name');
 
-        console.log('UPDATES', updates)
-        console.log('PRODUCT', product)
         if (!product) return res.status(404).json({ message: "Product not found" });
         
         // Sync critical fields back to inventory
@@ -267,4 +267,93 @@ export const incrementProductViews = async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
+};
+
+export const getProductReportStats = async ({ period, category }) => {
+    const filter = {};
+
+    if (category) filter.category = category;
+
+    if (period) {
+        const now = new Date();
+        let startDate;
+
+        switch (period) {
+            case 'daily':
+                startDate = new Date(now.setHours(0, 0, 0, 0));
+                break;
+            case 'weekly':
+                startDate = new Date(now.setDate(now.getDate() - 7));
+                break;
+            case 'monthly':
+                startDate = new Date(now.setMonth(now.getMonth() - 1));
+                break;
+            case 'yearly':
+                startDate = new Date(now.setFullYear(now.getFullYear() - 1));
+                break;
+            default:
+                startDate = null;
+        }
+
+        if (startDate) filter.createdAt = { $gte: startDate };
+    }
+
+    const products = await Product.find(filter).populate('category', 'name');
+
+    if (!products.length) {
+        return {
+            totalProducts: 0,
+            active: 0,
+            inactive: 0,
+            sold: 0,
+            pending: 0,
+            available: 0,
+            mostViewed: 'N/A',
+            recentlySold: 'N/A',
+            averagePrice: 0,
+            categoryBreakdown: {},
+        };
+    }
+ 
+    const newPostedProduct = products.sort((a, b) => b.createdAt - a.createdAt).slice(0, 5)
+
+    const visibilityCounts = { active: 0, inactive: 0, sold: 0, pending: 0 };
+    const purchaseCounts = { available: 0, pending: 0, sold: 0 };
+    let totalPrice = 0;
+    const categoryBreakdown = {};
+    const conditionBreakdown = {}; 
+
+    products.forEach((p) => {
+        visibilityCounts[p.visibility]++;
+        purchaseCounts[p.purchaseStatus]++;
+        totalPrice += p.price;
+
+        const catName = p.category?.name || 'Uncategorized';
+        categoryBreakdown[catName] = (categoryBreakdown[catName] || 0) + 1;
+
+        const cond = p.condition || 'Unknown';
+        conditionBreakdown[cond] = (conditionBreakdown[cond] || 0) + 1;
+    });
+
+    const mostViewed = products.sort((a, b) => b.views - a.views).slice(0, 5);
+    const recentlySold = products
+        .filter((p) => p.purchaseStatus === 'sold')
+        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+        .slice(0, 5);
+    const averagePrice = totalPrice / products.length;
+    const activeProducts = products.filter((p) => p.visibility === 'active' && p.purchaseStatus === 'available').length
+
+
+    return {
+        totalProducts: products.length,
+        ...visibilityCounts,
+        purchaseStatusSummary: purchaseCounts,
+        mostViewed,
+        recentlySold,
+        activeProducts,
+        averagePrice: parseFloat(averagePrice.toFixed(2)),
+        categoryBreakdown,
+        conditionBreakdown,
+        newPostedProduct,
+    };
 };

@@ -61,7 +61,7 @@ const AuctionProductCard = ({auction, }) => {
                         <Grid size={{xs: 6}}>
                            
                             <Box sx={{cursor: 'pointer', position: 'relative'}} onClick={handleDetailsOpen}>
-                                { loading && 
+                                { loading ?
                                     <img 
                                         src={`/placeholder-image.svg`}
                                         onLoad={() => setLoading(false)}
@@ -75,21 +75,22 @@ const AuctionProductCard = ({auction, }) => {
                                             boxShadow: '5px 5px 10px -2px rgba(0, 0, 0, 0.5)'
                                         }} 
                                     />
+                                :
+                                    <img 
+                                        src={`${auction.inventoryId?.images[0]}`}
+                                        alt={auction.inventoryId?.productName}
+                                        onLoad={() => setLoading(false)}
+                                        style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            objectFit: 'cover',
+                                            display: 'block',
+                                            aspectRatio: '1/1',
+                                            borderRadius: 3,
+                                            boxShadow: '5px 5px 10px -2px rgba(0, 0, 0, 0.5)'
+                                        }} 
+                                    />
                                 }
-                                <img 
-                                    src={`${auction.inventoryId?.images[0]}`}
-                                    alt={auction.inventoryId?.productName}
-                                    onLoad={() => setLoading(false)}
-                                    style={{
-                                        width: '100%',
-                                        height: '100%',
-                                        objectFit: 'cover',
-                                        display: 'block',
-                                        aspectRatio: '1/1',
-                                        borderRadius: 3,
-                                        boxShadow: '5px 5px 10px -2px rgba(0, 0, 0, 0.5)'
-                                    }} 
-                                />
                                 <Box 
                                     sx={{
                                         position: 'absolute', 

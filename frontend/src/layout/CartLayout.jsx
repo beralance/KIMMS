@@ -10,7 +10,7 @@ const CartLayout = () => {
             <header>
                 <CartHeader/>
             </header>
-            <main style={{paddingTop: '80px'}}>
+            <main style={{paddingTop: '80px', backgroundColor: '#f0f0f0ff'}}>
                 <Outlet/>
             </main>   
         </Box>

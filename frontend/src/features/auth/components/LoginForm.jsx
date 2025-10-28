@@ -66,7 +66,7 @@ export default function LoginForm({ onSuccess }) {
                 address: data.address,
                 avatar: data.avatar,
                 phoneNumber: data.phoneNumber,
-                email: data.gender,
+                email: data.email,
                 gender: data.gender,
             })
 

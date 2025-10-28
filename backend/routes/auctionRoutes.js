@@ -3,6 +3,7 @@ import {
   createAuction,
   getAuctions,
   getAuctionById,
+  deletePendingAuction,
   // updateAuction,   // Optional: only for pre-auction editing
   // deleteAuction,   // Optional: only for pre-auction deletion
   finalizeAuction,
@@ -19,13 +20,17 @@ router.post("/", verifyToken, adminOnly, requireRole(['admin']), createAuction);
 // Public: list all auctions (active, upcoming, closed)
 router.get("/", getAuctions);
 
+router.get('/history/past', getPastAuctions)
+
 // Public: get single auction by ID
 router.get("/:id", getAuctionById);
+
+router.delete('/:id', verifyToken, deletePendingAuction)
 
 // Optional: admin manual finalize (override)
 router.post("/:id/finalize", verifyToken, adminOnly, requireRole(['admin']), finalizeAuction);
 
 // Public route to get auction history
-router.get('/history/past', getPastAuctions)
+
 
 export default router;

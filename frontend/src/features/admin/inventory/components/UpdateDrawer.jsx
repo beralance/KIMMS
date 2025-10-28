@@ -11,7 +11,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import ManageInventory from '../inventoryManagement/ManageInventory'
 import UpdatePosted from '../productManagement/UpdatePosted'
-import AuctionProductDetails from "../auctionManagement/AuctionProductDetails";
+import ProductStatusDetails from "../auctionManagement/ProductStatusDetails";
 
 export default function AddItemDrawer({ open, onClose, productData, id, title, content }) {
     const renderForm = () => {
@@ -21,7 +21,7 @@ export default function AddItemDrawer({ open, onClose, productData, id, title, c
             case 'update-product':
                 return <UpdatePosted productId={id} productData={productData} onClose={onClose}/>;
             case 'auction-details':
-                return <AuctionProductDetails productId={id} auction={productData} onClose={onClose}/>;
+                return <ProductStatusDetails productId={id} auction={productData} onClose={onClose}/>;
             default:
                 return null;
         }

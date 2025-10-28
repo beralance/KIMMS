@@ -336,6 +336,8 @@ export const googleLogin = async (req, res) => {
             email: user.email,
             isLocal: user.isLocal,
             address: user.address,
+            phoneNumber: user.phoneNumber,
+            gender: user.gender,
             avatar: user.avatar
         });
     }
@@ -594,7 +596,7 @@ export const createStaff = async (req, res) => {
             email,
             password,
             fullName,
-            isVerfied: isVerfied = true,
+            isVerfied: true,
             role: 'staff',
         });
 

@@ -6,11 +6,13 @@ import SectionWrapper from '../../../components/SectionWrapper'
 import dayjs from 'dayjs'
 import { formatNumber, toTitleCase } from '../../../utils/stringUtils'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../../contexts/AuthContext'
 
 const OrderDetailsDrawer = ({order, open, onClose}) => {
     const [copied, setCopied] = useState(false)
     const [viewMore, setViewMore] = useState(false)
     const [infoMore, setInfoMore] = useState(false)
+    const {user} = useAuth()
     const navigate = useNavigate()
 
     const address = order.userId?.address
@@ -19,6 +21,8 @@ const OrderDetailsDrawer = ({order, open, onClose}) => {
         (acc, product) => acc + product.productId.price,
         0
     );
+
+    console.log('IORDER', order)
     return (
         <Box>
             <Drawer anchor="bottom" open={open} onClose={onClose} sx={{ position: 'relative', width: "100%", display: {xs: 'block', md: 'none'}, }} PaperProps={{sx: {height: '90vh'}}}>
@@ -44,8 +48,8 @@ const OrderDetailsDrawer = ({order, open, onClose}) => {
                                     <Divider/>
                                     <Collapse in={infoMore}>
                                         <Typography variant="body2" color="secondary">{order.userId?.fullName}</Typography>
-                                        <Typography variant="body2" color="secondary">{order.userId?.isLocal === true ? 'Local' : 'International'} user</Typography>
-                                        <Typography variant="body2" color="secondary">{order.userId?.number || 'XXXXXXXXXXX'}</Typography>
+                                        <Typography variant="body2" color="secondary">{order.userId?.isLocal ? 'Local' : 'International'} user</Typography>
+                                        <Typography variant="body2" color="secondary">{order.userId?.phoneNumber || 'XXXXXXXXXXX'}</Typography>
                                         <Typography variant="body2" color="secondary">{order.userId?.email}</Typography>
                                     </Collapse>
                                     <Button variant='text'  color='secondary' fullWidth sx={{p: 0}} onClick={() => setInfoMore((prev) => !prev)}>  
@@ -86,7 +90,7 @@ const OrderDetailsDrawer = ({order, open, onClose}) => {
                                                     {product.productId?.productName}
                                                 </Typography>
                                                 <Typography variant="body2" color="secondary">
-                                                    {product.productId?.isLocal === true ? 'Small' : 'Large'} item
+                                                    {product.productId?.isLocal ? 'Large' : 'Small'} item
                                                 </Typography>
                                                 <Stack direction={'row'}>
                                                     <Typography variant="body2" color="secondary" sx={{border: '1px solid gray', borderRadius: '999px', px: 1}}>
@@ -113,7 +117,7 @@ const OrderDetailsDrawer = ({order, open, onClose}) => {
                             <SectionWrapper sx={{gap: 1}}>
                                 <Stack direction={'row'} justifyContent={'space-between'}>
                                     <Typography variant="body2" color="initial">
-                                        Order ID
+                                        Order ID 
                                     </Typography>
                                     <Stack direction={'row'} alignItems={'center'} gap={1}>
                                         <Typography variant="body2" color="initial">

@@ -8,8 +8,8 @@ const AuctionManagement = () => {
     const {searchTerm, setSearchTerm} = useOutletContext()
     return (
         <Box>
-            <Stack>
-                <Typography variant="h6" color="secondary" sx={{fontWeight: 'bold'}} gutterBottom>
+            <Stack sx={{mb: 3}}>
+                <Typography variant="subtitle1" color="secondary" sx={{fontWeight: 'bold'}} gutterBottom>
                     Auction Monitoring
                 </Typography>
                 <Typography variant="body2" color="grey" gutterBottom>

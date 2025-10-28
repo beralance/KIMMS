@@ -11,10 +11,10 @@ const NewArrival = () => {
     const navigate = useNavigate()        
 
     return (
-        <Box sx={{maxHeight: 480, overflowY: 'auto', px: 2}}>
+        <Stack gap={3} sx={{maxHeight: 480, overflowY: 'auto', px: 2}}>
             {newProducts.map(product => (
                 <ScrollSectionLeft key={product._id}>
-                    <Grid container spacing={2} sx={{mb: .5, p: 1}}>
+                    <Grid container spacing={2}>
                             <Grid size={{xs: 6}}>
                                 <img 
                                     src={`${product.images[0]}`} 
@@ -64,7 +64,7 @@ const NewArrival = () => {
                 </ScrollSectionLeft>
 
             ))}     
-        </Box>
+        </Stack>
     )
 }
 

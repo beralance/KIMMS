@@ -15,7 +15,7 @@ export const getOrdersForPolling = async (req, res) => {
                     select: 'name',
                 }
             })
-            .populate("userId", 'fullName email address avatar phonenumber')
+            .populate("userId", 'fullName email gender isLocal address avatar phoneNumber')
             .populate('auctionId', 'endtime starttime status reservePrice startPrice')
             .sort({createdAt: -1})
         res.json(orders);
@@ -32,6 +32,7 @@ export const createOrder = async (req, res) => {
             userId, 
             products, 
             totalPrice, 
+            finalPrice,
             orderType = 'fixed',
             auctionId = null,
             priorityLevel = null,
@@ -49,6 +50,7 @@ export const createOrder = async (req, res) => {
             userId,
             products,
             totalPrice,
+            finalPrice,
             orderType,
             auctionId,
             priorityLevel,
@@ -78,13 +80,13 @@ export const getOrders = async (req, res) => {
         const orders = await Order.find(query)
             .populate({
                 path: "products.productId", 
-                select: 'productName physicalCode images price details description category condition price isLocal',
+                select: 'productName physicalCode images price category details description condition price isLocal',
                 populate:{
                     path: 'category',
                     select: 'name',
                 }
             })
-            .populate("userId", 'fullName email address avatar phonenumber')
+            .populate("userId", 'fullName email gender isLocal address avatar phonenumber')
             .populate('auctionId', 'endtime starttime status reservePrice startPrice')
             .sort({createdAt: -1})
 
@@ -126,8 +128,8 @@ export const getOrder = async (req, res) => {
                     select: 'name',
                 }
             })
-            .populate("userId", 'fullName email role')
-            .populate('auctionId', 'endTime status')
+            .populate("userId", 'fullName email gender isLocal address avatar phonenumber')
+            .populate('auctionId', 'endtime starttime status reservePrice startPrice')
 
         if (!order) return res.status(404).json({ message: "Order not found" });
 
@@ -218,4 +220,78 @@ export const cancelOrder = async (req, res) => {
         console.error('Error cancelling order:', err)
         res.status(500).json({message: 'Failed to cancel order'})
     }
+}
+
+export const getOrderReportStats = async (options = {}) => {
+    const {period, paymentMethod, paymentStatus, purchaseStatus} = options
+
+    let filter = {};
+
+    if (paymentMethod) filter.paymentMethod = paymentMethod;
+    if (paymentStatus) filter.paymentStatus = paymentStatus;
+    if (purchaseStatus) filter.purchaseStatus = purchaseStatus;
+
+     if (period) {
+        const now = new Date();
+        let fromDate;
+
+        if (period === 'week') {
+            fromDate = new Date();
+            fromDate.setDate(now.getDate() - 7);
+        } else if (period === 'month') {
+            fromDate = new Date();
+            fromDate.setMonth(now.getMonth() - 1);
+        } else if (period === 'year') {
+            fromDate = new Date();
+            fromDate.setFullYear(now.getFullYear() - 1);
+        } else if (period.from && period.to) {
+            fromDate = new Date(period.from);
+            const toDate = new Date(period.to);
+            filter.createdAt = { $gte: fromDate, $lte: toDate };
+        }
+
+        if (fromDate && !filter.createdAt) {
+            filter.createdAt = { $gte: fromDate };
+        }
+    }
+
+    const orders = await Order.find(filter)
+
+    const totalOrders = orders.length;
+    const paidOrders = orders.filter(o => o.paymentStatus === 'paid').length;
+    const pendingPayments = orders.filter(o => o.paymentStatus === 'pending').length;
+    const failedPayments = orders.filter(o => o.paymentStatus === 'failed').length;
+    const refundedOrders = orders.filter(o => o.paymentStatus === 'refunded').length;
+    
+    const pendingOrders = orders.filter(o => o.purchaseStatus === 'pending').length;
+    const confirmedOrders = orders.filter(o => o.purchaseStatus === 'confirmed').length;
+    const processingOrders = orders.filter(o => o.purchaseStatus === 'processing').length;
+    const outForDeliveryOrders = orders.filter(o => o.purchaseStatus === 'out_for_delivery').length;
+    
+    
+    const totalRevenue = orders
+        .filter(o => o.paymentStatus === 'paid')
+        .reduce((sum, o) => sum + o.finalPrice, 0);
+
+    const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0
+
+    const fixedOrders = orders.filter(o => o.orderType = 'fixed').length
+    const auctionOrders = orders.filter(o => o.orderType = 'auction').length
+
+    return {
+        totalOrders, 
+        paidOrders,
+        pendingPayments,
+        failedPayments,
+        refundedOrders,
+        totalRevenue,
+        averageOrderValue,
+        fixedOrders,
+        auctionOrders,
+        pendingOrders,
+        confirmedOrders,
+        processingOrders,
+        outForDeliveryOrders,
+    }
+
 }

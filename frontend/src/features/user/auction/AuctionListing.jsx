@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Card, CardContent, Typography, Button, Grid } from "@mui/material";
+import { Box, Container, Card, CardContent, Typography, Button, Grid, Stack } from "@mui/material";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import AuctionPreviewCard from "./components/AuctionPreviewCard";
@@ -29,7 +29,7 @@ const AuctionListing = () => {
             clearInterval(tickInterval)
         }
 
-    }, []);
+    }, [auctions.status]);
 
     const getTimeRemaining = (endTime) => {
         const total = new Date(endTime) - new Date();
@@ -41,18 +41,25 @@ const AuctionListing = () => {
     };
 
     return (
-        <Box>
-            <Typography variant="h5" gutterBottom>
-                Live Auctions
-            </Typography>
-            <Grid container spacing={2}>
-                {auctions.map((auction) => (
-                    <Grid item xs={12} sm={6} md={4} key={auction._id}>
-                        <AuctionPreviewCard product={auction} getTimeRemaining={getTimeRemaining}/>
-                    </Grid>
-                ))}
-            </Grid>
-        </Box>
+        <Container>
+            <Stack gap={2}>
+                <Stack>
+                    <Typography variant="subtitle1" align="center">
+                        Live Auctions
+                    </Typography>
+                    <Typography variant="body2" align="center">
+                        Experience live bidding and win your next deal.
+                    </Typography>
+                </Stack>
+                <Grid container spacing={4}>
+                    {auctions.map((auction) => (
+                        <Grid item xs={12} sm={6} md={4} key={auction._id}>
+                            <AuctionPreviewCard product={auction} getTimeRemaining={getTimeRemaining}/>
+                        </Grid>
+                    ))}
+                </Grid>
+            </Stack>
+        </Container>
     );
 };
 

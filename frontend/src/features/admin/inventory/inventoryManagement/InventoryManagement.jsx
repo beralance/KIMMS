@@ -6,6 +6,7 @@ import { useOutletContext } from 'react-router-dom';
 import { Collapse, Stack, IconButton } from '@mui/material';
 import InventoryCharts from './InventoryCharts';
 import { InfoRounded } from '@mui/icons-material';
+import SectionWrapper from '../../../../components/SectionWrapper';
 
 const InventoryManagement = () => {
     const {searchTerm, setSearchTerm} = useOutletContext()
@@ -13,7 +14,10 @@ const InventoryManagement = () => {
 
     return (
         <div>
-            <Box sx={{pb: 4}}>
+            <Box sx={{mb: 3}}>
+                <Typography variant="subtitle1" color="secondary" sx={{fontWeight: 'bold'}}>
+                    Inventory Listing
+                </Typography>
                 <Typography variant="body2" color="grey" gutterBottom>
                     The list are products that have not been released, it's not available to customer yet.
                     You can add it in <b>Manage Products</b> to post it so that customer can purchase the product or sell it using <b>Manage Auction</b>
@@ -23,10 +27,10 @@ const InventoryManagement = () => {
             {/* Main Content*/}
             <Stack gap={5}>
                 {/* Chart */}
-                <Box component={'section'} sx={{bgcolor: '#F0F0F0', borderRadius: 5, p: 2, boxShadow: 3 }}>
+                <SectionWrapper sx={{boxShadow: 3}}>
                     <Stack  pb={1}>
                         <Stack justifyContent={'space-between'} direction={'row'} alignItems={'center'}>
-                            <Typography variant="h6" color="secondary" sx={{fontWeight: 'bold'}}>
+                            <Typography variant="subtitle2" color="secondary" sx={{fontWeight: 'bold'}}>
                                 Stock Info
                             </Typography>
                             <IconButton onClick={() => setNote((prev) => !prev)}>
@@ -41,13 +45,12 @@ const InventoryManagement = () => {
                         </Collapse>
                     </Stack>
                     <InventoryCharts/>
-                </Box>
-
+                </SectionWrapper>
                 {/* Table */}
-                <Box component={'section'} sx={{bgcolor: '#F0F0F0', borderRadius: 5, p: 2, boxShadow: 3}}>
+                <SectionWrapper sx={{boxShadow: 3}}>
                     <Stack  pb={1}>
                         <Stack justifyContent={'space-between'} direction={'row'} alignItems={'center'}>
-                            <Typography variant="h6" color="secondary" sx={{fontWeight: 'bold'}}>
+                            <Typography variant="subtitle2" color="secondary" sx={{fontWeight: 'bold'}}>
                                 Inventory List
                             </Typography>
                             <IconButton onClick={() => setNote((prev) => !prev)}>
@@ -62,7 +65,7 @@ const InventoryManagement = () => {
                         </Collapse>
                     </Stack>
                     <InventoryTable searchTerm={searchTerm}/>
-                </Box>
+                </SectionWrapper>
             </Stack>
         </div>
     )

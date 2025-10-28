@@ -47,7 +47,6 @@ const AdminLayout = () => {
             warned = false;
 
             const resetTime = Date.now()
-            console.log("🔄 Timer reset at:", new Date(resetTime).toLocaleTimeString())
 
             timeout = setTimeout(handleLogout, duration);
 

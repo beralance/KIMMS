@@ -29,13 +29,15 @@ const auctionStatusFilter = [
     {key: 2, status: 'PENDING', icon: <PendingRounded/>, color: 'primary' },
     {key: 3, status: 'CLOSED', icon: <HistoryRounded/>, color: 'warning' },
 ]
+
 const AdminAuctionMonitor = ({searchTerm}) => {
     const [auctions, setAuctions] = useState([]);
     const [filterStatus, setFilterStatus] = useState('ALL');
-    const { token } = useAuth()
+    const { user } = useAuth()
     const API_URL = import.meta.env.VITE_API_URL;
     const [loading, setLoading] = useState(false)
     const [collapseOpen, setCollapseOpen] = useState(true)
+    const token = user.token
     
     const fetchAuctions = async () => {
         setLoading(true)
@@ -71,7 +73,6 @@ const AdminAuctionMonitor = ({searchTerm}) => {
     useEffect(() => {
         fetchAuctions();
     }, []);
-
 
     return (
                 

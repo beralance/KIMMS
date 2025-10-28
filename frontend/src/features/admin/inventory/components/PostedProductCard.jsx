@@ -74,9 +74,9 @@ export default function ProductCard({ product, onEdit, onDelete }) {
 
     return (
         <>
-            <Card sx={{ maxWidth: 320, borderRadius: 0, boxShadow: 0, bgcolor: 'transparent' }}>
+            <Card sx={{ maxWidth: 320, borderRadius: 1, boxShadow: 3, bgcolor: 'transparent' }}>
                 <Box sx={{position: 'relative'}}>
-                    <Box onClick={handleUpdateOpen} sx={{cursor: 'pointer', boxShadow: 5, borderRadius: 1, overflow: 'hidden'}}>
+                    <Box onClick={handleUpdateOpen} sx={{cursor: 'pointer',}}>
                         <img 
                             src={`${product.images[0]}`} 
                             alt={product.productName}
@@ -116,7 +116,7 @@ export default function ProductCard({ product, onEdit, onDelete }) {
                         </Typography>
 
                     </Stack>
-                    <Divider/>
+                    <Divider sx={{my: 1}}/>
                     <Stack>
                         <Typography 
                             variant="body2" 

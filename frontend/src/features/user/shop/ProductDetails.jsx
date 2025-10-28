@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Box, Typography, Button, Dialog, DialogContent, IconButton, Container, Divider, Stack } from "@mui/material";
 import { useCart } from "../../../contexts/CartContext";
@@ -22,7 +22,7 @@ import FullScreenLoader from "../../../components/FullScreenLoader";
 export default function ProductDetails() {
     const { id } = useParams();
     const {showSnackbar} = useSnackbar()
-    const { products } = useContext(ProductContext);
+    const { products, incrementViews } = useContext(ProductContext);
     const navigate = useNavigate();
     const { addToCart } = useCart();
     const { setCheckoutItems } = useCheckout();
@@ -30,8 +30,16 @@ export default function ProductDetails() {
     const [recommendations, setRecommendations] = useState([]);
     const [imageOpen, setImageOpen] = useState(false);
     const [loading, setLoading] = useState(false)
+    const hasIncremented = useRef(false)
 
     ScrollOnTop()
+
+    useEffect(() => {
+        if (!hasIncremented.current && id) {
+            incrementViews(id)
+            hasIncremented.current = true
+        }
+    })
 
     useEffect(() => {
         setLoading(true);

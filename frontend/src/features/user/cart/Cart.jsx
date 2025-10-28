@@ -4,14 +4,19 @@ import { useCart } from "../../../contexts/CartContext";
 import { useCheckout } from "../../../contexts/CheckoutContext";
 import { NavLink, useNavigate } from "react-router-dom";
 import BottomActionBar from "../../../components/BottomActionBar";
+import SectionWrapper from "../../../components/SectionWrapper";
 import {DeleteRounded, DoneAllRounded, KeyboardArrowDownRounded, KeyboardArrowUpRounded, RemoveDoneRounded } from '@mui/icons-material'
 import { toTitleCase, formatNumber } from '../../../utils/stringUtils'
+import { useSnackbar } from "../../../contexts/SnackbarContext";
+import {ShoppingBagIcon} from 'lucide-react'
+
 
 export default function Cart() {
     const { cartItems, removeFromCart } = useCart();
     const { setCheckoutItems } = useCheckout();
     const [selectedIds, setSelectedIds] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
+    const {showSnackbar} = useSnackbar()
     const [summaryOpen, setSummaryOpen] = useState(false)
     const navigate = useNavigate();
 
@@ -75,12 +80,13 @@ export default function Cart() {
 
     const handleCheckout = () => {
         if (!selectedIds.length) {
-            alert("Please select at least one item to checkout.");
+            showSnackbar("Please select at least one item to checkout.", 'warning');
             return;
         }
         const itemsToCheckout = validCartItems.filter(item =>
             selectedIds.includes(item.productId._id)
         );
+        console.log('CHECKOUT ITEMS', itemsToCheckout)
         setCheckoutItems(itemsToCheckout);
         navigate("/checkout", { replace: true });
     };
@@ -91,15 +97,15 @@ export default function Cart() {
             name: item.productId.productName,
             price: item.productId.price,
         }))
-    console.log('$$$$$$$$cart Items', validCartItems[0].productId.category?.name)
-    console.log('$$$$$$$$cart Items', validCartItems)
+        
     return (
         <Container sx={{ pb: {xs: "120px", md: 0 }}}>
 
             {/* Mobile On*/}
             <Box sx={{ display: {xs: "flex", md: 'none'}, mb: 2, justifyContent: "space-between", alignItems: "center" }}>
-                <Typography variant="body1" sx={{fontWeight: 'bold'}} >
+                <Typography variant="subtitle1" sx={{display: 'flex', alignItems: 'center', gap: 1}}>
                     Shopping Cart
+                    <ShoppingBagIcon/>
                 </Typography>
                 <Box>
                     {selectedIds.length > 0 && (
@@ -112,115 +118,14 @@ export default function Cart() {
                     </Button>
                 </Box>
             </Box>
-            <Box sx={{boxShadow: 2, p: 2, borderRadius: 2, mb: 3, display: {xs: 'block', md: 'none'}}}>
-                <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1}}>
-                    <Typography variant="subtitle2" color="initial" fontWeight='bold'>
-                        Shipping Address:
-                    </Typography>
-                    <Button variant="outlined" color="secondary">
-                        Change
-                    </Button>
-                </Box>
-                <Typography variant="body2" color="grey">
-                    {Object.entries(user.address).map(([key, value]) => (
-                        <span key={key}>{toTitleCase(value)} </span>
-                    ))}
-                </Typography>
-            </Box>
-            <Box sx={{display: {xs: 'flex', md: 'none'}, width: 100, justifyContent: 'center', position: selectedIds.length && 'sticky', top: 70, backdropFilter: 'blur(10px)', WebkitBackdropFilter: "blur(10px)", zIndex: 1000, p: 2, py: 1, borderRadius: '0px 5px 5px 0px'}}>
-                <Typography variant="body2" color="secondary" fontWeight='bold'>
-                    {selectedIds.length} selected
-                </Typography>
-            </Box>
-            <Box sx={{display: {md: 'flex'}, gap: {xs: 0, md: 1}}}>
-                <Box  sx={{ width: {md: '60%'},}}>
-                    {/* Desktop On*/}
-                    <Box sx={{ display: {xs: 'none', md: "flex"}, mb: {md: 2}, mx: {md: 1}, justifyContent: "space-between", alignItems: "center" }}>
-                        <Typography variant="Subtitle1" fontWeight='bold'>
-                            Shopping Cart ({validCartItems.length})
-                        </Typography>
-                        <Box sx={{display: 'flex', gap: 2}}>
-                            {selectedIds.length > 0 && (
-                                <Button variant="text" color="error" onClick={handleRemoveSelected}>
-                                    <DeleteRounded fontSize="small" sx={{mr: 1}}/> Delete Selected
-                                </Button>
-                            )}
-                            <Button variant={selectedIds.length === validCartItems.length ? 'contained' : 'text'} color="secondary" onClick={handleSelectAll}>
-                                {selectedIds.length === validCartItems.length ? <><RemoveDoneRounded fontSize="small" sx={{mr: 1}}/> Unselect All</> : <><DoneAllRounded fontSize="small" sx={{mr: 1}}/> Select All</>}
-                            </Button>
-                        </Box>
-                    </Box>
-                    <Box sx={{ mt: 2, px: {xs: 2, sm: 2}, m: {md: 1}, py: {xs: 0, md: 1}, bgcolor: '#f8f8f8', borderRadius: {xs: 2, md: 4},  overflowY: 'auto', height: {md: '79vh'}}}>
-                        {validCartItems.slice().reverse().map((item) => {
-                            const product = item.productId;
-                            return (
-                                <Box key={item._id} >
-                                    <Grid container sx={{ boxShadow: 4, my: {xs: 2, sm: 1.5}, borderRadius: 2, overflow: 'hidden', bgcolor: 'white'}}>
-                                        <Grid size={{xs: 5}}>
-                                            <Button
-                                                onClick={() => navigate(`/product/${product._id}`)}
-                                                sx={{ padding: 0 }}
-                                            >
-                                                <Box>
-                                                    <img
-                                                        src={product.images[0]}
-                                                        alt={product.productName}
-                                                        style={{ width: "100%", display: 'block', height: '100%', aspectRatio: '1/1', objectFit: "cover" }}
-                                                    />
-                                                </Box>
-                                            </Button>
-                                        </Grid>
-                                        <Grid size={{ xs: 7 }}>
-                                            <Stack sx={{position: 'relative', height: '100%'}}>
-                                                <Box sx={{position:'absolute', top: 0, right: 0}}>
-                                                    <Checkbox
-                                                        color="secondary"
-                                                        checked={selectedIds.includes(product._id)}
-                                                        onChange={() => toggleSelect(product._id)}
-                                                    />
-                                                </Box>
-                                                <Stack sx={{ justifyContent: {xs: 'flex', md: 'space-between'}, my: {xs: 2, md: 2}, pt: {xs: 0, sm: 2}, mx: {xs: 1.5, sm: 2}, height: '100%', flexDirection: "column"}}>
-                                                    <Box sx={{mb: {xs: 2, md: 0}}}>
-                                                        <Typography 
-                                                            sx={{
-                                                                typography: {xs: 'body1', sm: 'h6'}, 
-                                                                textWrap: {xs: 'nowrap', sm: 'none'}, 
-                                                                minWidth: 50,
-                                                                maxWidth: 200,
-                                                                scrollbarWidth: 'none', 
-                                                                overflowX: 'auto', 
-                                                            }}
-                                                        >
-                                                                {product.productName ?? "Product not found"}
-                                                        </Typography>
-                                                        <Typography noWrap sx={{typography: {xs: 'body2'}, width: 'fit-content', border: '1px solid black', borderRadius: '999px', px: 1}}>{product.category?.name}</Typography>
-                                                    </Box>
-                                                    <Typography variant="body2" color="grey" sx={{display: {xs: 'none', sm: 'block'}}}>{product.description}</Typography>
-                                                    <Box sx={{bgcolor: '#37353E', display: 'flex', mt: {xs: 'auto', md: 0}, justifyContent: 'center', p: {xs: .5, md: 1}, px: {xs: 1, md: 2}, mx: {xs: 0, md: 2} , borderRadius: '999px'}}>
-                                                        <Typography  sx={{typography: {xs: 'body2'}, fontWeight: {xs: '', sm: 'bold',}}} color="white" >
-                                                            PHP {(product.price ?? 0).toLocaleString('en-PH', {minimumFractionDigits: 2})}
-                                                        </Typography>
-                                                    </Box>
-                                                </Stack>
-                                            </Stack>
-                                        </Grid>
-                                    </Grid>
-                                </Box>
-                            );
-                        })}
-                    </Box>
-                </Box>
-                {/* Right Container */}
-                <Box sx={{display: {xs: 'none', md: 'flex'}, flexDirection: 'column', width: {xs: 0, md: '40%'}, height: 400, p: 2}}>
-                    <Typography variant="subtitle1" fontWeight='bold' color="secondary" sx={{mb: 1}}>
-                        Order Summary
-                    </Typography>
-                    <Box sx={{boxShadow: 2, p: 2, borderRadius: 2, mb: 2}}>
+            <Stack gap={2}>
+                <Box sx={{display: {xs: 'block', md: 'none'}}}>
+                    <SectionWrapper>
                         <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1}}>
                             <Typography variant="subtitle2" color="initial" fontWeight='bold'>
                                 Shipping Address:
                             </Typography>
-                            <Button variant="outlined" color="secondary">
+                            <Button variant="outlined" color="secondary" onClick={() => navigate('/account/update-address')}>
                                 Change
                             </Button>
                         </Box>
@@ -229,54 +134,163 @@ export default function Cart() {
                                 <span key={key}>{toTitleCase(value)} </span>
                             ))}
                         </Typography>
-                    </Box>
-                    <Box sx={{boxShadow: 2, p: 2, borderRadius: 2}}>
-                        <Typography variant="body1" color="initial" fontWeight='bold'>
-                            Selected Item:
+                    </SectionWrapper>
+                </Box>
+                
+                <Box sx={{display: {md: 'flex'}}}>
+                    <SectionWrapper>
+                        <Box sx={{display: {xs: 'flex', md: 'none'}, width: 100, justifyContent: 'center', position: selectedIds.length && 'sticky', top: 70, backdropFilter: 'blur(10px)', WebkitBackdropFilter: "blur(10px)", zIndex: 1000, p: 2, py: 1, borderRadius: '0px 5px 5px 0px'}}>
+                            <Typography variant="body2" color="secondary" fontWeight='bold'>
+                                {selectedIds.length} selected
+                            </Typography>
+                        </Box>
+                        <Box  sx={{ width: {md: '60%'},}}>
+                            {/* Desktop On*/}
+                            <Box sx={{ display: {xs: 'none', md: "flex"}, justifyContent: "space-between", alignItems: "center" }}>
+                                <Typography variant="Subtitle1" fontWeight='bold'>
+                                    Shopping Cart ({validCartItems.length})
+                                </Typography>
+                                <Box sx={{display: 'flex', gap: 2}}>
+                                    {selectedIds.length > 0 && (
+                                        <Button variant="text" color="error" onClick={handleRemoveSelected}>
+                                            <DeleteRounded fontSize="small" sx={{mr: 1}}/> Delete Selected
+                                        </Button>
+                                    )}
+                                    <Button variant={selectedIds.length === validCartItems.length ? 'contained' : 'text'} color="secondary" onClick={handleSelectAll}>
+                                        {selectedIds.length === validCartItems.length ? <><RemoveDoneRounded fontSize="small" sx={{mr: 1}}/> Unselect All</> : <><DoneAllRounded fontSize="small" sx={{mr: 1}}/> Select All</>}
+                                    </Button>
+                                </Box>
+                            </Box>
+                            <Stack gap={2} sx={{overflowY: 'auto', height: {md: '79vh'}}}>
+                                {validCartItems.slice().reverse().map((item) => {
+                                    const product = item.productId;
+                                    return (
+                                        <Box key={item._id} >
+                                            <Grid container sx={{ boxShadow: 4, borderRadius: 2, overflow: 'hidden', bgcolor: 'white'}}>
+                                                <Grid size={{xs: 5}}>
+                                                    <Button
+                                                        onClick={() => navigate(`/product/${product._id}`)}
+                                                        sx={{ padding: 0 }}
+                                                    >
+                                                        <Box>
+                                                            <img
+                                                                src={product.images[0]}
+                                                                alt={product.productName}
+                                                                style={{ width: "100%", display: 'block', height: '100%', aspectRatio: '1/1', objectFit: "cover" }}
+                                                            />
+                                                        </Box>
+                                                    </Button>
+                                                </Grid>
+                                                <Grid size={{ xs: 7 }}>
+                                                    <Stack sx={{position: 'relative', height: '100%'}}>
+                                                        <Box sx={{position:'absolute', top: 0, right: 0}}>
+                                                            <Checkbox
+                                                                color="secondary"
+                                                                checked={selectedIds.includes(product._id)}
+                                                                onChange={() => toggleSelect(product._id)}
+                                                            />
+                                                        </Box>
+                                                        <Stack sx={{ justifyContent: {xs: 'flex', md: 'space-between'}, my: {xs: 2, md: 2}, pt: {xs: 0, sm: 2}, mx: {xs: 1.5, sm: 2}, height: '100%', flexDirection: "column"}}>
+                                                            <Box sx={{mb: {xs: 2, md: 0}}}>
+                                                                <Typography 
+                                                                    sx={{
+                                                                        typography: {xs: 'subtitle2', sm: 'h6'}, 
+                                                                        textWrap: {xs: 'nowrap', sm: 'none'}, 
+                                                                        minWidth: 50,
+                                                                        maxWidth: 200,
+                                                                        scrollbarWidth: 'none', 
+                                                                        overflowX: 'auto', 
+                                                                    }}
+                                                                >
+                                                                        {product.productName ?? "Product not found"}
+                                                                </Typography>
+                                                                <Typography noWrap sx={{typography: {xs: 'body2'}, width: 'fit-content', border: '1px solid black', borderRadius: '999px', px: 1}}>{product.category?.name}</Typography>
+                                                            </Box>
+                                                            <Typography variant="body2" color="grey" sx={{display: {xs: 'none', sm: 'block'}}}>{product.description}</Typography>
+                                                            <Box sx={{border: '1px solid #37353E', display: 'flex', mt: {xs: 'auto', md: 0}, justifyContent: 'center', p: {xs: .5, md: 1}, px: {xs: 1, md: 2}, mx: {xs: 0, md: 2} , borderRadius: '999px'}}>
+                                                                <Typography variant="body2" color="initial" >
+                                                                    PHP {(product.price ?? 0).toLocaleString('en-PH', {minimumFractionDigits: 2})}
+                                                                </Typography>
+                                                            </Box>
+                                                        </Stack>
+                                                    </Stack>
+                                                </Grid>
+                                            </Grid>
+                                        </Box>
+                                    );
+                                })}
+                            </Stack>
+                        </Box>
+                    </SectionWrapper>
+                    
+                    {/* Right Container */}
+                    <Box sx={{display: {xs: 'none', md: 'flex'}, flexDirection: 'column', width: {xs: 0, md: '40%'}, height: 400, p: 2}}>
+                        <Typography variant="subtitle1" fontWeight='bold' color="secondary" sx={{mb: 1}}>
+                            Order Summary
                         </Typography>
-                        <Box sx={{my: 1}}>
-                            {selectedItemsDetails.map((item, index) => (
-                                <Grow in={true}  key={index} mountOnEnter unmountOnExit timeout={500}>
-                                    <List sx={{py: 0}}>
-                                        <ListItem sx={{display: 'flex', px: 0, justifyContent: 'space-between', py: 1, my: 0}}>
-                                            <Typography noWrap variant="subtitle2" color="initial">
-                                                - {item.name}
-                                            </Typography>
-                                            <Typography variant="subtitle2" color="grey">
-                                                PHP {formatNumber(item.price)}
-                                            </Typography>
-                                        </ListItem>
-                                    </List>
-                                </Grow>
-                            ))}
-                        </Box>
-                        <Divider/>
-                        <Box sx={{my: 2, display: 'flex', justifyContent: 'space-between'}}> 
-                            <Typography variant="subtitle2" fontWeight='bold'>
-                                Sub-total (
-                                    {selectedIds.length ?
-                                        (
-                                            `${selectedIds.length} item${selectedIds.length <= 1 ? '' : 's'}`
-                                        )
-                                        :
-                                        ''
-                                    }
-                                ) :
-                            </Typography>
-                            <Typography variant="subtitle2">
-                                PHP {formatNumber(totalPrice)} 
-                            </Typography>
-                        </Box>
-                        <Box sx={{width: '100%'}}>
-                            {selectedIds.length > 0 && (
-                                <Button variant="contained" color="secondary" fullWidth onClick={handleCheckout}>
-                                    Checkout Selected
+                        <Box sx={{boxShadow: 2, p: 2, borderRadius: 2, mb: 2}}>
+                            <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1}}>
+                                <Typography variant="subtitle2" color="initial" fontWeight='bold'>
+                                    Shipping Address:
+                                </Typography>
+                                <Button variant="outlined" color="secondary">
+                                    Change
                                 </Button>
-                            )}
+                            </Box>
+                            <Typography variant="body2" color="grey">
+                                {Object.entries(user.address).map(([key, value]) => (
+                                    <span key={key}>{toTitleCase(value)} </span>
+                                ))}
+                            </Typography>
+                        </Box>
+                        <Box sx={{boxShadow: 2, p: 2, borderRadius: 2}}>
+                            <Typography variant="body1" color="initial" fontWeight='bold'>
+                                Selected Item:
+                            </Typography>
+                            <Box sx={{my: 1}}>
+                                {selectedItemsDetails.map((item, index) => (
+                                    <Grow in={true}  key={index} mountOnEnter unmountOnExit timeout={500}>
+                                        <List sx={{py: 0}}>
+                                            <ListItem sx={{display: 'flex', px: 0, justifyContent: 'space-between', py: 1, my: 0}}>
+                                                <Typography noWrap variant="subtitle2" color="initial">
+                                                    - {item.name}
+                                                </Typography>
+                                                <Typography variant="subtitle2" color="grey">
+                                                    PHP {formatNumber(item.price)}
+                                                </Typography>
+                                            </ListItem>
+                                        </List>
+                                    </Grow>
+                                ))}
+                            </Box>
+                            <Divider/>
+                            <Box sx={{my: 2, display: 'flex', justifyContent: 'space-between'}}> 
+                                <Typography variant="subtitle2" fontWeight='bold'>
+                                    Sub-total (
+                                        {selectedIds.length ?
+                                            (
+                                                `${selectedIds.length} item${selectedIds.length <= 1 ? '' : 's'}`
+                                            )
+                                            :
+                                            ''
+                                        }
+                                    ) :
+                                </Typography>
+                                <Typography variant="subtitle2">
+                                    PHP {formatNumber(totalPrice)} 
+                                </Typography>
+                            </Box>
+                            <Box sx={{width: '100%'}}>
+                                {selectedIds.length > 0 && (
+                                    <Button variant="contained" color="secondary" fullWidth onClick={handleCheckout}>
+                                        Checkout Selected
+                                    </Button>
+                                )}
+                            </Box>
                         </Box>
                     </Box>
                 </Box>
-            </Box>
+            </Stack>
             
             <Box sx={{ display: {xs: "flex", md: 'none'}, }}>
                 <BottomActionBar>

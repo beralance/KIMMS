@@ -1,17 +1,68 @@
-import React from "react";
-import { Container, Typography, Box, Button } from "@mui/material";
+import React, { useState } from "react";
+import { Container, Typography, Box, Button, Divider, Stack, FormControl, InputLabel, Select, MenuItem, IconButton, Collapse } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useCheckout } from "../../../contexts/CheckoutContext";
+import { BanknoteIcon, ChevronLeftIcon, InfoIcon, MapPinIcon, Package2Icon, PackageOpenIcon, ReceiptTextIcon, WalletIcon} from 'lucide-react'
+import { toTitleCase, formatNumber} from '../../../utils/stringUtils'
+import { getDistanceInKm } from '../../../utils/haversine'
+import { useAuth } from '../../../contexts/AuthContext'
+import phData from '../../../data/phData.json'
 import BottomActionBar from "../../../components/BottomActionBar";
-import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
-import PaymentMethod from "./components/PaymentMethod";
+import SectionWrapper from '../../../components/SectionWrapper'
+import FullScreenLoader from '../../../components/FullScreenLoader'
+import ConfirmDialog from '../../../components/ConfirmDialog'
 
+const shopLat = 13.355346998983666 
+const shopLng =  123.72596017036658
+const baseFees = {SM: 100, MD: 200, LG: 300, XL: 400}
+const incrementPerKm = 40
 
 export default function Checkout() {
-    const { checkoutItems, totalAmount, isProcessing, checkout } = useCheckout();
-    
-    const finalAmount = totalAmount + 1 // change 1 into shipping fee
+    const { checkoutItems, totalAmount, setFinalPrice, isProcessing, checkout, codCheckout } = useCheckout();
+    const {user} = useAuth()
+    const [paymentOption, setPaymentOption] = useState('gcash')
+    const [showInfo, setShowInfo] = useState(true)
+    const [checkoutConfirm, setCheckoutConfirm] = useState(false)
+    const [loading, setLoading] = useState(false) 
+    const [size, setSize] = useState('SM')
     const navigate = useNavigate();
+
+    const userAddress = `${user.address?.street}, ${user.address?.city}, ${user.address?.province}, ${user.address?.country}, ${user.address?.postalCode}`
+    const userMunicipality = user.address.city    
+    const dataMunicipality = phData[user.address.region].province_list[user.address.province.toUpperCase()].municipality_list[user.address.city.toUpperCase()]
+    
+    const checkoutConfirmOpen = () => setCheckoutConfirm(true)
+    const checkoutConfirmClose = () => setCheckoutConfirm(false)
+
+    const calculateShipping = () => {
+        if (!userMunicipality || !dataMunicipality ) return 0;
+
+        const distance = getDistanceInKm(shopLat, shopLng, dataMunicipality.lat, dataMunicipality.lng);
+        const increment = distance * incrementPerKm;
+        return baseFees[size] + Math.ceil(increment);
+    }
+
+    const shippingFee = calculateShipping()
+    const finalAmount = totalAmount + shippingFee
+    setFinalPrice(finalAmount)
+
+    const handleCheckout = () => {
+        try {
+            setLoading(true)
+            if (paymentOption === 'gcash') {
+                checkout()
+            }
+            else if (paymentOption === 'cashOnDelivery') {
+                checkoutConfirmOpen()
+            }
+        }
+        catch (err) {
+            console.error('Problem occured during checkout: ', err)
+        }
+        finally {
+            setLoading(false)
+        }
+    }
 
     if (!checkoutItems.length) {
         return (
@@ -25,30 +76,138 @@ export default function Checkout() {
     }
     
     return (
-        <Container sx={{ mt: 4 }}>
-            <Typography variant="h4" sx={{ mb: 3 }}>
-                Checkout
-            </Typography>
-
-            <PaymentMethod/>
-
-
-            {checkoutItems.map((item) => (
-                <Box key={item._id} sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-                    <Typography noWrap>
-                        {item.productId.productName}
+        <Box sx={{bgcolor: '#f0f0f0ff', height: '100%', minHeight: '100vh', p: 2}}>
+            <Stack gap={2} sx={{ pb: 10}}>
+                <Stack>
+                    <Typography variant="subtitle1" sx={{display: 'flex', alignItems: 'center', gap: 1}}>
+                        Checkout
+                        <ReceiptTextIcon/>
                     </Typography>
-                    <Typography>
-                        PHP {(item.productId.price ?? 0).toLocaleString('en-PH', {minimumFractionDigits: 2})}
+                    <Typography variant="body2" color="gray">
+                        Please review your cart items and delivery information before continuing
                     </Typography>
-                </Box>
-            ))}
-
-            <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}>
-                <Typography variant="h6">Total:</Typography>
-                <Typography variant="h6">PHP {totalAmount.toLocaleString('en-PH', {minimumFractionDigits: 2})}</Typography>
-            </Box>
-
+                </Stack>
+                <Stack gap={2}>
+                    <SectionWrapper>
+                        <Stack gap={1}>
+                            <Typography variant="body1" color="secondary" sx={{display: 'flex', alignItems: 'center', gap: 1}}>
+                                <MapPinIcon/>
+                                Shipping information
+                            </Typography>
+                            <Stack sx={{px: 1 }}>
+                                <Typography variant="body2" color="gray">{user.fullName}</Typography>
+                                <Typography variant="body2" color="gray">{user.email}</Typography>
+                                <Typography variant="body2" color="gray">{user.phoneNumber}</Typography>
+                                <Typography variant="body2" color="gray">{toTitleCase(userAddress)}</Typography>
+                            </Stack>
+                            <Button variant="outlined" color="secondary" onClick={() => navigate('/account/update')}>
+                                Change
+                            </Button>
+                        </Stack>
+                    </SectionWrapper>
+                    <SectionWrapper>
+                        <Stack>
+                            <Typography variant="subtitle2" color="initial" gutterBottom sx={{display: 'flex', gap: 1, alignItems: 'center'}}>
+                                <Package2Icon/>
+                                Total items {`(${checkoutItems.length})`}
+                            </Typography>
+                            <Stack gap={1} sx={{bgcolor: '#f5f5f5ff', p: 2, my: 1, borderRadius: 2}}>
+                                {checkoutItems.map((item) => (
+                                    <Box key={item._id} sx={{ display: "flex", gap: 3, justifyContent: 'space-between'}}>
+                                        <Box sx={{width: 80, height: 80, overflow: 'hidden', borderRadius: 1}}>
+                                            <img 
+                                                src={item.productId?.images?.[0]}
+                                                style={{
+                                                    display: 'block',
+                                                    height: '100%',
+                                                    width: '100%',
+                                                    aspectRatio: '1/1',
+                                                    objectFit: 'cover',
+                                                }}
+                                            />
+                                        </Box>
+                                        <Stack>
+                                            <Typography variant="body2" color="initial" align="end">
+                                                {item.productId?.productName}
+                                            </Typography>
+                                            <Typography variant="body2" color="initial" align="end">
+                                                {item.productId?.condition}
+                                            </Typography>
+                                            <Typography variant="body2" color="secondary" align="end">
+                                                - Php {formatNumber(item.productId?.price)}
+                                            </Typography>
+                                        </Stack>
+                                    </Box>
+                                ))}
+                            </Stack>
+                        </Stack>
+                        <Divider sx={{my: 2}}/>
+                        <Stack direction={'row'} justifyContent={'space-between'}>
+                            <Typography variant="body2">Total:</Typography>
+                            <Typography variant="body2">PHP {formatNumber(totalAmount)}</Typography>
+                        </Stack>
+                    </SectionWrapper>
+                    <SectionWrapper sx={{gap: 2}}>
+                        <Stack>
+                            <Stack justifyContent={'space-between'} alignItems={'center'} direction={'row'}>
+                                <Typography variant="body1" color="initial" sx={{alignItems: 'center', display: 'flex', gap: 1}}>
+                                    <WalletIcon/>
+                                    Pay with
+                                </Typography>
+                                <IconButton onClick={() => setShowInfo((prev) => !prev)}>
+                                    <InfoIcon style={{color: showInfo ? 'white' : 'gray', fill: showInfo ? 'gray' : 'none'}}/>
+                                </IconButton>
+                            </Stack>
+                            <Collapse in={showInfo} mountOnEnter unmountOnExit>
+                                <Typography variant="body2" color="gray" gutterBottom sx={{px: 1}}>
+                                    Local items can be purchased using Cash on Delivery or Online Payment, while international items support Online Payment only
+                                </Typography>
+                            </Collapse>
+                        </Stack>
+                        <Stack>
+                            <FormControl fullWidth>
+                                <InputLabel id='payment-option'>Payment options</InputLabel>
+                                <Select
+                                    labelId="payment-option"
+                                    value={paymentOption}
+                                    label='Payment option'
+                                    onChange={(e) => setPaymentOption(e.target.value)}
+                                >
+                                    <MenuItem value='gcash'>GCash</MenuItem>
+                                    <MenuItem value='cashOnDelivery'>Cash on Delivery</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Stack>
+                        <Stack justifyContent={'space-between'} direction={'row'}>
+                            <Typography variant="body2" color="secondary">Payment method: </Typography>
+                            <Typography variant="body2" color="secondary">{paymentOption === 'cashOnDelivery' ? 'Cash on Delivery' : 'GCash'}</Typography>
+                        </Stack>
+                    </SectionWrapper>
+                    <SectionWrapper>
+                        <Stack gap={1}>
+                            <Typography variant="subtitle2" color="initial" sx={{display: 'flex', alignItems: 'center', gap: 1}}>
+                                <BanknoteIcon/>
+                                Payment details
+                            </Typography>
+                            <Stack>
+                                <Stack direction={'row'} justifyContent={'space-between'}>
+                                    <Typography variant="body2" color="secondary">Item(s) Subtotal</Typography>
+                                    <Typography variant="body2" color="secondary">- Php {formatNumber(totalAmount)}</Typography>
+                                </Stack>
+                                <Stack justifyContent={'space-between'} direction={'row'}>
+                                    <Typography variant="body2" color="secondary">Shipping Subtotal</Typography>
+                                    <Typography variant="body2" color="secondary">- Php {shippingFee}</Typography>
+                                </Stack>
+                                <Divider sx={{my: 2}}/>
+                                <Stack justifyContent={'space-between'} direction={'row'}>
+                                    <Typography variant="body2" color="secondary" fontWeight={'bold'}>Shipping Subtotal</Typography>
+                                    <Typography variant="body2" color="secondary" fontWeight={'bold'}>Php {formatNumber(finalAmount)}</Typography>
+                                </Stack>
+                            </Stack>
+                        </Stack>
+                    </SectionWrapper>
+                </Stack>
+            </Stack>
             <BottomActionBar>
                 <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <Button
@@ -57,24 +216,34 @@ export default function Checkout() {
                         sx={{ p: 0, height: 50 }}
                         disabled ={isProcessing}
                     >
-                        <ChevronLeftRoundedIcon fontSize="large" />
+                        <ChevronLeftIcon fontSize="large" />
                     </Button>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                        <Typography variant="body1" sx={{ fontWeight: "bold" }} color="secondary">
-                            PHP {totalAmount.toLocaleString('en-PH', {minimumFractionDigits: 2})}
+                        <Typography variant="subtitle2" sx={{ fontWeight: "bold" }} color="secondary">
+                            PHP {formatNumber(finalAmount)}
                         </Typography>
                         <Button
                             variant="contained"
                             color="secondary"
-                            onClick={() => checkout()} // ✅ just call checkout from context
+                            onClick={handleCheckout}
                             disabled={isProcessing}
-                            sx={{ p: 1, px: 4, borderRadius: 2 }}
+                            sx={{ p: 1, px: 4}}
                         >
                             {isProcessing ? "Processing..." : "Checkout"}
                         </Button>
                     </Box>
                 </Box>
             </BottomActionBar>
-        </Container>
+            <FullScreenLoader open={loading}/>
+            <ConfirmDialog
+                open={checkoutConfirm}
+                title="Proceed to Checkout?"
+                content="You’re about to place your order. Continue?"
+                confirmText="Yes, Continue"
+                cancelText="No, Go Back"
+                onConfirm={() => codCheckout()}
+                onCancel={checkoutConfirmClose}
+            />
+        </Box>
     );
 }

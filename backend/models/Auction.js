@@ -26,11 +26,35 @@ const auctionSchema = new mongoose.Schema(
             type: Date,
             required: true,
         },
-
+        claimStage: {
+            type: Number,
+            default: 0,
+        },
+        winnerClaimed: {
+            type: Boolean,
+            default: false
+        },
+        claimedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            default: null
+        },
+        claimAt: {
+            type: Date,
+            default: null
+        },
+        winnerNotified: {
+            type: String,
+            default: 'none',
+        },
+        claimDeadline: {
+            type: Date,
+            default: null,
+        },
         // Lifecycle of the auction
         status: {
             type: String,
-            enum: ["PENDING", "LIVE", "ENDED", "CLOSED"],
+            enum: ["PENDING", "PENDING_CLAIM", "UNCLAIMED", "LIVE", "ENDED", "CLOSED"],
             default: "PENDING",
         },
 

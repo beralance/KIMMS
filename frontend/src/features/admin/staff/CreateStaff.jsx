@@ -12,11 +12,15 @@ import {
     Stack,
     Typography,
     Alert,
-    Collapse
+    Collapse,
+    IconButton
 } from "@mui/material";
 import axios from "axios";
 import { useAuth } from "../../../contexts/AuthContext";
-
+import SectionWrapper from '../../../components/SectionWrapper'
+import {toTitleCase} from '../../../utils/stringUtils'
+import { ListCheckIcon, UserRoundPenIcon, UserRoundPlusIcon, XIcon } from 'lucide-react'
+import {useSnackbar} from '../../../contexts/SnackbarContext'
 
 const modulesList = ['dashboard', "inventory", "order", 'report'];
 const nestedInventoryModules = [
@@ -27,15 +31,14 @@ const nestedInventoryModules = [
 
 const CreateStaff = ({ open, onClose, onStaffCreated }) => {
     const { token } = useAuth();
-    //const API_URL = "http://localhost:5000/api";
     const API_URL = import.meta.env.VITE_API_URL;
+    const {showSnackbar} = useSnackbar()
 
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [allowedModules, setAllowedModules] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
 
     const toggleModule = (moduleName) => {
@@ -72,8 +75,6 @@ const CreateStaff = ({ open, onClose, onStaffCreated }) => {
 
     const handleSubmit = async () => {
         setLoading(true);
-        setError("");
-        setSuccess("");
 
         // validation: inventory is checked but no nested tab
         if (
@@ -82,13 +83,13 @@ const CreateStaff = ({ open, onClose, onStaffCreated }) => {
                 nestedInventoryModules.map((tab) => tab.name).includes(m)
         )) 
         {
-            setError("Please select at least one tab for Inventory");
+            showSnackbar("Please select at least one tab for Inventory", 'warning');
             setLoading(false);
             return;
         }
 
         if (!fullName || !email || !password) {
-            setError("Please fill all required fields");
+            showSnackbar("Please fill all required fields", 'warning');
             setLoading(false);
             return;
         }
@@ -99,7 +100,7 @@ const CreateStaff = ({ open, onClose, onStaffCreated }) => {
                 { email, password, fullName, allowedModules },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            setSuccess(res.data.message);
+            showSnackbar(res.data.message || 'Account created successfully', 'success');
             onStaffCreated && onStaffCreated(res.data);
             setFullName("");
             setEmail("");
@@ -107,7 +108,7 @@ const CreateStaff = ({ open, onClose, onStaffCreated }) => {
             setAllowedModules([]);
             onStaffCreated()
         } catch (err) {
-            setError(err.response?.data?.error || "Something went wrong");
+            showSnackbar(err.response?.data?.error || "Something went wrong", 'error');
         } finally {
             setLoading(false);
         }
@@ -115,83 +116,116 @@ const CreateStaff = ({ open, onClose, onStaffCreated }) => {
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-            <DialogTitle>Create New Staff</DialogTitle>
-            <DialogContent>
-                <Stack spacing={2}>
-                    {error && <Alert severity="error">{error}</Alert>}
-                    {success && <Alert severity="success">{success}</Alert>}
+            <SectionWrapper sx={{gap: 3, bgcolor: '#f0f0f0', position: 'relative'}}>
+                <IconButton onClick={onClose} disabled={loading} sx={{position: 'absolute', top: 10, right: 10}}>
+                    <XIcon/>
+                </IconButton>
+                <Stack sx={{mt: 2}}>
+                    <Typography variant="subtitle1" color="secondary" sx={{display: 'flex', alignItems: 'center', gap: 1}}>
+                        <UserRoundPlusIcon/>
+                        Create staff account
+                    </Typography>
+                    <Typography variant="body2" color="gray">
+                        Register a staff account and assign module permissions
+                    </Typography>
+                </Stack>
+                <Stack>
+                    <Stack spacing={3}>
+                        <SectionWrapper sx={{gap: 2}}>
+                            <Stack>
+                                <Typography variant="subtitle2" color="secondary" sx={{display: 'flex', alignItems: 'center', gap: 1}}>
+                                    <UserRoundPenIcon/>
+                                    Add account
+                                </Typography>
+                                <Typography variant="body2" color="gray">
+                                    Enter user details to add a new account
+                                </Typography>
+                            </Stack>
+                            <Stack gap={2}>
+                                <TextField
+                                    label="Full Name"
+                                    value={fullName}
+                                    onChange={(e) => setFullName(e.target.value)}
+                                    fullWidth
+                                />
+                                <TextField
+                                    label="Email"
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    fullWidth
+                                />
+                                <TextField
+                                    label="Password"
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    fullWidth
+                                />
+                            </Stack>
+                        </SectionWrapper>
+                        <Stack>
+                            <SectionWrapper sx={{gap: 1}}>
+                                <Stack>
+                                    <Typography variant="subtitle1" color="secondary" sx={{display: 'flex', alignItems: 'center', gap: 1}}>
+                                        <ListCheckIcon/>
+                                        Assign modules
+                                    </Typography>
+                                    <Typography variant="body2" color="gray">
+                                        Grant or restrict access to specific system modules
+                                    </Typography>
+                                </Stack>
+                                <Stack direction="column" gap={1} sx={{p: 1}}>
+                                    {modulesList.map((module) => {
+                                        const isInventory = module === "inventory";
+                                        return (
+                                            <Box key={module}>
+                                                <FormControlLabel
+                                                    control={
+                                                        <Checkbox
+                                                            color="secondary"
+                                                            checked={allowedModules.includes(module)}
+                                                            onChange={
+                                                            isInventory ? toggleInventory : () => toggleModule(module)
+                                                            }
+                                                        />
+                                                    }
+                                                    label={toTitleCase(module)}
+                                                />
 
-                    <TextField
-                        label="Full Name"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        fullWidth
-                    />
-                    <TextField
-                        label="Email"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        fullWidth
-                    />
-                    <TextField
-                        label="Password"
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        fullWidth
-                    />
-
-                    <Typography variant="subtitle1">Assign Modules:</Typography>
-                    <Stack direction="column" spacing={1}>
-                        {modulesList.map((module) => {
-                            const isInventory = module === "inventory";
-                            return (
-                                <Box key={module}>
-                                    <FormControlLabel
-                                        control={
-                                            <Checkbox
-                                                checked={allowedModules.includes(module)}
-                                                onChange={
-                                                isInventory ? toggleInventory : () => toggleModule(module)
-                                                }
-                                            />
-                                        }
-                                        label={module}
-                                    />
-
-                                    {isInventory && (
-                                        <Collapse in={allowedModules.includes("inventory")}>
-                                            <Stack direction="column" spacing={0.5} sx={{ ml: 4 }}>
-                                                {nestedInventoryModules.map((tab) => (
-                                                    <FormControlLabel
-                                                        key={tab.name}
-                                                        control={
-                                                            <Checkbox
-                                                                checked={allowedModules.includes(tab.name)}
-                                                                onChange={() => toggleNestedTab(tab.name)}
-                                                            />
-                                                        }
-                                                        label={tab.label}
-                                                    />
-                                                ))}
-                                            </Stack>
-                                        </Collapse>
-                                    )}
-                                </Box>
-                            );
-                        })}
+                                                {isInventory && (
+                                                    <Collapse in={allowedModules.includes("inventory")}>
+                                                        <Stack direction="column" spacing={0.5} sx={{ ml: 4 }}>
+                                                            {nestedInventoryModules.map((tab) => (
+                                                                <FormControlLabel
+                                                                    key={tab.name}
+                                                                    control={
+                                                                        <Checkbox
+                                                                            color="#777777ff"
+                                                                            checked={allowedModules.includes(tab.name)}
+                                                                            onChange={() => toggleNestedTab(tab.name)}
+                                                                        />
+                                                                    }
+                                                                    label={tab.label}
+                                                                />
+                                                            ))}
+                                                        </Stack>
+                                                    </Collapse>
+                                                )}
+                                            </Box>
+                                        );
+                                    })}
+                                </Stack>
+                            </SectionWrapper>
+                        </Stack>
                     </Stack>
                 </Stack>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={onClose} disabled={loading}>
-                    Cancel
-                </Button>
-                <Button onClick={handleSubmit} variant="contained" disabled={loading}>
-                    {loading ? "Creating..." : "Create Staff"}
-                </Button>
-            </DialogActions>
+                <Stack>
+                    <Button onClick={handleSubmit} variant="contained" color="secondary" disabled={loading}>
+                        {loading ? "Creating..." : "Create Staff"}
+                    </Button>
+                </Stack>
+            </SectionWrapper>
         </Dialog>
     );
 };

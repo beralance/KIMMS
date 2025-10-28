@@ -2,8 +2,9 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useCart } from "./CartContext";
 import { useAuth } from "./AuthContext";
-import axios from "axios";
 import { useSnackbar } from "./SnackbarContext";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const CheckoutContext = createContext();
 
@@ -14,8 +15,9 @@ export const CheckoutProvider = ({ children }) => {
 
     const [checkoutItems, setCheckoutItems] = useState([]);
     const [totalAmount, setTotalAmount] = useState(0);
+    const [finalPrice, setFinalPrice] = useState(0)
     const [isProcessing, setIsProcessing] = useState(false);
-
+    const navigate = useNavigate()
     const API_URL = import.meta.env.VITE_API_URL;
 
     // Update checkout items and total whenever cart changes
@@ -27,8 +29,7 @@ export const CheckoutProvider = ({ children }) => {
         setTotalAmount(total);
     }, [checkoutItems]);
 
-    // debugging
-
+    // online checkout
     const checkout = async () => {
         if (!checkoutItems.length) return;
 
@@ -39,7 +40,6 @@ export const CheckoutProvider = ({ children }) => {
 
         try {
             setIsProcessing(true);
-            // 1️⃣ Create an order first
             const orderResp = await axios.post(
                 `${API_URL}/api/orders`,
                 {
@@ -48,14 +48,13 @@ export const CheckoutProvider = ({ children }) => {
                         productId: item.productId._id
                     })),
                     totalPrice: totalAmount,
+                    finalPrice,
                 },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
             const order = orderResp.data;
-            const amountInCentavos = Math.round(order.totalPrice * 100)
-            console.log('NOT CONVERTED PRICE !!!!!!!!', order.totalPrice)
-            console.log('CONVERTED PRICE !!!!!!!!', amountInCentavos)
+            const amountInCentavos = Math.round(order.finalPrice * 100)
 
             const paymentResp = await axios.post(
                 `${API_URL}/api/payment/create-checkout-session`,
@@ -66,17 +65,14 @@ export const CheckoutProvider = ({ children }) => {
                 },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
-            console.log('###### PAYMENT RESP: ', paymentResp)
 
             const checkoutUrl = paymentResp.data.checkout_url;
             const sessionId = paymentResp.data.sessionId;
 
-            console.log('this is whats inside checkoutUrl: ', checkoutUrl)
-
             if (checkoutUrl) {
                 localStorage.setItem("pendingPurchase", JSON.stringify(order));
                 localStorage.setItem('checkoutSessionId', JSON.stringify(sessionId)) //add session id to local storage
-                window.location.href = checkoutUrl; // redirect to PayMongo
+                window.location.href = checkoutUrl;
             } else {
                 console.error("No checkout_url returned:", paymentResp.data);
                 showSnackbar("Failed to create checkout session.", "error");
@@ -84,6 +80,37 @@ export const CheckoutProvider = ({ children }) => {
         } catch (err) {
             console.error(err.response?.data || err.message);
             showSnackbar("Could not create checkout session.", "error");
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
+    const codCheckout = async () => {
+        if (!checkoutItems.length) return;
+        if (!user || !token) {
+            showSnackbar("You must be logged in to checkout", "error");
+            return;
+        }
+        try {
+            setIsProcessing(true);
+            const res = await axios.post(
+                `${API_URL}/api/checkout/cod`,
+                { 
+                    userId: user.userId, 
+                    checkoutItems,
+                },
+                { headers: { Authorization: `Bearer ${token}` } },
+            );
+
+            showSnackbar(res.data.message || "Order placed successfully with COD.", "success");
+             if (res.status === 201) {
+                navigate('/success');
+            } else {
+                navigate('/cancel');
+            }
+        } catch (err) {
+            console.error(err.response?.data || err.message);
+            showSnackbar("COD checkout failed.", "error");
         } finally {
             setIsProcessing(false);
         }
@@ -97,6 +124,8 @@ export const CheckoutProvider = ({ children }) => {
                 totalAmount,
                 isProcessing,
                 checkout,
+                codCheckout,
+                setFinalPrice,
             }}
         >
             {children}

@@ -24,11 +24,11 @@ const OrderContainer = ({order}) => {
                <Stack sx={{gap: 2}}>
                     {/*ORDER ID*/}
                     <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'} gap={1}>
-                        <Stack direction={'row'} >
+                        <Stack direction={'row'} gap={1}>
                             <Typography variant="body2" color="initial">
-                                Order ID:
+                                Order ID: 
                             </Typography>
-                            <Typography variant="body2" color="initial">
+                            <Typography variant="body2" color="secondary">
                                 {order.orderId}
                             </Typography>
                         </Stack>

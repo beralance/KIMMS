@@ -1,5 +1,8 @@
 // controllers/checkoutController.js
 import Cart from "../models/Cart.js";
+import Order from '../models/Order.js'
+import Product from "../models/Product.js";
+import Inventory from '../models/Inventory.js';
 
 export const handleCheckout = async (req, res) => {
     try {
@@ -9,14 +12,12 @@ export const handleCheckout = async (req, res) => {
             return res.status(400).json({ message: "userId is required" });
         }
 
-        // Get user's cart and populate product details
-        const cart = await Cart.findOne({ userId }).populate("items.productId");
+        const cart = await Cart.findOne({ userId }).populate("items.productId", 'images productName condition price');
 
         if (!cart || cart.items.length === 0) {
             return res.status(400).json({ message: "Cart is empty" });
         }
 
-        // Backend restriction, block local only products for non local users
         const invalidItems = cart.items.filter(
             item => item.productId?.isLocal && !req.user.isLocal
         );
@@ -27,10 +28,9 @@ export const handleCheckout = async (req, res) => {
                 blockedProducts: invalidItems.map(i => i.productId?.productName)
             })
         }
-        // Extract product IDs (as ObjectId) and total amount
         const productIds = cart.items
             .map((item) => item.productId?._id)
-            .filter(Boolean); // filter out any null/undefined
+            .filter(Boolean);
 
         if (productIds.length === 0) {
             return res.status(400).json({ message: "No valid products in cart" });
@@ -40,11 +40,6 @@ export const handleCheckout = async (req, res) => {
             (sum, item) => sum + (item.productId?.price || 0) * (item.quantity || 1),
             0
         );
-
-        // Optional: clear cart after checkout initiation
-        // cart.items = [];
-        // await cart.save();
-
         res.status(200).json({ totalAmount, productIds });
     } 
     catch (err) {
@@ -52,3 +47,81 @@ export const handleCheckout = async (req, res) => {
         res.status(500).json({ message: "Checkout failed", error: err.message });
     }
 };
+
+export const handleCodCheckout = async (req, res) => {
+    try {
+        const {userId, checkoutItems} = req.body;
+        console.log('Checkout Items in Backend', checkoutItems)
+
+        if (!userId) {
+            return res.status(400).json({message: 'userId are required'})
+        }
+
+        if (!checkoutItems || checkoutItems.length === 0) {
+            return res.status(400).json({message: 'Cart is empty'})
+        }
+
+        const products = checkoutItems.map((item) => ({
+            productId: item.productId?._id
+        }))
+
+        const totalAmount = checkoutItems.reduce(
+            (sum, item) => 
+                sum + (item.productId?.price || 0) * (item.quantity || 1),
+            0
+        )
+
+        const newOrder = await Order.create({
+            userId,
+            products,
+            totalAmount,
+            paymentMethod: 'cashOnDelivery',
+            paymentStatus: 'pending',
+            purchaseStatus: 'pending',
+        })
+
+        const productIds = checkoutItems.map(item => item.productId._id)
+
+        await Product.updateMany(
+            { _id: { $in: productIds} },
+            { $set: { visibility: 'pending', purchaseStatus: "pending" } }
+        );
+
+        const prod = await Product.find({_id: {$in: productIds}})
+        if (!prod.length) {
+            return res.status(404).json({error: 'No products found'})
+        }
+
+        const inventoryIds = prod.map(p => p.inventoryId)
+        if (!inventoryIds.length) {
+            console.log('No inventory IDs found for these products')
+            return res.status(404).json({error: 'No inventory IDs found'})
+        }
+        await Inventory.updateMany(
+            {_id: {$in: inventoryIds}},
+            {$set: {status: 'sold'}},
+        )
+
+        const userCart = await Cart.findOne({ userId });
+        if (userCart) {
+            userCart.items = userCart.items.filter(
+                cartItem => !productIds.includes(cartItem.productId.toString())
+            );
+            await userCart.save();
+        }
+        req.io.emit('removeCartItem', {
+            userId,
+            productIds,
+        })
+        req.io.emit('productSold', productIds)
+
+        res.status(201).json({
+            message: 'Order placed successfully with COD.',
+            order: newOrder,
+        })
+    }
+    catch (err) {
+        console.error('COD checkout error: ', err)
+        res.status(500).json({message: 'COD checkout failed', error: err.message})
+    }
+}

@@ -10,7 +10,7 @@ const AuctionLayout = () => {
             <header>
                 <AuctionHeader/>
             </header>
-            <main style={{paddingTop: '80px'}}>
+            <main style={{paddingTop: '60px'}}>
                 <Outlet/>
             </main>   
         </Box>

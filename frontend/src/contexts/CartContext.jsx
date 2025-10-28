@@ -3,6 +3,7 @@ import { useAuth } from "./AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useSnackbar } from "./SnackbarContext";
 import { fetchWithAuth } from "../utils/fetchWithAuth";
+import {useSocket} from './SocketContext'
 
 const CartContext = createContext();
 
@@ -16,10 +17,31 @@ export const CartProvider = ({ children }) => {
     const { user, logout, token } = useAuth();
     const navigate = useNavigate();
     const { showSnackbar } = useSnackbar();
+    const socket = useSocket()
 
     const [cartItems, setCartItems] = useState([]);
     const [notification, setNotification] = useState(null);
     const API_URL = import.meta.env.VITE_API_URL;
+
+    
+    useEffect(() => {
+        if (!socket) return
+
+        socket.on('removeCartItem', (data) => {
+            console.log('📢 Cart items ID removed', data.productIds)
+            console.log('IDS inside cart', cartItems)
+            setCartItems((prev) => prev.filter((p) => !data.productIds.includes(p.productId._id)))
+        })
+
+        if (!socket.emittedTestMessage) {
+            socket.emit("testMessage", "Hello from client!");
+            socket.emittedTestMessage = true;
+        }
+
+        return ()  => {
+            socket.off('removeCartItem')
+        }
+    }, [socket])
 
     /** 🔹 Fetch Cart */
     const fetchCart = async () => {
@@ -37,6 +59,7 @@ export const CartProvider = ({ children }) => {
 
             const data = await res.json();
             const validItems = (data.items || []).filter(item => item.productId);
+            console.log('IDS inside cart', cartItems)
             setCartItems(validItems);
         } catch (err) {
             console.error("Failed to fetch cart:", err);

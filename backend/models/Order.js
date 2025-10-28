@@ -56,6 +56,7 @@ const orderSchema = new mongoose.Schema(
         expiryDate: {type: Date, default: null},
         isActive: {type: Boolean, default: true},
         totalPrice: { type: Number, required: true, default: 0},
+        finalPrice: { type: Number, required: true, default: 0},
 
         // payment status tracking
         paymentStatus: {

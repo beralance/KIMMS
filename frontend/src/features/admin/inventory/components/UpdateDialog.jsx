@@ -4,7 +4,7 @@ import { Dialog, DialogTitle,Typography, Box, IconButton, DialogContent, DialogA
 import ManageInventory from '../inventoryManagement/ManageInventory'
 import { CloseRounded } from '@mui/icons-material'
 import UpdatePosted from '../productManagement/UpdatePosted'
-import AuctionProductDetails from '../auctionManagement/AuctionProductDetails'
+import ProductStatusDetails from '../auctionManagement/ProductStatusDetails'
 
 export default function AddItemDialog({ open, onClose, productData, id, title, content }) {
     const renderForm = () => {
@@ -14,7 +14,7 @@ export default function AddItemDialog({ open, onClose, productData, id, title, c
             case 'update-product':
                 return <UpdatePosted productId={id} productData={productData} onClose={onClose}/>;
             case 'auction-details':
-                return <AuctionProductDetails productId={id} auction={productData} onClose={onClose}/>;
+                return <ProductStatusDetails productId={id} auction={productData} onClose={onClose}/>;
             default:
                 return null;
         }

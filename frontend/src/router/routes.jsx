@@ -6,6 +6,7 @@ import UserProtectedRoute from "./UserProtectedRoute";
 import AdminRoute from "./AdminRoute";
 import StaffProtectedRoute from "./StaffProtectedRoute";
 import AdminStaffRoute from "./AdminStaffRoute";
+import { ReportProvider } from "../contexts/ReportContext";
 
 // User Pages
 import Home from '../features/user/home/Home'
@@ -23,6 +24,8 @@ import AuctionHistoryDetails from '../features/user/auction/AuctionHistoryDetail
 import AuctionProductPreview from '../features/user/auction/AuctionProductPreview'
 import UserOrders from '../features/user/orders/UserOrders'
 import SoldProductDetails from '../features/user/shop/SoldProductDetails'
+import Notification from "../features/user/notification/notification";
+
 
 // Admin Pages
 import Dashboard from '../features/admin/dashboard/Dashboard'
@@ -85,6 +88,14 @@ export default function AppRoutes() {
             <Route path='/auth/signup' element={<Auth/>}/>
             <Route path="/auth/signup/verify" element={<VerifyForm/>}/>
             */}
+
+            <Route element={<AccountLayout/>}>
+                <Route path="/notification" element={
+                    <UserProtectedRoute>
+                        <Notification/>
+                    </UserProtectedRoute>
+                }/>
+            </Route>
 
             <Route path="/product/:id" element={<ProductDetails/>}/>
 
@@ -154,7 +165,13 @@ export default function AppRoutes() {
             <Route path="/auction/listing/product-preview/:id" element={<AuctionProductPreview/>}/>
 
             {/* ADMIN ROUTES */}
-            <Route path="admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+            <Route path="admin" element={
+                <AdminRoute>
+                    <ReportProvider>
+                        <AdminLayout />
+                    </ReportProvider>
+                </AdminRoute>
+            }>
                 <Route index element={<Dashboard />} />
                 <Route path="inventory" element={<Inventory />}>
                     <Route path="manage-inventory" element={<InventoryManagement />} />
