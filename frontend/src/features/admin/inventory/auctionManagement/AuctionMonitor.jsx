@@ -18,7 +18,7 @@ import axios from "axios";
 import { useAuth } from "../../../../contexts/AuthContext";
 import KeyboardArrowDownOutlined from '@mui/icons-material/KeyboardArrowDownOutlined'
 import KeyboardArrowUpOutlined from '@mui/icons-material/KeyboardArrowUpRounded'
-import { AlbumRounded, CloseRounded, HistoryRounded, MenuRounded, MoreVert, PendingRounded, RadioButtonCheckedRounded, RefreshRounded } from '@mui/icons-material'
+import { AlbumRounded, CloseRounded, HistoryRounded, Inventory2Rounded, InventoryRounded, MenuRounded, MoreVert, PendingRounded, RadioButtonCheckedRounded, RefreshRounded } from '@mui/icons-material'
 import FullScreenLoader from "../../../../components/FullScreenLoader";
 import AuctionProductCard from "./AuctionProductCard";
 import { toTitleCase } from "../../../../utils/stringUtils";
@@ -27,7 +27,9 @@ const auctionStatusFilter = [
     {key: 0, status: 'ALL', icon: 'ALL', color: 'secondary' },
     {key: 1, status: 'LIVE', icon: <RadioButtonCheckedRounded/>, color: 'error' },
     {key: 2, status: 'PENDING', icon: <PendingRounded/>, color: 'primary' },
-    {key: 3, status: 'CLOSED', icon: <HistoryRounded/>, color: 'warning' },
+    {key: 3, status: 'PENDING_CLAIM', icon: <Inventory2Rounded/>, color: 'success' },
+    {key: 4, status: 'CLOSED', icon: <HistoryRounded/>, color: 'warning' },
+
 ]
 
 const AdminAuctionMonitor = ({searchTerm}) => {
@@ -60,6 +62,10 @@ const AdminAuctionMonitor = ({searchTerm}) => {
     }
 
     const filteredAuctions = auctions.filter(auction => {
+        const exludedStatuses = ['UNCLAIMED'];
+
+        if (exludedStatuses.includes(auction.status)) return false;
+
         const matchesSearch = !searchTerm || (
             auction.inventoryId?.productName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             auction._id?.toLowerCase().includes(searchTerm.toLowerCase()) ||

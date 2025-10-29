@@ -48,7 +48,17 @@ const productSchema = new mongoose.Schema(
             enum: ["mostViewed", "featured", "none"],
             default: "none"
         },
-
+        weight: {
+            type: Number,
+            required: function () { return this.isLocal === false; },
+            validate: {
+                validator: function (value) {
+                    // Ensure weight does not exceed 10kg
+                    return this.isLocal === true || (value >= 0 && value <= 10);
+                },
+                message: "Weight must be between 0 and 10 kg for non-local items.",
+            },
+        },
         views: { type: Number, default: 0 },
 
         // Optional: track the user who bought it

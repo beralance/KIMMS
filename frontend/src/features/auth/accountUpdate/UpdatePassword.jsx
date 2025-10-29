@@ -24,6 +24,10 @@ const UpdatePassword = () => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         
+        if (user.googleId) {
+            showSnackbar("Password cannot be changed for google account", 'warning');
+            return;
+        }
         
         if (newPassword !== confirmPassword) {
             showSnackbar("Passwords do not match", 'warning');

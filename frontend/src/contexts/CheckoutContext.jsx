@@ -126,6 +126,7 @@ export const CheckoutProvider = ({ children }) => {
                 checkout,
                 codCheckout,
                 setFinalPrice,
+                finalPrice
             }}
         >
             {children}

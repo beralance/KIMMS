@@ -150,6 +150,7 @@ export default function SignUpForm() {
                     fullName: backendData.fullName,
                     role: backendData.role,
                     token: backendData.token,
+                    googleId: backendData.googleId,
                     address: backendData.address,
                     gender: backendData.gender,
                     phoneNumber: backendData.phoneNumber,

@@ -24,6 +24,7 @@ export default function ProductForm({productId, onClose}) { // <-- accept callba
     const [tags, setTags] = useState('')
     const [isLocal, setIsLocal] = useState(true)
     const [existingImages, setExistingImages] = useState([])
+    const [itemWeight, setItemWeight] = useState(0)
 
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -58,6 +59,7 @@ export default function ProductForm({productId, onClose}) { // <-- accept callba
                 setTags(item.tags  || '');
                 setIsLocal(item.isLocal ?? true);
                 setExistingImages(item.images  || []);
+                setItemWeight(item.weight || 0)
 
                 console.log('Loaded item:', item)
             }
@@ -193,15 +195,26 @@ export default function ProductForm({productId, onClose}) { // <-- accept callba
         setImages([])
         setExistingImages([])
         setNewCategory('')
+        setItemWeight(0)
     }
 
     const handleSubmit = async () => {
+        console.log('Weight', itemWeight)
         if (error) {
             showSnackbar(error, 'error')
             return
         }
         if ( !productName || !description || !details || !price || !category || !condition) {
             showSnackbar("Please fill in all fields.", 'warning');
+            return;
+        }
+        
+        if (!itemWeight || itemWeight <= 0) {
+            showSnackbar("Please enter a valid item weight (1–10 kg).", "warning");
+            return;
+        }
+        if (itemWeight > 10) {
+            showSnackbar("Maximum weight allowed is 10 kg.", "warning");
             return;
         }
         // Image check
@@ -222,10 +235,11 @@ export default function ProductForm({productId, onClose}) { // <-- accept callba
         formData.append('condition', condition);
         formData.append('tags', toTitleCase(tags));
         formData.append('isLocal', isLocal);
+        formData.append("itemWeight", itemWeight);
         formData.append('existingImages', JSON.stringify(existingImages || []))
         images.filter(Boolean).forEach((file) => formData.append('images', file))
 
-
+        console.log('Weight', formData)
 
         try {
             setLoading(true)
@@ -582,6 +596,26 @@ export default function ProductForm({productId, onClose}) { // <-- accept callba
                         }                            
                     </Typography>
                 </Stack>
+                <Box>
+                    {!isLocal && (
+                        <Stack>
+                            <Typography variant="body1" color="initial">
+                                Item Weight (kg)
+                            </Typography>
+                            <TextField
+                                type='number'
+                                fullWidth
+                                value={itemWeight}
+                                onChange={(e) => setItemWeight(e.target.value)}
+                                placeholder='Enter item weight (max 10kg)'
+                                inputProps={{min: 0, max: 10}}
+                            />
+                            <Typography variant="body1" color="initial">
+                                Weight is used for small or international items (max 10kg)
+                            </Typography>
+                        </Stack>
+                    )}
+                </Box>
 
                 {/*Submit BUTTON*/}
                 <Button

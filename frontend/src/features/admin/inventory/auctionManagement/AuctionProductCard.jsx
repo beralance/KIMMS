@@ -98,7 +98,7 @@ const AuctionProductCard = ({auction, }) => {
                                         left: 5,
                                         px: 1,
                                         borderRadius: '999px',
-                                        bgcolor: auction.status === 'LIVE' && 'error.main' || auction.status === 'PENDING' && 'primary.main' || auction.status === 'CLOSED' && 'warning.main' 
+                                        bgcolor: auction.status === 'LIVE' && 'error.main' || auction.status === 'PENDING' && 'primary.main' || auction.status === 'CLOSED' && 'warning.main' || auction.status === 'PENDING_CLAIM' && 'success.main'
                                     }}
                                 >
                                     <Typography variant='body2' fontSize={12} fontWeight={'bold'} color={'white'}>

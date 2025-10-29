@@ -1,4 +1,5 @@
 import User from '../models/User.js';
+import Cart from '../models/Cart.js'
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import StaffPermission from '../models/StaffPermission.js';
@@ -99,6 +100,7 @@ export const signup = async (req, res) => {
                 fullName: newUser.fullName,
                 isLocal: newUser.isLocal,
                 email: newUser.email,
+                googleId: newUser.googleId,
                 avatar: newUser.avatar,
                 gender: newUser.gender || '',
                 phoneNumber: newUser.phoneNumber || '',
@@ -147,6 +149,14 @@ export const updateAddress = async (req, res) => {
 
         console.log('USER BACKEND IS LOCAL', user.isLocal)
 
+        const cart = await Cart.findOne({userId}).populate('items.productId')
+        if (cart) {
+            cart.items = cart.items.filter(
+                item => !item.productId?.isLocal || user.isLocal
+            )
+            await cart.save()
+        }
+
         const token = jwt.sign(
             {id: user._id, role: user.role, isLocal: user.isLocal},
             process.env.JWT_SECRET,
@@ -165,6 +175,8 @@ export const updateAddress = async (req, res) => {
         res.status(500).json({error: 'Server error'})
     }
 }
+
+
 // VERIFY EMAIL
 export const verifyEmail = async (req, res) => {
     try {
@@ -336,6 +348,7 @@ export const googleLogin = async (req, res) => {
             email: user.email,
             isLocal: user.isLocal,
             address: user.address,
+            googleId: user.googleId,
             phoneNumber: user.phoneNumber,
             gender: user.gender,
             avatar: user.avatar

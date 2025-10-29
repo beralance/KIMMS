@@ -9,6 +9,7 @@ import {DeleteRounded, DoneAllRounded, KeyboardArrowDownRounded, KeyboardArrowUp
 import { toTitleCase, formatNumber } from '../../../utils/stringUtils'
 import { useSnackbar } from "../../../contexts/SnackbarContext";
 import {ShoppingBagIcon} from 'lucide-react'
+import { useAuth } from "../../../contexts/AuthContext";
 
 
 export default function Cart() {
@@ -79,6 +80,16 @@ export default function Cart() {
     };
 
     const handleCheckout = () => {
+        if (!user.phoneNumber || !user.email ) {
+            showSnackbar("Please complete your basic information first before checking out", 'warning');
+            return;
+        }
+
+        if (!user.address?.region || !user.address?.province || !user.address?.city || !user.address?.street || !user.address?.postalCode ) {
+            showSnackbar("Your address is not yet added or has missing field, please verify it first to proceed", 'warning');
+            return;
+        }
+
         if (!selectedIds.length) {
             showSnackbar("Please select at least one item to checkout.", 'warning');
             return;

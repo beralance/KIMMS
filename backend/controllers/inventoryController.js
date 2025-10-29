@@ -42,7 +42,24 @@ export const createInventoryItem = async (req, res) => {
             uploadedFiles.push(publicUrl) 
         }
 
-        const {productName, description, price, category, details, condition, isLocal, tags } = req.body;
+        const {
+            productName, 
+            description, 
+            price, 
+            category, 
+            details, 
+            condition, 
+            isLocal, 
+            tags,
+            itemWeight,
+        } = req.body;
+
+        if (isLocal === 'false' || isLocal === false){
+            if (!itemWeight)
+                return res.status(400).json({error: 'Weight is required for non-local items.'})
+            if (parseFloat(itemWeight) > 10) // change if needs additional kg
+                return res.status(400).json({error: 'Weight cannot exceed 10kg for non-local items.'})
+        }
 
         const generatedProductId = await generateProductId(category);
         const generatedPhysicalCode = await generatePhysicalCode(category);
@@ -58,10 +75,12 @@ export const createInventoryItem = async (req, res) => {
             category,
             isLocal,
             tags,
+            weight: isLocal === 'false' || isLocal === false ? itemWeight : undefined,
             addedBy: addedBy,
             status: 'available',
             images: uploadedFiles,
         });
+
 
         try {
             const savedItem = await inventoryItem.save()
@@ -161,6 +180,7 @@ export const updateInventoryItem = async (req, res) => {
             isLocal: req.body.isLocal,
             tags: req.body.tags,
             status: req.body.status,
+            weight: req.body.itemWeight,
             images: uploadedFiles,
             physicalCode,
             

@@ -1,16 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, Typography, Box, Button, Divider, Stack, FormControl, InputLabel, Select, MenuItem, IconButton, Collapse } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useCheckout } from "../../../contexts/CheckoutContext";
 import { BanknoteIcon, ChevronLeftIcon, InfoIcon, MapPinIcon, Package2Icon, PackageOpenIcon, ReceiptTextIcon, WalletIcon} from 'lucide-react'
 import { toTitleCase, formatNumber} from '../../../utils/stringUtils'
 import { getDistanceInKm } from '../../../utils/haversine'
+import { calculateInterIslandShipping } from '../../../utils/calculateInterIslandShipping'
 import { useAuth } from '../../../contexts/AuthContext'
+import { useSnackbar} from '../../../contexts/SnackbarContext'
 import phData from '../../../data/phData.json'
 import BottomActionBar from "../../../components/BottomActionBar";
 import SectionWrapper from '../../../components/SectionWrapper'
 import FullScreenLoader from '../../../components/FullScreenLoader'
 import ConfirmDialog from '../../../components/ConfirmDialog'
+import freeShippinZones from '../../../data/freeShippinZones.json'
+
 
 const shopLat = 13.355346998983666 
 const shopLng =  123.72596017036658
@@ -20,6 +24,7 @@ const incrementPerKm = 40
 export default function Checkout() {
     const { checkoutItems, totalAmount, setFinalPrice, isProcessing, checkout, codCheckout } = useCheckout();
     const {user} = useAuth()
+    const {showSnackbar} = useSnackbar()
     const [paymentOption, setPaymentOption] = useState('gcash')
     const [showInfo, setShowInfo] = useState(true)
     const [checkoutConfirm, setCheckoutConfirm] = useState(false)
@@ -28,23 +33,82 @@ export default function Checkout() {
     const navigate = useNavigate();
 
     const userAddress = `${user.address?.street}, ${user.address?.city}, ${user.address?.province}, ${user.address?.country}, ${user.address?.postalCode}`
-    const userMunicipality = user.address.city    
-    const dataMunicipality = phData[user.address.region].province_list[user.address.province.toUpperCase()].municipality_list[user.address.city.toUpperCase()]
-    
+
+    const region = user?.address?.region?.toString();
+    const province = user?.address?.province?.toUpperCase();
+    const city = user?.address?.city?.toUpperCase();
+
+    const dataRegion = phData[region];
+    const dataProvince = dataRegion?.province_list?.[province];
+    const dataMunicipality = dataProvince?.municipality_list?.[city];
+
+
     const checkoutConfirmOpen = () => setCheckoutConfirm(true)
     const checkoutConfirmClose = () => setCheckoutConfirm(false)
 
     const calculateShipping = () => {
-        if (!userMunicipality || !dataMunicipality ) return 0;
+        if (!city || !dataMunicipality ) return 0;
 
         const distance = getDistanceInKm(shopLat, shopLng, dataMunicipality.lat, dataMunicipality.lng);
         const increment = distance * incrementPerKm;
         return baseFees[size] + Math.ceil(increment);
     }
 
-    const shippingFee = calculateShipping()
-    const finalAmount = totalAmount + shippingFee
+    let shippingFee = 0;
+
+    const anyProductIsLocal = checkoutItems.some((item) => item.productId.isLocal)
+    const anyProductIsNotLocal = checkoutItems.some((item) => !item.productId.isLocal)
+
+    if (user.isLocal) {
+        const isFreeShipping = freeShippinZones.some(
+            (zone) =>
+                zone.region === user.address?.region &&
+                zone.city === user.address?.city.toUpperCase()
+        )
+        if (isFreeShipping) {
+            shippingFee = 0;
+        }
+        else if (anyProductIsLocal && anyProductIsNotLocal) {
+            shippingFee = calculateShipping()
+        }
+        else if (anyProductIsLocal && !anyProductIsNotLocal) {
+            shippingFee = calculateShipping()
+        }
+        else if (!anyProductIsLocal && anyProductIsNotLocal) {
+            const totalWeight = checkoutItems.reduce((sum, item) => sum + (item.productId?.weight || 0), 0);
+
+            if (totalWeight <= 5) {
+                shippingFee = 100;
+            } else if (totalWeight <= 10) {
+                shippingFee = 200;
+            } else {
+                const extraBlocks = Math.ceil((totalWeight - 10) / 5);
+                shippingFee = 300 + extraBlocks * 100;
+            } 
+        }
+    }
+    else {
+        if (anyProductIsLocal && !anyProductIsNotLocal) {
+            showSnackbar('The item you are trying to buy is not available at your region', 'error')
+            navigate('/cart')
+            return;
+        }
+        else if (anyProductIsNotLocal) {
+            console.log('INSIDE non local')
+            const nonLocalProduct = checkoutItems.find((item) => !item.productId.isLocal)
+            console.log('INSIDE non local - local products', nonLocalProduct)
+            shippingFee = calculateInterIslandShipping(nonLocalProduct.productId, user)
+        }
+        else {
+            shippingFee = 0
+            return
+        }
+    }
+
+    console.log('checkoutItems', checkoutItems)
+    const finalAmount = totalAmount + shippingFee;
     setFinalPrice(finalAmount)
+
 
     const handleCheckout = () => {
         try {

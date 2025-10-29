@@ -19,6 +19,10 @@ const inventorySchema = new mongoose.Schema(
         },
         tags: [{type: String}],
         isLocal: {type: Boolean, default: true},
+        weight: {
+            type: Number,
+            required: function() { return this.isLocal === false}
+        },
         addedBy: {type: mongoose.Schema.Types.ObjectId, required: false},
         createdAt: {type: Date, default: Date.now},
     },

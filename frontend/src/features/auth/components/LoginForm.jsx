@@ -68,6 +68,7 @@ export default function LoginForm({ onSuccess }) {
                 phoneNumber: data.phoneNumber,
                 email: data.email,
                 gender: data.gender,
+                googleId: data.googleId,
             })
 
             if (onSuccess) onSuccess(data);

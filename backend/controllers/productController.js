@@ -26,6 +26,8 @@ export const postProduct = async (req, res) => {
             return res.status(400).json({ message: "Item is not available for posting" });
         }
 
+        const weight = !inventoryItem.isLocal ? inventoryItem.weight : undefined;
+
         // Create new Product from Inventory data
         const product = new Product({
             inventoryId: inventoryItem._id,
@@ -42,6 +44,7 @@ export const postProduct = async (req, res) => {
             physicalCode: inventoryItem.physicalCode,
             visibility: "active",
             addedBy: addedBy,
+            weight: weight || undefined,
             // add physical code here
         });
 

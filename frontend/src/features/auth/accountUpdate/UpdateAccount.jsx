@@ -4,6 +4,7 @@ import { AlignJustify, ChevronRightIcon, DraftingCompassIcon, InboxIcon, LockKey
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import SectionWrapper from '../../../components/SectionWrapper'
+import { useAuth } from '../../../contexts/AuthContext'
 
 const options = [
     {key: 0, path: '/account/update-address', label: 'My Address', icon: <MapPinHouseIcon/>, divide: <Divider sx={{my: 1}}/>},
@@ -14,6 +15,12 @@ const options = [
 
 const UpdateAccount = () => {
     const navigate = useNavigate()
+    const {user} = useAuth()
+
+    const filteredOptions = options.filter(o => {
+        if (user?.googleId && (o.path === '/account/update-password' || o.path === '/account/update-email')) return false;
+        return true
+    })
 
     return (
         <nav>
@@ -29,7 +36,7 @@ const UpdateAccount = () => {
                 </Stack>
                 <List>
                     <Stack sx={{px: 1}}>
-                        {options.map((o) => 
+                        {filteredOptions.map((o) => 
                             <Box key={o.key}>
                                 <ListItem disablePadding>
                                     <ListItemButton onClick={() => navigate(o.path)}  sx={{px: 1, py: 2, borderRadius: 2}}>

@@ -20,6 +20,10 @@ const UpdateEmail = () => {
     const handleUpdateEmail = async (e) => {
         e.preventDefault()
 
+        if (user.googleId) {
+            showSnackbar('Google accounts cannot be updated here', 'warning')
+            return
+        }
         if (!newEmail || !currentPassword) {
             showSnackbar('Please fill in all fields', 'warning')
             return

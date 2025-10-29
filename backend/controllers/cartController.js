@@ -11,7 +11,7 @@ export const getCart = async (req, res) => {
         let cart = await Cart.findOne({ userId })
             .populate({
                 path: 'items.productId',
-                select: "productName category images price status description condition",
+                select: "productName category images weight isLocal price status description condition",
                 match: {purchaseStatus: "available"},
                 populate: {
                     path: 'category',
@@ -24,7 +24,7 @@ export const getCart = async (req, res) => {
             cart = await Cart.create({ userId, items: [] });
             cart = await cart.populate({
                 path: 'items.productId',
-                select: "productName category images price status description condition",
+                select: "productName category images weight isLocal price status description condition",
                 match: {purchaseStatus: "available"},
                 populate: {
                     path: 'category',
@@ -66,7 +66,7 @@ export const addToCart = async (req, res) => {
             
             cart = await cart.populate({
                 path: 'items.productId',
-                select: "productName category images price status description condition",
+                select: "productName category images weight isLocal price status description condition",
                 match: {purchaseStatus: "available"},
                 populate: {
                     path: 'category',
@@ -85,7 +85,7 @@ export const addToCart = async (req, res) => {
 
         await cart.populate({
             path: "items.productId",
-            select: "productName category images price description condition",
+            select: "productName category images weight isLocal price description condition",
             populate: {path: 'category', select: 'name createdAt'}
         });
 
@@ -110,7 +110,7 @@ export const removeFromCart = async (req, res) => {
         cart.items = cart.items.filter((i) => i.productId.toString() !== productId);
         await cart.save();
 
-        await cart.populate("items.productId", "productName category images price description");
+        await cart.populate("items.productId", "productName weight category isLocal images price description");
         res.json(cart);
     } 
     catch (err) {
@@ -153,7 +153,7 @@ export const removePurchased = async (req, res) => {
             { userId },
             { $pull: { items: { productId: { $in: removeIds } } } }, // ✅ MongoDB pull
             { new: true }
-        ).populate("items.productId", "productName category images price description");
+        ).populate("items.productId", "productName weight category isLocal images price description");
 
         if (!cart) {
             return res.status(404).json({ message: "Cart not found" });
