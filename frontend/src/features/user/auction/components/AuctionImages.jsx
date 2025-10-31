@@ -19,7 +19,7 @@ const AuctionImages = () => {
                         }}    
                     />    
                 </Grid>  
-                <Grid size={{xs: 6}} height={150}>
+                <Grid size={{xs: 6}} height={200}>
                     <img 
                         src="/top-view-dining-tables-without-food.jpg"
                         style={{
@@ -31,7 +31,7 @@ const AuctionImages = () => {
                         }}    
                     />    
                 </Grid>  
-                <Grid size={{xs: 6}} height={150}>
+                <Grid size={{xs: 6}} height={200}>
                     <img 
                         src="/black-cup-bottle.jpg"
                         style={{
