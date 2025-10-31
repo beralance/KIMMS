@@ -4,7 +4,7 @@ import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
 import IconButton from '@mui/material/IconButton';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
-import { fetchCategoriesFromProducts } from '../../../utils/categoryApi'
+import { fetchCategoriesFromProducts, fetchCategories } from '../../../utils/categoryApi'
 import { useState, useEffect } from 'react';
 import Typography from '@mui/material/Typography'
 import { Box, Grid, Stack } from '@mui/material';
@@ -22,30 +22,17 @@ export default function CategoriesList() {
         try {
             const data = await fetchCategoriesFromProducts();
             setCategories(data);
-
-            const sorted = [...data].sort((a, b) => b.count - a.count);
-            const newTop = sorted.slice(0, 2)
-            
-            const isSame = 
-                topCategories.length === newTop.length &&
-                topCategories.every((cat, i) => cat._id === newTop[0]._id)
-
-            if (!isSame) {
-                setTopCategories(newTop)
-            }
         } catch (err) {
             console.error('Cannot fetch categories:', err);
         }
     };
 
     useEffect(() => {
-        fetchAndSetCategories();
-        const timer = setInterval(fetchAndSetCategories, 15000);
-        return () => clearInterval(timer);
+        fetchAndSetCategories()
     }, []);
 
     return (
-        <Box sx={{p: 2, mb: 12, borderRadius: 2, maxHeight: {xs: 300}, overflowY: 'auto',}}>
+        <Box sx={{p: 2, mb: 12, borderRadius: 2, maxHeight: {xs: '100vh'}, overflowY: 'auto',}}>
             <Grid spacing={1} container>
                 {categories.map((category) => (
                     <Grid size={{xs: 6}} key={category.categoryId} sx={{position: 'relative'}}>

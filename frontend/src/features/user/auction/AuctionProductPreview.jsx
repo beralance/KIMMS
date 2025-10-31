@@ -96,7 +96,7 @@ const AuctionProductPreview = () => {
                         <Typography variant='h6' fontWeight={'bold'} color='white'>
                             Join to place your bid
                         </Typography>
-                        <Typography variant='subtitle2' gutterBottom color='white'>
+                        <Typography variant='body2' gutterBottom color='white'>
                         Time is limited, don't miss your chance to bid.
                         </Typography>
                     </Stack>

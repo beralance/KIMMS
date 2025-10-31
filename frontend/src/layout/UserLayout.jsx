@@ -1,4 +1,4 @@
-import { Box, Button } from '@mui/material'
+import { Box, Button, Container, Divider, Typography } from '@mui/material'
 import React, { useRef, useState, useEffect } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import UserHeader from '../components/UserHeader'
@@ -36,7 +36,11 @@ const UserLayout = () => {
                     <Outlet/>
                 </Box>
             </main>
-
+            <Container sx={{bgcolor: '#fafafa'}}>
+                <Divider sx={{py: 10}}>
+                    <img src='/sofa.svg' style={{width: '30px', opacity: '.8', marginInline: '15px'}} />
+                </Divider>
+            </Container>
             <footer>
                 <UserFooter/>
             </footer>

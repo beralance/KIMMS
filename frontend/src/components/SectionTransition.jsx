@@ -30,7 +30,7 @@ export default function ScrollSection({ children, sx }) {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                ...sx, // allow custom styles
+                ...sx,
             }}
         >
             {children}

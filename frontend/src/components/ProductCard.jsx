@@ -5,11 +5,12 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { Badge, Box, Stack } from '@mui/material';
+import { Badge, Box, Divider, Stack } from '@mui/material';
 import {toTitleCase} from '../utils/stringUtils'
 import { ShoppingCartRounded } from '@mui/icons-material';
+import { ShoppingCartIcon } from 'lucide-react';
 
-export default function ProductCard({ images, category, name = 'Unknown', price = 0, description = '...', onNavigate, addToCart, condition}) {
+export default function ProductCard({ images, category, isLocal, name = 'Unknown', price = 0, description = '...', onNavigate, addToCart, condition}) {
     return (
         <Card
             sx={{
@@ -38,7 +39,7 @@ export default function ProductCard({ images, category, name = 'Unknown', price 
                             borderRadius: 1
                     }}
                     />
-                    <Box sx={{position: 'absolute', top: 15, left: 0, bgcolor: '#37353E', p: .5, px: 2, borderRadius: '0px 5px 5px 0px'}}>
+                    <Box sx={{position: 'absolute', top: 10, right: 10, bgcolor: '#37353E', p: .5, px: 2, borderRadius: '999px'}}>
                         <Typography variant="body2" color="white">
                             {toTitleCase(condition)}
                         </Typography>
@@ -48,66 +49,89 @@ export default function ProductCard({ images, category, name = 'Unknown', price 
 
                 {/* Card Body */}
                 <CardContent sx={{px: .5, '&:last-child': {paddingBlock: 1}}}>
-                    {/* Product Name */}
-                    <Typography
-                        variant='body1'
-                        component="div"
-                        noWrap
-                        sx={{ fontWeight: 600, mb: 1 }}
-                    >
-                        {name}
-                    </Typography>
-                    
-                    <Stack direction={'row'} gap={2} alignItems={'center'} justifyContent={'space-between'} sx={{mb: 1}}>
+                    <Stack gap={1} justifyContent={'center'} alignItems={'space-between'}>
+                        {/* Product Name */}
+                        <Stack direction={'row'} gap={2} alignItems={'center'} justifyContent={'space-between'}>
+                            <Typography
+                                variant='body1'
+                                component="div"
+                                noWrap
+                                sx={{ fontWeight: 600}}
+                            >
+                                {name}
+                            </Typography>
+                            <Typography
+                                variant="subtitle2"
+                                color='initial'
+                            >
+                                PHP {price.toLocaleString()}
+                            </Typography>
+                        </Stack>
+                        <Stack direction={'row'} gap={1}>
+                            <Typography
+                                variant="body2"
+                                color='black'
+                                sx={{
+                                    px: 1,
+                                    borderRadius: '999px',
+                                    border: '1px solid gray'
+                                }}
+                            >
+                                {category}
+                            </Typography>
+                            <Divider orientation='horizontal' sx={{border: '0.5px solid #b3b3b3ff'}}/>
+                            <Typography
+                                variant="body2"
+                                color='black'
+                                sx={{
+                                    px: 1,
+                                    borderRadius: '999px',
+                                    border: '1px solid gray'
+                                }}
+                            >
+                                {condition}
+                            </Typography>
+                        </Stack>
+                        {/* Description */}
                         <Typography
                             variant="body2"
-                            color='white'
-                            sx={{py: .5, px: 2, width: '100%', bgcolor: '#37353E', display: 'flex', justifyContent: 'center', borderRadius: '999px', fontWeight: 'bold',}}
+                            sx={{
+                                color: 'text.secondary',
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                            }}
                         >
-                            PHP {price.toLocaleString()}
+                            {description}
                         </Typography>
-                        
                     </Stack>
-                    {/* Description */}
-                    <Typography
-                        variant="body2"
-                        sx={{
-                            color: 'text.secondary',
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
-                        }}
-                    >
-                        {description}
-                    </Typography>
                 </CardContent>
-                <Stack direction={'row'} gap={2} px={1}>
+                <Stack direction={'row'} justifyContent={'space-between'} gap={1} alignItems={'center'}>
                     {/* Category */}
                     <Typography
                         variant="body2"
-                        fontWeight={'bold'}
                         align='center'
-                        sx={{ width: '100%', alignSelf: 'center', border: 1, px: 1,py: .5, color: 'black', backdropFilter: 'blur(10px)', bgcolor: 'rgba(255, 255, 255, 255)', borderRadius: '999px'}}
+                        sx={{ width: '100%', border: '1px solid black', alignSelf: 'center', color: 'black', p: .5, backdropFilter: 'blur(10px)', bgcolor: 'rgba(255, 255, 255, 255)', borderRadius: 1}}
                     >
-                        {category}
+                        - {isLocal ? 'Large' : 'Small'} item -
                     </Typography>
-                    <CardActions sx={{ p: 0, pt: 0 }}>
-                        <Button
-                            variant="contained"
-                            size="medium"
-                            fullWidth
-                            color='secondary'
-                            onClick={addToCart}
-                            sx={{
-                                textTransform: 'none',
-                                fontWeight: 600,
-                                borderRadius: 1,
-                            }}
-                        >
-                            <ShoppingCartRounded/>
-                        </Button>
-                    </CardActions>
+                    <Button
+                        variant="text"
+                        size="medium"
+                        color='secondary'
+                        onClick={addToCart}
+                        sx={{
+                            width: '10%',
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            px: 0,
+                            borderRadius: 1,
+                            bgcolor: '#37353E'
+                        }}
+                    >
+                        <ShoppingCartIcon style={{color: 'white', fill: 'white'}}/>
+                    </Button>
                 </Stack>
             </Box>
         </Card>

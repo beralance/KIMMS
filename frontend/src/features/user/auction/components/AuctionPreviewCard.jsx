@@ -43,16 +43,16 @@ export default function AuctionPreviewCard({ product, getTimeRemaining, onNaviga
                             <Typography variant="body2" color="initial" sx={{px: 1, border: '1px solid gray', borderRadius: '999px'}}>
                                 {product.inventoryId?.category?.name}
                             </Typography>
-                            <Divider orientation='vertical' sx={{mx: 1}}/>
+                            <Divider orientation='vertical' flexItem sx={{mx: 1,}}/>
                             <Typography variant="body2" color="initial" sx={{px: 1, border: '1px solid gray', borderRadius: '999px'}}>
                                 {product.inventoryId?.condition}
                             </Typography>
                         </Stack>
                     </Stack>
-                    <Grid container spacing={2}>
+                    <Grid container spacing={1}>
                         <Grid size={{xs: 6}}>  
-                            <Stack sx={{bgcolor: '#f0f0f0', p: 1, borderRadius: 1}}>                    
-                                <Typography variant="subtitle2" color='initial' sx={{display: 'flex', alignItems: 'center', gap: 1}}>
+                            <Stack sx={{bgcolor: '#f0f0f0', borderRadius: 1}}>                    
+                                <Typography variant="body2" color='initial' sx={{display: 'flex', alignItems: 'center', gap: 1}}>
                                     <BanknoteArrowUpIcon/>
                                     Starting Price
                                 </Typography>
@@ -63,8 +63,8 @@ export default function AuctionPreviewCard({ product, getTimeRemaining, onNaviga
                             </Stack>
                         </Grid>
                         <Grid size={{xs: 6}}>     
-                            <Stack sx={{bgcolor: '#f0f0f0', p: 1, borderRadius: 1}}>                 
-                                <Typography variant="subtitle2" color="initial" sx={{display: 'flex', alignItems: 'center', gap: 1}}>
+                            <Stack sx={{bgcolor: '#f0f0f0', borderRadius: 1}}>                 
+                                <Typography variant="body2" color="initial" sx={{display: 'flex', alignItems: 'center', gap: 1}}>
                                     <TimerIcon/>
                                     Ends in
                                 </Typography>

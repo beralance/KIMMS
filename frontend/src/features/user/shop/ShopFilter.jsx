@@ -14,92 +14,179 @@ import {
   FormControlLabel,
   Radio,
   Button,
+  Drawer,
+  IconButton,
+  Divider,
+  ListItem,
+  Checkbox,
+  Container,
 } from "@mui/material";
 import { fetchPostedCategories, fetchCategoriesFromProducts } from "../../../utils/categoryApi";
 import { useNavigate } from "react-router-dom";
 import { CloseRounded } from "@mui/icons-material";
+import { ArrowDown01Icon, ArrowUpDownIcon, BlocksIcon, ChartColumnStacked, ChartColumnStackedIcon, FilterIcon, FunnelIcon, XIcon } from "lucide-react";
+import SectionWrapper from "../../../components/SectionWrapper";
 
-export default function ShopFilters({ sort, setSort, category, setCategory, categoryName, categoryId }) {
+export default function ShopFilters({ sort, setSort, filteredProducts, category, setCategory, categoryName, categoryId }) {
     const [categories, setCategories] = useState(["all"]);
+    const [openDrawer, setOpenDrawer] = useState(false)
+
+    const handleDrawerOpen = () => setOpenDrawer(true)
+    const handleDrawerClose = () => setOpenDrawer(false)
+
+    const getSelectedCat = categories.filter((p) => p.id === category)
+
     const navigate = useNavigate()
-    // Fetch only posted categories from backend
+
+
     useEffect(() => {
         const loadCategories = async () => {
             try {
                 const data = await fetchCategoriesFromProducts();
-                console.log('****THIS IS DATA CATEGORY ))))))', data)
-                setCategories(["all", ...data.map((c) => ({ id: c.categoryId, name: c.name }))]);
-                console.log('$$categories$$', categories)
+                setCategories(['all', ...data.map((c) => ({ id: c.categoryId, name: c.name }))]);
             } catch (err) {
                 console.error("Failed to fetch categories", err);
             }
         };
         loadCategories();
     }, []);
+
     return (
+
         <Box sx={{ mb: 2 }}>
-            {/* Mobile: Select dropdowns */}
             <Box sx={{ display: { xs: "flex", md: "none" }, gap: 2, mb: 1 }}>
-                <FormControl sx={{ minWidth: 120 }}>
-                    <InputLabel id="sort-label">Sort</InputLabel>
-                    <Select
-                        labelId="sort-label"
-                        id="sort-select"
-                        value={sort}
-                        label="Sort"
-                        onChange={(e) => setSort(e.target.value)}
-                    >
-                        <MenuItem value="default">Default</MenuItem>
-                        <MenuItem value="price-low-high">Price: Low → High</MenuItem>
-                        <MenuItem value="price-high-low">Price: High → Low</MenuItem>
-                    </Select>
-                </FormControl>
-                {!categoryId ? (
-                <FormControl sx={{ minWidth: 120 }}>
-                    <InputLabel id="category-label">Category</InputLabel>
-                    <Select
-                        labelId="category-label"
-                        id="category-select"
-                        value={category}
-                        label="Category"
-                        onChange={(e) => setCategory(e.target.value)}
-                    >
-                        {categories.map((c, index) =>
-                            c.id ? (
-                                <MenuItem key={index} value={c.id}>
-                                {c.name.charAt(0).toUpperCase() + c.name.slice(1)}
-                                </MenuItem>
-                            ) : (
-                                <MenuItem key="all" value="all">
-                                All
-                                </MenuItem>
-                            )
-                        )}
-                    </Select>
-                </FormControl>
-                )
-                :
-                (
-                    <Button 
-                        variant="text" 
-                        color="error" 
-                        onClick={() => navigate('/shop')}
-                        sx={{
-                            display: 'flex',
-                            gap: .5,
-                            alignItems: 'center',
-                        }}
-                    >
-                        {categoryName}
-                        <CloseRounded fontSize="small"/>
-                    </Button>
-                )
-            }
+                <Stack gap={1} width={'100%'}>
+                    
+                    <Stack gap={1} direction={'row'} flexWrap={'wrap'} alignItems={'center'} justifyContent={'space-between'} width={'100%'}>
+                        <Typography variant="body2" color="secondary" sx={{display: 'flex', alignItems: 'center', gap: 1}}>
+                            {`Product${filteredProducts.length > 1 ? 's' : ''} (${filteredProducts.length})`}
+                        </Typography>
+                        <Stack direction={'row'} gap={1}>
+                            {categoryId &&
+                                <Button 
+                                    variant="text" 
+                                    color="error" 
+                                    onClick={() => navigate('/shop')}
+                                    sx={{
+                                        display: 'flex',
+                                        gap: .5,
+                                        alignItems: 'center',
+                                    }}
+                                >
+                                    {categoryName}
+                                    <CloseRounded fontSize="small"/>
+                                </Button>
+                            }
+                            <Box sx={{ display: { xs: "flex", md: "none" }, }}>
+                                <Button onClick={handleDrawerOpen} variant="contained" color="secondary" sx={{display: 'flex', alignItems: 'center', gap: 1}}>
+                                    <FilterIcon style={{color: 'white'}}/>
+                                    <Typography variant="body1" color="white">Filter</Typography>
+                                </Button>
+                            </Box>
+                        </Stack>
+                    </Stack>
+                </Stack>
+
+                <Drawer anchor="left" open={openDrawer} onClose={handleDrawerClose}>
+                    <IconButton onClick={handleDrawerClose} sx={{position: 'absolute', top: 5, right: 5}}>
+                        <XIcon/>
+                    </IconButton>
+                    <Container sx={{height: '100%'}}>
+                        <Stack sx={{ width: 300, height: '100%', py: 2}}>
+                            <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                <Typography variant="subtitle1" sx={{display: 'flex', alignItems: 'center', gap: 1, py: 1}}>
+                                    <FunnelIcon/>
+                                    Filters
+                                </Typography>
+                            </Stack>
+                            <Divider sx={{my: 2}}/>
+                            <Stack gap={2} sx={{maxHeight: '90vh', p: 1, overflowY: 'auto',}}>
+                                {/*Price filter*/}
+                                <SectionWrapper sx={{bgcolor: '#f0f0f0'}}>
+                                    <Box mb={3}>
+                                        <Typography variant="subtitle2" fontWeight={'bold'} color="secondary" sx={{display: 'flex', alignItems: 'center', gap: 1}}>
+                                            <ArrowUpDownIcon/>
+                                            Sort
+                                        </Typography>
+                                        <RadioGroup
+                                            sx={{p: 1}}
+                                            value={sort}
+                                            onChange={(e) => setSort(e.target.value)}
+                                        >
+                                            <FormControlLabel
+                                                value="default"
+                                                control={<Radio color="secondary"/>}
+                                                label="Default"
+                                            />
+                                            <FormControlLabel
+                                                value="price-low-high"
+                                                control={<Radio color="secondary" />}
+                                                label="Low → High"
+                                            />
+                                            <FormControlLabel
+                                                value="price-high-low"
+                                                control={<Radio color="secondary" />}
+                                                label="High → Low"
+                                            />
+                                        </RadioGroup>
+                                    </Box>
+                                </SectionWrapper>
+
+                                {/*Category Filter, hide if shop is filtered using home*/}
+                                <SectionWrapper sx={{bgcolor: '#f0f0f0'}}>
+                                    <Box>
+                                        <Typography variant="subtitle2"  fontWeight={'bold'} color="secondary" sx={{display: 'flex', alignItems: 'center', gap: 1}}>
+                                            <ChartColumnStackedIcon/>
+                                            Category
+                                        </Typography>
+                                        {!categoryId ? (
+                                            <List sx={{p: 1}}>
+                                                <RadioGroup
+                                                    value={category}
+                                                    onChange={(e) => setCategory(e.target.value)}
+                                                >
+                                                    <FormControlLabel value="all" control={<Radio color="secondary"/>} label="All" />
+                                                    {categories
+                                                        .filter((c) => c.id)
+                                                        .map((c) => (
+                                                        <FormControlLabel
+                                                            key={c.id}
+                                                            value={c.id}
+                                                            control={<Radio color="secondary" />}
+                                                            label={typeof c.name === 'string' ? c.name.charAt(0).toUpperCase() + c.name.slice(1) : JSON.stringify(c.name)}
+                                                        />
+                                                    ))}
+                                                </RadioGroup>
+                                            </List>
+                                        ) : (
+                                            <Box sx={{mt: 2}}>
+                                                <Button 
+                                                    variant="outlined" 
+                                                    color="error" 
+                                                    fullWidth
+                                                    onClick={() => navigate('/shop')}
+                                                    sx={{
+                                                        display: 'flex',
+                                                        justifyContent: 'space-between',
+                                                        py: 1,
+                                                        my: 1,
+                                                        alignItems: 'center',
+                                                    }}
+                                                >
+                                                    {categoryName}
+                                                    <CloseRounded fontSize="small"/>
+                                                </Button>
+                                            </Box>
+                                        )}
+                                    </Box>
+                                </SectionWrapper>
+                            </Stack>
+                        </Stack>
+                    </Container>
+                </Drawer>
             </Box>
 
-            {/* Desktop: List + Radio */}
             <Stack direction="column" spacing={4} sx={{ display: { xs: "none", md: "flex" } }}>
-                {/* Categories list */}
                 <List sx={{ width: 150 }}>
                     <Typography variant="subtitle1" sx={{ pl: 2 }}>
                         Categories
@@ -125,7 +212,6 @@ export default function ShopFilters({ sort, setSort, category, setCategory, cate
                     )}
                 </List>
 
-                {/* Sorting radio */}
                 <FormControl>
                     <Typography variant="subtitle1" sx={{ mb: 1 }}>
                         Sort

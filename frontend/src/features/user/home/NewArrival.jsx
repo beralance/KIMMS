@@ -25,39 +25,47 @@ const NewArrival = () => {
                                         height: '100%',
                                         aspectRatio: '1/1',
                                         objectFit: 'cover',
-                                        boxShadow: '2px 2px 10px rgba(0, 0, 0, 0.3)',
+                                        boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.3)',
                                         borderRadius: 3,
                                     }}
                                 />
                             </Grid>
                             <Grid size={{xs: 6}}>
                                 <Stack height={'100%'}>
-                                    <Stack sx={{pb: 1}}>
-                                        <Typography noWrap variant="body1" fontWeight={'bold'} color="secondary">
-                                            {product.productName}
-                                        </Typography>
+                                    <Stack sx={{pb: 1}} gap={1}>
+                                        <Stack>
+                                            <Typography noWrap variant="body1" fontWeight={'bold'} color="secondary">
+                                                {product.productName}
+                                            </Typography>
+                                            <Stack direction={'row'}>
+                                                <Divider sx={{border: 1, color: 'black', mr: 1}}/>
+                                                <Typography variant="body2" color="secondary">
+                                                    PHP {formatNumber(product.price)}
+                                                </Typography>
+                                            </Stack>
+                                        </Stack>
                                         <Stack direction={'row'}>
-                                            <Divider sx={{border: 1, color: 'black', mr: 1}}/>
-                                            <Typography variant="body2" color="secondary">
-                                                PHP {formatNumber(product.price)}
+                                            <Typography variant="body2" color="secondary" noWrap >
+                                                - {product.isLocal ? 'Large' : 'Small'} item -
                                             </Typography>
                                         </Stack>
                                     </Stack>
-                                    <Stack gap={1}>
-                                        <Typography variant="body2" color="secondary" noWrap sx={{border: 1, alignSelf: 'flex-start', py: .2, borderRadius: '999px', width: 'auto', px: 2,}}>
-                                            {product.category?.name}
-                                        </Typography>
+                                    <Stack direction={'row'} sx={{mt: 'auto'}} alignItems={'center'}>
+                                        <Stack>
+                                            <Typography variant="body2" color="secondary" noWrap sx={{border: 1, alignSelf: 'flex-start', py: .2, borderRadius: '999px', width: 'auto', px: 2,}}>
+                                                {product.category?.name}
+                                            </Typography>
+                                        </Stack>
+                                        <IconButton 
+                                            onClick={() => navigate(`/product/${product._id}`)}
+                                            sx={{
+                                                py: .5,
+                                                alignSelf: 'flex-end'
+                                            }} 
+                                        >
+                                            <ArrowCircleRightRounded fontSize='large'/>
+                                        </IconButton>
                                     </Stack>
-                                    <IconButton 
-                                        onClick={() => navigate(`/product/${product._id}`)}
-                                        sx={{
-                                            py: .5,
-                                            mt: 'auto', 
-                                            alignSelf: 'flex-end'
-                                        }} 
-                                    >
-                                        <ArrowCircleRightRounded fontSize='large'/>
-                                    </IconButton>
                                 </Stack>
                             </Grid>
                     </Grid>

@@ -20,7 +20,7 @@ export default function ProductCardSimple ({ product, onNavigate, addToCart }) {
                     p: 2, 
                     m: 1, 
                     boxShadow: '3px 3px 8px rgba(0, 0, 0, 0.5)', 
-                    borderRadius: 2, 
+                    borderRadius: 1, 
                     minWidth: 100, 
                     maxWidth: 300,
                     
@@ -42,10 +42,10 @@ export default function ProductCardSimple ({ product, onNavigate, addToCart }) {
                     />
                 </Box>
                 <CardContent sx={{py: '0px !important'}}>
-                    <Stack alignItems={'center'} sx={{px: .5}}>
-                        <Stack sx={{alignItems: 'center', py: 1}}>
-                            <Stack alignItems={'center'} width={'100%'} sx={{mb: .5}}>
-                                <Typography variant="body1" align='center' color='secondary' noWrap sx={{width: '80%', fontWeight: 'bold'}}>
+                    <Stack alignItems={'center'} sx={{px: .5, py: 1}}>
+                        <Stack sx={{alignItems: 'center'}}>
+                            <Stack alignItems={'center'} width={'80%'}>
+                                <Typography variant="body1" align='center' color='secondary' noWrap sx={{fontWeight: 'bold', textOverflow: 'ellipsis'}}>
                                     {product.productName}
                                 </Typography>
                             </Stack>
@@ -54,7 +54,7 @@ export default function ProductCardSimple ({ product, onNavigate, addToCart }) {
                             </Typography>
                         </Stack>
                         <Stack>
-                            <Button variant='contained' color='secondary' onClick={onNavigate} sx={{alignSelf: 'flex-end', py: .5, my: 1, borderRadius: '999px', px: 4}}>
+                            <Button variant='contained' color='secondary' onClick={onNavigate} sx={{alignSelf: 'flex-end', py: .5, borderRadius: '999px', px: 4}}>
                                 Visit
                             </Button>
                         </Stack>
