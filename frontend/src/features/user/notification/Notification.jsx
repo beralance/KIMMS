@@ -3,7 +3,6 @@ import { Box, Typography, IconButton, Stack, Divider, CircularProgress, Button }
 import { CheckCircle, Bell, Clock, BellIcon, ChevronLeftIcon, ChevronRightIcon, BellRing, BellRingIcon } from "lucide-react";
 import { fetchNotifications, markNotificationAsRead } from "../../../utils/notificationApi";
 import { useAuth } from "../../../contexts/AuthContext";
-import { markAsRead } from "../../../../../backend/controllers/auctionNotificationController";
 import { useNavigate } from "react-router-dom";
 
 const Notification = () => {
