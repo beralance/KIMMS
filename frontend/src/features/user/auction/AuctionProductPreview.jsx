@@ -75,11 +75,11 @@ const AuctionProductPreview = () => {
             <Box 
                 sx={{
                     backgroundImage: 'url(/view-photo-frame-with-interior-home-decor.jpg)',
-                    backgroundPosition: 'cover',
+                    backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
                     backgroundOrigin: 'center',
+                    backgroundSize: 'cover',
                     position: 'fixed',
-                    backgroundSize: '100%',
                     height: '100vh',
                     zIndex: -1,
                     top: 0, bottom: 0, left: 0, right: 0,

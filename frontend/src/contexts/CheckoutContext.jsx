@@ -14,6 +14,7 @@ export const CheckoutProvider = ({ children }) => {
     const { showSnackbar } = useSnackbar();
 
     const [checkoutItems, setCheckoutItems] = useState([]);
+    const [auctionCheckout, setAuctionCheckout] = useState([]);
     const [totalAmount, setTotalAmount] = useState(0);
     const [finalPrice, setFinalPrice] = useState(0)
     const [isProcessing, setIsProcessing] = useState(false);
@@ -31,23 +32,35 @@ export const CheckoutProvider = ({ children }) => {
 
     // online checkout
     const checkout = async () => {
-        if (!checkoutItems.length) return;
+        if (!checkoutItems.length && !auctionCheckout) return;
+        console.log('auction checkout', auctionCheckout)
+
+        if (auctionCheckout.length > 0){
+            if (auctionCheckout?.winner !== user.userId) {
+                showSnackbar("This product can only be bought by the auction winner", "error");
+                return;
+            }
+        }
 
         if (!user || !token) {
             showSnackbar("You must be logged in to checkout", "error");
             return;
         }
 
+        const isAuction = auctionCheckout && Object.keys(auctionCheckout).length > 0;
+        const productType = isAuction 
+            ? [{ productId: auctionCheckout?.inventoryId?._id }]
+            : checkoutItems.map(item => ({productId: item.productId._id}))
         try {
             setIsProcessing(true);
             const orderResp = await axios.post(
                 `${API_URL}/api/orders`,
                 {
                     userId: user.userId,
-                    products: checkoutItems.map(item => ({
-                        productId: item.productId._id
-                    })),
-                    totalPrice: totalAmount,
+                    products: productType,
+                    auctionId: auctionCheckout._id || null,
+                    orderType: isAuction ? 'auction' : 'fixed',
+                    totalPrice: isAuction ? auctionCheckout.reservePrice : totalAmount,
                     finalPrice,
                 },
                 { headers: { Authorization: `Bearer ${token}` } }
@@ -126,6 +139,8 @@ export const CheckoutProvider = ({ children }) => {
                 checkout,
                 codCheckout,
                 setFinalPrice,
+                auctionCheckout,
+                setAuctionCheckout,
                 finalPrice
             }}
         >

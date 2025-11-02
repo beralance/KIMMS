@@ -36,6 +36,8 @@ const userSchema = new mongoose.Schema({
     isVerified: { type: Boolean, default: false},
     verificationCode: {type: String}, // store 6 digit code
     verificationExpiry: {type: Date}, // code expiry time
+    resetPasswordCode: {type: String},
+    resetPasswordExpiry: {type: Date},
 }, {timestamps: true});
 
 // hash password before saving

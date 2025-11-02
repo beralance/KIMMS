@@ -1,9 +1,9 @@
 import Notification from "../models/AuctionNotification.js";
 
 // Create a new notification
-export const createNotification = async (userId, auctionId, message) => {
+export const createNotification = async (userId, auctionId, message, label) => {
     try {
-        const notif = new Notification({ userId, auctionId, message });
+        const notif = new Notification({ userId, auctionId, message, label });
         await notif.save();
         return notif;
     } catch (err) {
@@ -15,7 +15,20 @@ export const createNotification = async (userId, auctionId, message) => {
 export const getUserNotifications = async (req, res) => {
     console.log('USER ID', req.user.id )
     try {
-        const notifications = await Notification.find({ userId: req.user.id }).sort({ createdAt: -1 });
+        const notifications = await Notification.find({ userId: req.user.id })
+            .populate({
+                path: 'auctionId',
+                select: 'inventoryId claimDeadline winnerClaimed startPrice reservePrice startTime endTime status description finalized createdAt updatedAt winner',
+                populate: {
+                    path: 'inventoryId',
+                    select: 'productName condition isLocal category description details images',
+                    populate: {
+                        path: 'category',
+                        select: 'name'
+                    }
+                }
+            })
+            .sort({ read: 1, createdAt: -1 });
         res.json(notifications);
     } catch (err) {
         res.status(500).json({ error: err.message });

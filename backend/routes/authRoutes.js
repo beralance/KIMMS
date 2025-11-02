@@ -1,5 +1,5 @@
 import express from 'express'
-import { login, signup, updateEmail, verifyNewEmail, createStaff, updatePassword, updateUserAvatar, deleteStaff, updateUserProfile, googleLogin, verifyEmail, resendCode, updateAddress} from '../controllers/authController.js'
+import { login, signup, updateEmail, verifyNewEmail, forgotPassword, resetPassword, createStaff, updatePassword, updateUserAvatar, deleteStaff, updateUserProfile, googleLogin, verifyEmail, resendCode, updateAddress} from '../controllers/authController.js'
 import {verifyToken, adminOnly, requireRole} from '../middleware/authMiddleware.js'
 import rateLimit from '../middleware/rateLimitMiddleware.js'
 import upload from '../middleware/upload.js'
@@ -11,6 +11,10 @@ router.post('/login', rateLimit, login);
 router.post('/google-login', rateLimit, googleLogin);
 router.post('/verify', verifyEmail);
 router.post('/resent-code', rateLimit, resendCode) //add rate limiting
+
+// forgot password routes
+router.post('/forgot-password', rateLimit, forgotPassword);
+router.post('/reset-password', rateLimit, resetPassword);  
 
 // user routes
 router.patch('/:userId/profile', verifyToken, requireRole(['user']), updateUserProfile)

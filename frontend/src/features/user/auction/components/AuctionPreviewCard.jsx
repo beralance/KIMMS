@@ -77,6 +77,7 @@ export default function AuctionPreviewCard({ product, getTimeRemaining, onNaviga
                     </Grid>
                 </Stack>
                 <Button
+                    disabled={(new Date(product.endTime) - new Date()) >= new Date()}
                     component={Link}
                     to={`/auction/listing/product-preview/${product._id}`} 
                     variant="contained"

@@ -8,14 +8,38 @@ import { LocalOfferRounded, ShoppingBagRounded, TagRounded } from '@mui/icons-ma
 import HomeHero from './HomeHero'
 import HomeAuctionSection from './HomeAuctionSection'
 import { ScrollOnTop } from '../../../utils/ScrollOnTop'
+import { fetchAuctions } from '../../../utils/auctionApi'
 import CategoriesList from './CategoriesList'
 import NewArrival from './NewArrival'
 import { useNavigate } from 'react-router-dom'
-
+import AuctionLiveDisplayer from './components/AuctionLiveDisplayer'
+import AuctionPendingDisplayer from './components/AuctionPendingDisplayer'
 
 export default function Home () {
+    const [auctions, setAuctions] = useState(null)
+    const [pendingAuctions, setPendingAuctions] = useState([])
+    const [liveAuctions, setLiveAuctions] = useState([])
+
     const navigate = useNavigate()
     ScrollOnTop()
+
+    useEffect(() => {
+        const getAuction = async () => {
+            const data = await fetchAuctions()
+            setAuctions(data)
+
+            const liveAuctionsData = data.filter((l) => l.status === 'LIVE')
+            const pendingAuctionsData = data.filter((p) => p.status === 'PENDING')
+
+            console.log('LIVE AUCTIONS', liveAuctionsData)
+            console.log('PENDING AUCTIONS', pendingAuctionsData)
+
+            setLiveAuctions(liveAuctionsData)
+            setPendingAuctions(pendingAuctionsData)
+        }
+        getAuction()
+    }, [])
+
 
     return (
         <Box>
@@ -114,6 +138,34 @@ export default function Home () {
                             </Stack>
                         </section>
                         <section>
+                            {(liveAuctions.length > 0) &&
+                                <Stack gap={1}>
+                                    <Stack alignItems={'center'} sx={{mb: 2}}>
+                                        <Typography variant="h5" color="initial">
+                                            Live Auctions Are On!
+                                        </Typography>
+                                        <Typography variant="body1" color="secondary" align='center'>
+                                            Join the excitement — bid live, win big, and make it yours today!
+                                        </Typography>
+                                    </Stack>
+                                    <Container>
+                                        <AuctionLiveDisplayer auctions={liveAuctions}/>
+                                    </Container>
+                                </Stack>
+                            }
+                        </section>
+                        <section>
+                            {pendingAuctions.length > 0 &&
+                                <Container>
+                                    {pendingAuctions.map((pending) => 
+                                        <Box key={pending._id}>
+                                            <AuctionPendingDisplayer auction={pending}/>
+                                        </Box>
+                                    )}
+                                </Container>
+                            }
+                        </section>
+                        <section>
                             <Stack alignItems={'center'}>
                                 <Typography variant='h5' color='initial'>
                                     Handpicked just for you
@@ -161,13 +213,4 @@ export default function Home () {
             </Box>
         </Box>
     )
-}
-
-export const scrollSnapContent = {
-    width: '100%',
-    height: '100vh',
-    scrollSnapAlign: 'start',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
 }

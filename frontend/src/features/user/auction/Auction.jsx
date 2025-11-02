@@ -81,7 +81,7 @@ const Auction = () => {
                         </Stack>
 
                         <Stack>
-                            {pendingAuction.length && 
+                            {pendingAuction.length > 0 && 
                                 <AuctionSection 
                                     auctions={pendingAuction}
                                     label={'Bidding starts soon!'}

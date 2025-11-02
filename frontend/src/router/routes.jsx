@@ -25,6 +25,7 @@ import AuctionProductPreview from '../features/user/auction/AuctionProductPrevie
 import UserOrders from '../features/user/orders/UserOrders'
 import SoldProductDetails from '../features/user/shop/SoldProductDetails'
 import Notification from "../features/user/notification/Notification";
+import NotificationContent from "../features/user/notification/NotificationContent";
 
 
 // Admin Pages
@@ -95,6 +96,11 @@ export default function AppRoutes() {
                         <Notification/>
                     </UserProtectedRoute>
                 }/>
+                <Route path="/notification/:id" element={
+                    <UserProtectedRoute>
+                        <NotificationContent/>
+                    </UserProtectedRoute>
+                }/>
             </Route>
 
             <Route path="/product/:id" element={<ProductDetails/>}/>
@@ -106,6 +112,12 @@ export default function AppRoutes() {
             }/>
                 
             <Route path='/checkout' element={
+                <UserProtectedRoute>
+                    <Checkout/>
+                </UserProtectedRoute>
+            }/>
+
+            <Route path='/auction-checkout/:auctionId/:winner' element={
                 <UserProtectedRoute>
                     <Checkout/>
                 </UserProtectedRoute>

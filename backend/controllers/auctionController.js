@@ -2,6 +2,7 @@
 import Auction from "../models/Auction.js";
 import Inventory from "../models/Inventory.js"; // ✅ Auction uses Inventory as source
 import Bid from '../models/Bid.js'
+import {createNotification} from '../controllers/auctionNotificationController.js'
 /**
  * Create a new auction
  */
@@ -61,7 +62,7 @@ export const getAuctions = async (req, res) => {
         const auctions = await Auction.find()
             .populate({
                 path: "inventoryId", 
-                select: "productName price status description details condition images",
+                select: "productName price isLocal category status description details condition images",
                 populate: {
                     path: 'category',
                     select: 'name',
@@ -214,6 +215,76 @@ export const getPastAuctions = async (req, res) => {
         res.json(auctions);
     } catch (err) {
         res.status(500).json({ error: err.message });
+    }
+};
+
+export const claimAuctionItem = async (req, res) => {
+    try {
+        const {auctionId} = req.params;
+        const userId = req.user.id
+        
+        const auction = await Auction.findById(auctionId)
+            .populate('winner', 'fullName email phoneNumber address')
+            .populate('inventoryId', 'productName category condition isLocal physicalCode')
+
+        if (!auction) return res.status(404).json({message: 'Auction not found'})
+        if (auction.status !== 'PENDING_CLAIM')
+            return res.status(400).json({message: 'Auction not open for claiming'})
+        if (auction.winner.toString() !== userId.toString())
+            return res.status(403).json({message: 'You are not the winner'})
+        if (auction.claimDeadline && auction.claimDeadline < new Date())
+            return res.status(400).json({ message: "Claim period has expired" });
+
+        res.status(200).json({message: 'Item successfully claimed', auction})
+    }
+    catch (err) {
+        res.status(500).json({message: err.message})
+    }
+}
+
+export const confirmAuctionDelivery = async (req, res) => {
+    try {
+        const { auctionId } = req.params;
+
+        const auction = await Auction.findById(auctionId).populate('inventoryId winner', 'productName fullName');
+        if (!auction) return res.status(404).json({ message: 'Auction not found' });
+
+        if (auction.status === 'CLAIMED')
+            return res.status(400).json({ message: 'Item already claimed or already processed' });
+
+        
+
+        await auction.save();
+
+        await createNotification(
+            auction.winner._id,
+            auction._id,
+            `Your item "${auction.inventoryId.productName}" has been successfully delivered. Thank you for participating!`
+        );
+
+        res.status(200).json({ message: 'Auction successfully marked as completed', auction });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const auctionCloseCron = async () => {
+    try {
+        const sevenDaysAgo = new Date(Date.now() - 1 * 24 * 60 * 60 * 1000); // return to 7days
+
+        const completedAuctions = await Auction.find({
+            status: 'COMPLETED',
+            deliveredAt: { $lt: sevenDaysAgo },
+        });
+
+        for (const auction of completedAuctions) {
+            auction.status = 'CLOSED';
+            await auction.save();
+        }
+
+        console.log(`${completedAuctions.length} auctions closed successfully.`);
+    } catch (err) {
+        console.error("auctionCloseCron error:", err);
     }
 };
 

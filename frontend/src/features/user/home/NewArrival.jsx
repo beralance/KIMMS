@@ -50,7 +50,7 @@ const NewArrival = () => {
                                             </Typography>
                                         </Stack>
                                     </Stack>
-                                    <Stack direction={'row'} sx={{mt: 'auto'}} alignItems={'center'}>
+                                    <Stack direction={'row'} sx={{mt: 'auto'}} justifyContent={'space-between'} alignItems={'center'}>
                                         <Stack>
                                             <Typography variant="body2" color="secondary" noWrap sx={{border: 1, alignSelf: 'flex-start', py: .2, borderRadius: '999px', width: 'auto', px: 2,}}>
                                                 {product.category?.name}

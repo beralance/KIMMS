@@ -7,6 +7,8 @@ import {
   // updateAuction,   // Optional: only for pre-auction editing
   // deleteAuction,   // Optional: only for pre-auction deletion
   finalizeAuction,
+  claimAuctionItem,
+  confirmAuctionDelivery,
   getPastAuctions,
 } from "../controllers/auctionController.js";
 
@@ -26,6 +28,9 @@ router.get('/history/past', getPastAuctions)
 router.get("/:id", getAuctionById);
 
 router.delete('/:id', verifyToken, deletePendingAuction)
+
+router.delete('/:id/deliver', verifyToken, confirmAuctionDelivery)
+router.post('/:id/claim', verifyToken, claimAuctionItem)
 
 // Optional: admin manual finalize (override)
 router.post("/:id/finalize", verifyToken, adminOnly, requireRole(['admin']), finalizeAuction);

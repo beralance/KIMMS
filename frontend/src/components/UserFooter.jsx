@@ -51,7 +51,7 @@ export default function UserFooter() {
                         </Container>
                         <Grid container spacing={2} width={'100%'} sx={{justifyContent: 'center'}}>
                             {quickLinks.map((link, index) => 
-                                <Grid size={{xs: 6}}>
+                                <Grid key={index} size={{xs: 6}}>
                                     <Link href={link.path} underline="hover">
                                         <Typography variant="body2" color="secondary" sx={{display: 'flex', justifyContent: 'center', textDecoration: 'underline', alignItems: 'center', gap: 1}}>
                                             {link.icon}

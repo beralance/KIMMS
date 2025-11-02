@@ -415,6 +415,62 @@ export const updateUserProfile = async (req, res) => {
     }
 };
 
+export const forgotPassword = async (req, res) => {
+    try {
+        const {email} = req.body
+        const user = await User.findOne({email})
+
+        if (!user) {
+            return res.status(404).json({message: 'User not found'})
+        }
+
+        
+        const code = generateCode(6);
+        const expiry = new Date(Date.now() + 10 * 60 * 1000);
+
+        user.verificationCode = code;
+        user.verificationExpiry = expiry
+        await user.save()
+
+        await sendEmail({
+            to: user.email,
+            subject: "Password Reset Code",
+            text: `Your password reset code is ${code}. It expires in 15 minutes.`,
+            html: `<p>Your password reset code is <b>${code}</b>.</p><p>It expires in 15 minutes.</p>`
+        })
+        res.json({ message: "Password reset code sent to your email" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export const resetPassword = async (req, res) => {
+    try {
+        const { email, code, newPassword } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (!user.verificationCode || user.verificationCode !== code || user.verificationExpiry < new Date()) {
+            return res.status(400).json({ message: "Invalid or expired code" });
+        }
+
+        user.password = newPassword;
+        user.verificationCode = null;
+        user.verificationExpiry = null;
+        await user.save();
+
+        res.json({ message: "Password reset successfully" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+
 // Update user password
 export const updatePassword = async (req, res) => {
     try {
