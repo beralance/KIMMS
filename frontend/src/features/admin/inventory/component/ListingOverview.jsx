@@ -18,7 +18,7 @@ const ListingOverview = () => {
                         { label: "Pending", value: pendingAuctions, color: '#2612d8ff'},
                     ].map((item, index) => (
                         <Grid size={{xs: 6}} key={index}>
-                            <Box sx={{bgcolor: '#f0f0f0', p: 2, borderRadius: 2}}>
+                            <Box sx={{bgcolor: 'rgba(255, 255, 255, 0.2)', backdropFilter: 'blur(10px)', p: 2, borderRadius: 2}}>
                                 <InventoryDataCard 
                                     color={item.color}
                                     label={item.label} 

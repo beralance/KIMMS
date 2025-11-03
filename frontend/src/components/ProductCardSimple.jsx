@@ -23,7 +23,6 @@ export default function ProductCardSimple ({ product, onNavigate, addToCart }) {
                     borderRadius: 1, 
                     minWidth: 100, 
                     maxWidth: 300,
-                    
                 }}
             >
                 
@@ -41,15 +40,15 @@ export default function ProductCardSimple ({ product, onNavigate, addToCart }) {
                         }}
                     />
                 </Box>
-                <CardContent sx={{py: '0px !important'}}>
-                    <Stack alignItems={'center'} sx={{px: .5, py: 1}}>
+                <Box>
+                    <Stack alignItems={'center'} gap={2}>
                         <Stack sx={{alignItems: 'center'}}>
                             <Stack alignItems={'center'} width={'80%'}>
                                 <Typography variant="body1" align='center' color='secondary' noWrap sx={{fontWeight: 'bold', textOverflow: 'ellipsis'}}>
                                     {product.productName}
                                 </Typography>
                             </Stack>
-                            <Typography variant='body2' align='center' color='secondary' height={40} overflow={'auto'}>
+                            <Typography variant='body2' align='center' color='secondary' maxHeight={40} overflowY={'auto'}>
                                 {product.description}
                             </Typography>
                         </Stack>
@@ -59,8 +58,7 @@ export default function ProductCardSimple ({ product, onNavigate, addToCart }) {
                             </Button>
                         </Stack>
                     </Stack>
-                </CardContent>
-                
+                </Box>
             </Card>
         </SectionTransition>
     );

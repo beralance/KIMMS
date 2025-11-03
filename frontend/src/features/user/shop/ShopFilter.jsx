@@ -34,8 +34,6 @@ export default function ShopFilters({ sort, setSort, filteredProducts, category,
     const handleDrawerOpen = () => setOpenDrawer(true)
     const handleDrawerClose = () => setOpenDrawer(false)
 
-    const getSelectedCat = categories.filter((p) => p.id === category)
-
     const navigate = useNavigate()
 
 
@@ -51,6 +49,8 @@ export default function ShopFilters({ sort, setSort, filteredProducts, category,
         loadCategories();
     }, []);
 
+    const selectedCategory = categories.find((c) => c.id === category) || {name: 'All'}
+
     return (
 
         <Box sx={{ mb: 2 }}>
@@ -62,7 +62,7 @@ export default function ShopFilters({ sort, setSort, filteredProducts, category,
                             {`Product${filteredProducts.length > 1 ? 's' : ''} (${filteredProducts.length})`}
                         </Typography>
                         <Stack direction={'row'} gap={1}>
-                            {categoryId &&
+                            {categoryId ?
                                 <Button 
                                     variant="text" 
                                     color="error" 
@@ -76,13 +76,14 @@ export default function ShopFilters({ sort, setSort, filteredProducts, category,
                                     {categoryName}
                                     <CloseRounded fontSize="small"/>
                                 </Button>
+                                :
+                                <Box sx={{ display: { xs: "flex", md: "none" }, }}>
+                                    <Button onClick={handleDrawerOpen} variant="contained" color="secondary" sx={{display: 'flex', alignItems: 'center', gap: 1}}>
+                                        <FilterIcon style={{color: 'white'}}/>
+                                        <Typography variant="body2" color="white">{selectedCategory.name}</Typography>
+                                    </Button>
+                                </Box>
                             }
-                            <Box sx={{ display: { xs: "flex", md: "none" }, }}>
-                                <Button onClick={handleDrawerOpen} variant="contained" color="secondary" sx={{display: 'flex', alignItems: 'center', gap: 1}}>
-                                    <FilterIcon style={{color: 'white'}}/>
-                                    <Typography variant="body1" color="white">Filter</Typography>
-                                </Button>
-                            </Box>
                         </Stack>
                     </Stack>
                 </Stack>
