@@ -19,8 +19,8 @@ export const saveLocation = async (req, res) => {
             {
                 latitude, 
                 longitude, 
-                address: locationData.display_name,
-                fullAddress: locationData,
+                address: locationData.display_name || null,
+                fullAddress: locationData || null,
                 updatedAt: new Date()},
 
             {upsert: true, new: true}
