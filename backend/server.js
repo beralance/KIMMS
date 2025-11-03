@@ -21,6 +21,7 @@ import auctionNotificationRoutes from './routes/auctionNotificationRoutes.js'
 import staffPermissionRoutes from './routes/staffPermissionRoutes.js'
 import categoryRoutes from './routes/categoryRoutes.js'
 import reportsRoutes from './routes/reportsRoutes.js'
+import locationRoutes from './routes/locationRoutes.js'
 
 // cron
 import { auctionLifecycleCron } from './cron/auctionCron.js'
@@ -66,6 +67,7 @@ app.use('/api/auction-notifications', auctionNotificationRoutes)
 app.use('/api/staff-permissions', staffPermissionRoutes)
 app.use('/api/categories', categoryRoutes)
 app.use('/api/reports', reportsRoutes)
+app.use('/api/location', locationRoutes)
 
 const testPassword = async () => {
     const hashed = '$2b$10$nL7l300trZVegcJFiQOpQ.J9I5oocqll71.rWqyxawvlPj9a.wWdC'

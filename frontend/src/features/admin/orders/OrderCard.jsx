@@ -6,7 +6,6 @@ import OrderDetailsDrawer from "./OrderDetailsDrawer";
 import {ArrowRightIcon, ChevronDownIcon, CopyCheckIcon, CopyIcon} from 'lucide-react'
 import SectionWrapper from '../../../components/SectionWrapper';
 
-
 const OrderCard = ({orderData, openDrawer = false, onOpen, onClose}) => {
     const [openDetails, setOpenDetails] = useState(false);
     const [openProductPreview, setOpenProductPreview] = useState(false)

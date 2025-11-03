@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import {} from '@mui/icons-material'
 import { Stack } from '@mui/material'
-import OrdersAuction from './OrdersAuction'
 import OrdersFixed from './OrdersFixed'
 import FullScreenLoader from '../../../components/FullScreenLoader'
 import OrderSearch from './OrderSearch'

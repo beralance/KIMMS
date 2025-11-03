@@ -9,6 +9,7 @@ import HomeHero from './HomeHero'
 import HomeAuctionSection from './HomeAuctionSection'
 import { ScrollOnTop } from '../../../utils/ScrollOnTop'
 import { fetchAuctions } from '../../../utils/auctionApi'
+import { useAuth } from '../../../contexts/AuthContext'
 import CategoriesList from './CategoriesList'
 import NewArrival from './NewArrival'
 import { useNavigate } from 'react-router-dom'
@@ -16,6 +17,7 @@ import AuctionLiveDisplayer from './components/AuctionLiveDisplayer'
 import AuctionPendingDisplayer from './components/AuctionPendingDisplayer'
 
 export default function Home () {
+    const {user} = useAuth()
     const [auctions, setAuctions] = useState(null)
     const [pendingAuctions, setPendingAuctions] = useState([])
     const [liveAuctions, setLiveAuctions] = useState([])
