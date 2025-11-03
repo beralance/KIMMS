@@ -48,7 +48,7 @@ export default function ProductCardSimple ({ product, onNavigate, addToCart }) {
                                     {product.productName}
                                 </Typography>
                             </Stack>
-                            <Typography variant='body2' align='center' color='secondary' maxHeight={40} overflowY={'auto'}>
+                            <Typography variant='body2' align='center' color='secondary' maxHeight={40} overflow={'hidden'} sx={{textOverflow: 'ellipsis'}}>
                                 {product.description}
                             </Typography>
                         </Stack>
