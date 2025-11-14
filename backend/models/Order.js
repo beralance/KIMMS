@@ -31,6 +31,12 @@ const orderSchema = new mongoose.Schema(
             default: 'fixed',
         },
 
+        orderStatus: {
+            type: String,
+            enum: ['PENDING', 'SUCCESSFUL', 'CANCELLED'],
+            default: 'PENDING'
+        },
+
         paymentId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Payment',
@@ -61,7 +67,7 @@ const orderSchema = new mongoose.Schema(
         // payment status tracking
         paymentStatus: {
             type: String,
-            enum: ["pending", "paid", "failed", 'refunded'],
+            enum: ["pending", 'unpaid', "paid", "failed", 'refunded'],
             default: "pending",
         },
 
@@ -78,7 +84,11 @@ const orderSchema = new mongoose.Schema(
             ],
             default: "pending",
         },
-        
+        cancelledBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            default: null,
+        },
         // For auction fallback logic
         priorityLevel: {
             type: Number, // 1 = top bidder, 2 = second, etc.

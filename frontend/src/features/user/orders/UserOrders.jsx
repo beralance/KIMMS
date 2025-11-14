@@ -1,35 +1,61 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {OrderContext} from '../../../contexts/OrderContext'
-import { Box, Stack, Typography } from '@mui/material'
+import { ProductContext } from '../../../contexts/ProductContext'
+import { Box, Divider, Container, Stack, Typography } from '@mui/material'
 import OrderContainer from './OrderContainer'
 import OrderTab from './OrderTab'
 import SectionWrapper from '../../../components/SectionWrapper'
+import FullScreenLoader from '../../../components/FullScreenLoader'
+import MostViewedProducs from './MostViewedProducs'
 
 
 const UserOrders = () => {
     const {orders, fetchOrders} = useContext(OrderContext)
-    
+    const {products} = useContext(ProductContext)
+    const [loading, setLoading] = useState(false)
+
+
     useEffect(() => {
-        fetchOrders()
+        setLoading(true)
+        try {
+            fetchOrders()
+        }
+        catch (err) {
+            console.error('Problem fetching orders', err)
+        }
+        finally {
+            setLoading(false)
+        }
     }, [])
 
-    const visibleOrders = orders.filter(o => {
-        if ((o.paymentMethod === 'gcash' && o.paymentStatus?.toLowerCase() === 'pending')) {
-            return false
-        }
-        return true
-    })
+    const successOrders = orders.filter(o => 
+        o.isActive === true && o.orderStatus === 'SUCCESSFUL'
+    );
+
+    const mostViewedProduct = products
+        .sort((a, b) => b.views - a.views)
+        .slice(0, 10)
 
     return (
-        <Box>
-            <SectionWrapper>
-                <Stack>
-                    <Typography variant="body1" color="initial">
-                        Change Address HERE
-                    </Typography>
+        <Box py={2}>
+            <Container>
+                <Stack gap={2}>
+                    <Stack>
+                        <Typography variant="subtitle1" color="secondary">My Purchases</Typography>
+                        <Typography variant="body2" color="gray">Track your orders and see what you’ve purchased</Typography>
+                    </Stack>
+                    <OrderTab orders={successOrders}/>
                 </Stack>
-            </SectionWrapper>
-            <OrderTab orders={visibleOrders}/>
+                <Divider sx={{my: 5}}>
+                    <Typography variant="body2" color="gray">
+                        You may also like
+                    </Typography>
+                </Divider>
+                <SectionWrapper>
+                    <MostViewedProducs products={mostViewedProduct}/>
+                </SectionWrapper>
+            </Container>
+            <FullScreenLoader open={loading}/>
         </Box>
     )
 }

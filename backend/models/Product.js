@@ -32,14 +32,14 @@ const productSchema = new mongoose.Schema(
         // Status for Products tab
         visibility: { 
             type: String, 
-            enum: ["active", "inactive", "sold", "pending"], 
+            enum: ["active", "inactive", "sold", 'cancelled', "pending"], 
             default: "active" 
         },
 
         // Purchase workflow status
         purchaseStatus: {
             type: String,
-            enum: ["available", "pending", "sold"],
+            enum: ["available", "pending", "sold", 'cancelled'],
             default: "available", // available for checkout
         },
 

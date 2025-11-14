@@ -126,9 +126,34 @@ export function OrderProvider({ children }) {
             return {error: err.message}
         }
     }
+
+    const cancelOrder = async (orderId) => {
+        try {
+            const res = await fetch(`${API_URL}/api/orders/${orderId}/cancel`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                }
+            })
+
+            if (!res.ok) {
+                if (res.status === 404) return {error: `Order not found`}
+                if (res.status === 400) return {error: `Cannot cancel this order`}
+                throw new Error('Failed to cancel order')
+            }
+
+            const data = await res.json()
+            return data;
+        }
+        catch (err) {
+            console.error('Failed to cancel order:', err);
+            return {error: err.message}
+        }
+    }
+
     useEffect(() => {
-        // Optionally fetch all orders on mount (e.g., admin)
-        if(token) {
+        if (token) {
             fetchOrders();
         }
     }, []);
@@ -140,6 +165,7 @@ export function OrderProvider({ children }) {
                 isLoading,
                 searchOrder,
                 fetchOrders,
+                cancelOrder,
                 createOrder,
                 updateOrderStatus,
             }}

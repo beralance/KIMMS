@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
-import { Container, Typography, Button, Box, Stack } from '@mui/material';
+import { Container, Typography, Button, Box, Stack, IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { ChevronLeftIcon } from 'lucide-react';
 
 export default function Success() {
     const navigate = useNavigate();
@@ -17,6 +18,19 @@ export default function Success() {
                             height: '150px',
                         }}
                     />
+                    <Button 
+                        variant='contained'
+                        color='secondary'
+                        onClick={() => navigate('/shop')}
+                        sx={{
+                            position: 'absolute',
+                            top: 10,
+                            borderRadius: '999px',
+                            left: 10,
+                        }}
+                    >
+                        <ChevronLeftIcon style={{color: 'white'}}/>
+                    </Button>
                 </Box>
                 <Stack>
                     <Typography variant="h4" align='center'>
@@ -26,8 +40,8 @@ export default function Success() {
                         Thank you for your purchase.
                     </Typography>
                 </Stack>
-                <Button variant="contained" color='secondary' sx={{borderRadius: '999px', px: 3}} onClick={() => navigate('/shop')}>
-                    Back to Shop
+                <Button variant="outlined" color='secondary' sx={{borderRadius: '999px', px: 3}} onClick={() => navigate('/my-purchases')}>
+                    View my purchase
                 </Button>
             </Stack>
         </Container>

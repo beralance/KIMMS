@@ -33,6 +33,12 @@ const steps = [
         label: 'Delivered', 
         icon: PackageCheckIcon, 
         description: 'Your order has successfully arrived at the designated delivery address. We hope you enjoy your purchase and thank you for choosing us!' 
+    },
+    { 
+        status: 'cancelled', 
+        label: 'Cancelled', 
+        icon: PackageXIcon, 
+        description: 'Your order has been cancelled' 
     }
 ];
 

@@ -1,17 +1,38 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, IconButton, Stack, Divider, CircularProgress, Button } from "@mui/material";
-import { CheckCircle, Bell, Clock, BellIcon, ChevronLeftIcon, ChevronRightIcon, BellRing, BellRingIcon } from "lucide-react";
-import { fetchNotifications, markNotificationAsRead } from "../../../utils/notificationApi";
+import {
+    Box,
+    Typography,
+    IconButton,
+    Stack,
+    Divider,
+    CircularProgress,
+    Button,
+} from "@mui/material";
+import {
+    CheckCircle,
+    Bell,
+    Clock,
+    BellIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    BellRing,
+    BellRingIcon,
+    MailIcon,
+} from "lucide-react";
+import {
+    fetchNotifications,
+    markNotificationAsRead,
+} from "../../../utils/notificationApi";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import {} from "lucide-react";
 
 const Notification = () => {
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
-    const {user} = useAuth()
-    const token = user.token
-    const navigate = useNavigate()
-
+    const { user } = useAuth();
+    const token = user.token;
+    const navigate = useNavigate();
 
     useEffect(() => {
         const loadNotifications = async () => {
@@ -34,7 +55,7 @@ const Notification = () => {
             setNotifications((prev) =>
                 prev.map((n) => (n._id === id ? { ...n, read: true } : n))
             );
-            navigate(`/notification/${id}`)
+            navigate(`/notification/${id}`);
         } catch (err) {
             console.error("Error marking as read:", err);
         }
@@ -48,10 +69,11 @@ const Notification = () => {
         );
     }
 
-    console.log('Notification', notifications)
+    console.log("Notification", notifications);
 
     return (
-        <Box
+        <Stack
+            gap={2}
             sx={{
                 maxWidth: 600,
                 margin: "auto",
@@ -61,14 +83,22 @@ const Notification = () => {
                 boxShadow: 2,
             }}
         >
-            <Typography variant="h5" fontWeight="bold" mb={2}>
-                Notifications
-            </Typography>
+            <Stack>
+                <Typography
+                    variant="subtitle1"
+                    color="secondary"
+                    sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                >
+                    Auction Notifications
+                    <MailIcon />
+                </Typography>
+                <Typography variant="body2" color="gray">
+                    Auction announcements and results
+                </Typography>
+            </Stack>
 
             {notifications.length === 0 ? (
-                <Typography color="text.secondary" align="center">
-                    No notifications yet.
-                </Typography>
+                <FullScreenLoader />
             ) : (
                 <Stack spacing={2}>
                     {notifications.map((notif) => (
@@ -76,63 +106,139 @@ const Notification = () => {
                             onClick={() => handleMarkAsRead(notif._id)}
                             key={notif._id}
                             sx={{
-                                cursor: 'pointer',
+                                cursor: "pointer",
                                 p: 2,
                                 borderRadius: 2,
-                                bgcolor: notif.read === true ? "#ffffffff" : "white",
+                                bgcolor:
+                                    notif.read === true ? "#ffffffff" : "white",
                                 boxShadow: notif.read === true ? 0 : 4,
                                 opacity: notif.read === true ? "0.8" : "1",
                                 display: "flex",
                                 alignItems: "center",
-                                position: 'relative',
+                                position: "relative",
                                 justifyContent: "space-between",
                             }}
                         >
-                            {notif.read === false &&
+                            {notif.read === false && (
                                 <Box
                                     sx={{
-                                        position: 'absolute',
-                                        top: -3, right: -3,
+                                        position: "absolute",
+                                        top: -3,
+                                        right: -3,
                                         height: 12,
                                         width: 12,
-                                        bgcolor: 'error.main',
-                                        borderRadius: '999px'
+                                        bgcolor: "error.main",
+                                        borderRadius: "999px",
                                     }}
                                 />
-                            }
+                            )}
                             <Box>
                                 <Stack>
-                                    <Stack direction={'row'} justifyContent={'space-between'}>
-                                        <Stack direction={'row'} gap={2} alignItems={'center'}>
-                                            {notif.read === true ? 
-                                                <BellIcon style={{width: '20px', height: '20px', fill: 'gray', color: 'gray'}}/>
-                                                :
-                                                <BellRingIcon style={{width: '20px', height: '20px', fill: '#37353E', color: '#37353E'}}/>
-                                            }
-                                            <Typography variant="subtitle2" fontWeight={'bold'}>
+                                    <Stack
+                                        direction={"row"}
+                                        justifyContent={"space-between"}
+                                    >
+                                        <Stack
+                                            direction={"row"}
+                                            gap={2}
+                                            alignItems={"center"}
+                                        >
+                                            {notif.read === true ? (
+                                                <BellIcon
+                                                    style={{
+                                                        width: "20px",
+                                                        height: "20px",
+                                                        fill: "gray",
+                                                        color: "gray",
+                                                    }}
+                                                />
+                                            ) : (
+                                                <BellRingIcon
+                                                    style={{
+                                                        width: "20px",
+                                                        height: "20px",
+                                                        fill: "#37353E",
+                                                        color: "#37353E",
+                                                    }}
+                                                />
+                                            )}
+                                            <Typography
+                                                variant="subtitle2"
+                                                fontWeight={"bold"}
+                                            >
                                                 {notif.label}
                                             </Typography>
                                         </Stack>
                                     </Stack>
-                                    <Divider sx={{my: 1}}/>
-                                    <Stack sx={{p: 1}} gap={notif.auctionId?.winner === user.userId ? 3 : 1}>
+                                    <Divider sx={{ my: 1 }} />
+                                    <Stack
+                                        sx={{ p: 1 }}
+                                        gap={
+                                            notif.auctionId?.winner ===
+                                            user.userId
+                                                ? 3
+                                                : 1
+                                        }
+                                    >
                                         <Typography variant="body2">
                                             {notif.message}
                                         </Typography>
-                                        <Stack direction={ notif.auctionId?.winner === user.userId && 'row-reverse'} alignItems={'center'} justifyContent={'space-between'}>
+                                        <Stack
+                                            direction={
+                                                notif.auctionId?.winner ===
+                                                    user.userId && "row-reverse"
+                                            }
+                                            alignItems={"center"}
+                                            justifyContent={"space-between"}
+                                        >
                                             <Box>
-                                                {(notif.auctionId?.winner === user.userId && !notif.auctionId?.winnerClaimed) &&
-                                                    <Stack>
-                                                        <Button variant="contained" color="secondary" onClick={(e) => {e.stopPropagation(); navigate(`/auction-checkout/${notif.auctionId?._id}/${notif.auctionId.winner}`)}} sx={{display: 'flex', alignItems: 'center', gap: 1}}>
-                                                            Checkout Item
-                                                            <ChevronRightIcon style={{color: 'white'}}/>
-                                                        </Button>
-                                                    </Stack>
-                                                }
+                                                {notif.auctionId?.winner ===
+                                                    user.userId &&
+                                                    !notif.auctionId
+                                                        ?.winnerClaimed && (
+                                                        <Stack>
+                                                            <Button
+                                                                variant="contained"
+                                                                color="secondary"
+                                                                onClick={(
+                                                                    e
+                                                                ) => {
+                                                                    e.stopPropagation();
+                                                                    navigate(
+                                                                        `/auction-checkout/${notif.auctionId?._id}/${notif.auctionId.winner}`
+                                                                    );
+                                                                }}
+                                                                sx={{
+                                                                    display:
+                                                                        "flex",
+                                                                    alignItems:
+                                                                        "center",
+                                                                    gap: 1,
+                                                                }}
+                                                            >
+                                                                Checkout Item
+                                                                <ChevronRightIcon
+                                                                    style={{
+                                                                        color: "white",
+                                                                    }}
+                                                                />
+                                                            </Button>
+                                                        </Stack>
+                                                    )}
                                             </Box>
-                                            <Box display="flex" alignItems="center" gap={1} alignSelf={'flex-end'}>
-                                                <Typography variant="caption" color="text.secondary">
-                                                    {new Date(notif.createdAt).toLocaleString()}
+                                            <Box
+                                                display="flex"
+                                                alignItems="center"
+                                                gap={1}
+                                                alignSelf={"flex-end"}
+                                            >
+                                                <Typography
+                                                    variant="caption"
+                                                    color="text.secondary"
+                                                >
+                                                    {new Date(
+                                                        notif.createdAt
+                                                    ).toLocaleString()}
                                                 </Typography>
                                             </Box>
                                         </Stack>
@@ -143,7 +249,7 @@ const Notification = () => {
                     ))}
                 </Stack>
             )}
-        </Box>
+        </Stack>
     );
 };
 

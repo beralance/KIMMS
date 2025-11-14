@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { ChevronDownIcon, ChevronUpIcon, CopyCheckIcon, CopyIcon, Divide, LocationEditIcon, MapPinIcon } from 'lucide-react'
+import { ChevronDownIcon, ChevronUpIcon, CopyCheckIcon, CopyIcon, Divide, LocationEditIcon, MapPinIcon, XIcon } from 'lucide-react'
 import { Box, Drawer, Stack, Container, Typography, Tooltip, IconButton, Collapse, Divider, Button, Grid } from '@mui/material'
 import OrderStatusStepper from './OrderStatusStepper'
 import SectionWrapper from '../../../components/SectionWrapper'
@@ -18,20 +18,29 @@ const OrderDetailsDrawer = ({order, open, onClose}) => {
     const address = order.userId?.address
     const fullAddress = `${address?.street}, ${address?.city}, ${address?.province}, ${address?.region}, ${address?.postalCode}`
     const totalAmount = order.products.reduce(
-        (acc, product) => acc + product.productId.price,
+        (acc, product) => acc + product?.productId?.price,
         0
     );
 
-    console.log('IORDER', order)
     return (
         <Box>
             <Drawer anchor="bottom" open={open} onClose={onClose} sx={{ position: 'relative', width: "100%", display: {xs: 'block', md: 'none'}, }} PaperProps={{sx: {height: '90vh'}}}>
                 <Stack >
                     <Container sx={{bgcolor: '#f0f0f0ff', height: '100%', py: 3}}>
                         <Stack gap={2}>
-                            <Typography variant="body1" color="initial">
-                                Order Details
-                            </Typography>
+                            <Box>
+                                <Stack>
+                                    <Typography variant="subtitle1" color="secondart">
+                                        Order Details
+                                    </Typography>
+                                    <Typography variant="body2" color="gray">
+                                        Order information for order {order.orderId}
+                                    </Typography>
+                                </Stack>
+                                <IconButton aria-label="" onClick={onClose} sx={{position: 'absolute', top: 10, right: 10}}>
+                                    <XIcon/>
+                                </IconButton>
+                            </Box>
                             <SectionWrapper>
                                 <Typography variant="body1" color="initial" gutterBottom sx={{display: 'flex', alignItems: 'center', gap: 1}}>
                                     <MapPinIcon/> Delivery Information
@@ -109,8 +118,8 @@ const OrderDetailsDrawer = ({order, open, onClose}) => {
                                     )}
                                     <Divider/>
                                     <Stack justifyContent={'space-between'} direction={'row'}>
-                                        <Typography variant="body1" color="secondary">Order total</Typography>
-                                        <Typography variant="body1" color="secondary">PHP {formatNumber(totalAmount)}</Typography>
+                                        <Typography variant="body2" fontWeight={'bold'} color="secondary">Order total</Typography>
+                                        <Typography variant="body2" color="secondary">PHP {formatNumber(totalAmount)}</Typography>
                                     </Stack>
                                 </Stack>
                             </SectionWrapper>
@@ -141,7 +150,7 @@ const OrderDetailsDrawer = ({order, open, onClose}) => {
                                 </Stack>
                                 <Stack direction={'row'} justifyContent={'space-between'}>
                                     <Typography variant="body2" color="secondary">Paid by</Typography>
-                                    <Typography variant="body2" color="secondary">{order.paymentMethod === 'gcash' ? 'GCash' : order.paymentMethod}</Typography>
+                                    <Typography variant="body2" color="secondary">{order.paymentMethod === 'gcash' ? 'GCash' : 'Cash on Delivery'}</Typography>
                                 </Stack>
                                 <Divider/>
                                 <Collapse in={viewMore} unmountOnExit mountOnEnter>
@@ -161,11 +170,13 @@ const OrderDetailsDrawer = ({order, open, onClose}) => {
                                     {!viewMore ? <ChevronDownIcon/> : <ChevronUpIcon/>}
                                 </Button>
                             </SectionWrapper>
-                            <Stack>
-                                <Button variant='contained' fullWidth color='secondary' onClick={() => navigate('/shop')}>
-                                    View Shop
-                                </Button>
-                            </Stack>
+                            {order.purchaseStatus === 'pending' &&
+                                <Stack>
+                                    <Button variant='outlined' color='warning' sx={{bgcolor: 'rgba(255, 255, 255, 0.5)'}}>
+                                        Cancel Order
+                                    </Button>
+                                </Stack>
+                            }
                         </Stack>
                     </Container>
                 </Stack>

@@ -93,6 +93,9 @@ export const cancelPayment = async (req, res) => {
 
                 order.purchaseStatus = 'cancelled';
                 console.log('@ PurchaseStatus is:', order.purchaseStatus)
+
+                order.orderStatus = 'CANCELLED';
+                console.log('@ PurchaseStatus is:', order.orderStatus)
                 
                 await order.save();
             }

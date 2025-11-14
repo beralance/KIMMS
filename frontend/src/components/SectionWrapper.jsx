@@ -1,14 +1,17 @@
-import React from 'react'
-import { Box, Stack } from '@mui/material'
+import React from "react";
+import { Box, Stack } from "@mui/material";
 
-const SectionWrapper = ({children, sx}) => {
+const SectionWrapper = ({ children, sx, ...props }) => {
     return (
         <Box>
-            <Stack sx={{p: 2, bgcolor: 'white', borderRadius: 2, ...sx}}>
+            <Stack
+                {...props}
+                sx={{ p: 2, bgcolor: "white", borderRadius: 2, ...sx }}
+            >
                 {children}
             </Stack>
         </Box>
-    )
-}
+    );
+};
 
-export default SectionWrapper
+export default SectionWrapper;

@@ -68,7 +68,7 @@ const ShopImages = () => {
                         }}    
                     />    
                 </Grid>  
-                <Grid size={{xs: 12}} height={150}>
+                <Grid size={{xs: 12}} height={200}>
                     <img 
                         src="/yellow-armchair-living-room-with-copy-space.jpg"
                         style={{

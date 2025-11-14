@@ -1,8 +1,6 @@
 // src/features/admin/components/OrderSearch.jsx
 import React, { useContext, useState } from "react";
 import { TextField } from "@mui/material";
-import { OrderContext } from "../../../contexts/OrderContext";
-import { useSnackbar } from "../../../contexts/SnackbarContext";
 
 export default function OrderSearch({ searchTerm, setSearchTerm, onSearch, error }) {
     const handleKeyPress = (e) => {
@@ -22,7 +20,6 @@ export default function OrderSearch({ searchTerm, setSearchTerm, onSearch, error
             onKeyPress={handleKeyPress}
             error={!!error}
             helperText={error || ''}
-            sx={{ mb: 2 }}
         />
     );
 }

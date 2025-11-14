@@ -10,6 +10,7 @@ import { toTitleCase, formatNumber } from '../../../utils/stringUtils'
 import { useSnackbar } from "../../../contexts/SnackbarContext";
 import {ShoppingBagIcon} from 'lucide-react'
 import { useAuth } from "../../../contexts/AuthContext";
+import FullScreenLoader from "../../../components/FullScreenLoader";
 
 
 export default function Cart() {
@@ -19,6 +20,7 @@ export default function Cart() {
     const [totalPrice, setTotalPrice] = useState(0);
     const {showSnackbar} = useSnackbar()
     const [summaryOpen, setSummaryOpen] = useState(false)
+    const [loading, setLoading] = useState(false)
     const navigate = useNavigate();
 
     const user = JSON.parse(localStorage.getItem('user') || '{}')
@@ -41,7 +43,7 @@ export default function Cart() {
 
     if (!validCartItems.length) {
         return (
-            <Stack sx={{height: '80vh', justifyContent: 'center', alignItems: 'center'}}>
+            <Stack sx={{height: '90vh', justifyContent: 'center', alignItems: 'center'}}>
                 <Grow in={true} mountOnEnter unmountOnExit timeout={1000}>
                     <Box sx={{width: 80}}>
                         <img src="emoji-sick-svgrepo-com.svg" alt="emoji-sick" style={{width: '100%', objectFit: 'cover'}} />
@@ -73,10 +75,19 @@ export default function Cart() {
     };
 
     const handleRemoveSelected = async () => {
-        for (const id of selectedIds) {
-            await removeFromCart(id);
+        setLoading(true)
+        try {
+            for (const id of selectedIds) {
+                await removeFromCart(id);
+            }
+            setSelectedIds([])
         }
-        setSelectedIds([])
+        catch {
+            showSnackbar('Problem occured when removing the product', 'error')
+        }
+        finally {
+            setLoading(false)
+        }
     };
 
     const handleCheckout = () => {
@@ -118,16 +129,6 @@ export default function Cart() {
                     <ShoppingBagIcon/>
                     Shopping Cart
                 </Typography>
-                <Box>
-                    {selectedIds.length > 0 && (
-                        <Button variant="text" color="error" onClick={handleRemoveSelected}>
-                            <DeleteRounded fontSize="small" sx={{mr: 1}}/>
-                        </Button>
-                    )}
-                    <Button variant={selectedIds.length === validCartItems.length ? 'contained' : 'text'} color="secondary" onClick={handleSelectAll}>
-                        {selectedIds.length === validCartItems.length ? <RemoveDoneRounded fontSize="small" sx={{mr: 1}}/> : <DoneAllRounded fontSize="small" sx={{mr: 1}}/>}
-                    </Button>
-                </Box>
             </Box>
             <Stack gap={2}>
                 <Box sx={{display: {xs: 'block', md: 'none'}}}>
@@ -150,10 +151,21 @@ export default function Cart() {
                 
                 <Box sx={{display: {md: 'flex'}}}>
                     <SectionWrapper sx={{gap: 2}}>
-                        <Box sx={{display: {xs: 'flex', md: 'none'}, width: 110, py: 1, pl: 1, justifyContent: 'flex-start', position: selectedIds.length && 'sticky', top: 70, backdropFilter: 'blur(10px)', WebkitBackdropFilter: "blur(10px)", zIndex: 1000, borderRadius: '0px 5px 5px 0px'}}>
+                        <Box sx={{display: {xs: 'flex', md: 'none'}, width: '100%', p: 1, alignItems: 'center', justifyContent: 'space-between', position: selectedIds.length && 'sticky', top: 70, backdropFilter: 'blur(10px)', WebkitBackdropFilter: "blur(10px)", zIndex: 1000, borderRadius: 2}}>
                             <Typography variant="body2" color="secondary" fontWeight='bold'>
                                 {selectedIds.length} selected
                             </Typography>
+                            <Stack direction={'row'}>
+                                {selectedIds.length > 0 && (
+                                    <Button variant="text" color="error" onClick={handleRemoveSelected}>
+                                        <DeleteRounded fontSize="small" sx={{mr: 1}}/>
+                                    </Button>
+                                )}
+                                <Button variant={selectedIds.length === validCartItems.length ? 'outlined' : 'text'} sx={{display: 'flex', alignItems: 'center', gap: 1}} color={selectedIds.length === validCartItems.length ? 'warning' : 'secondary'} onClick={handleSelectAll}>
+                                    {selectedIds.length === validCartItems.length ? <RemoveDoneRounded fontSize="small"/> : <DoneAllRounded fontSize="small"/>}
+                                    {selectedIds.length !== validCartItems.length && 'Select All'}
+                                </Button>
+                            </Stack>
                         </Box>
                         <Box  sx={{ width: {md: '60%'},}}>
                             {/* Desktop On*/}
@@ -210,7 +222,7 @@ export default function Cart() {
                                                                         {product.productName ?? "Product not found"}
                                                                 </Typography>
                                                             </Stack>
-                                                            <Box width={'20%'}>
+                                                            <Box width={'20%'} sx={{display: 'flex', alignItems: 'center', justifyContent: 'flex-end'}}>
                                                                 <Checkbox
                                                                     sx={{p: 0}}
                                                                     color="secondary"
@@ -229,7 +241,7 @@ export default function Cart() {
                                                         <Stack>
                                                             <Box sx={{width: '100%', border: '1px solid gray', borderRadius: 1, p: 1}}>
                                                                 <Typography variant="body2" color="secondary" align="center" fontWeight={'bold'}>
-                                                                    PHP {(product.price ?? 0).toLocaleString('en-PH', {minimumFractionDigits: 2})}
+                                                                    - PHP {(product.price ?? 0).toLocaleString('en-PH', {minimumFractionDigits: 2})} -
                                                                 </Typography>
                                                             </Box>
                                                         </Stack>
@@ -362,6 +374,7 @@ export default function Cart() {
                     )}
                 </BottomActionBar>
             </Box>
+            <FullScreenLoader open={loading}/>
         </Container>
     );
 }

@@ -1,17 +1,34 @@
 import React, { useState } from "react";
-import { Box, Button, TextField, Typography, IconButton, InputAdornment, Fade, Grow, Stack } from "@mui/material";
-import { Facebook, Google, Visibility, VisibilityOff } from "@mui/icons-material";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import {
+    Box,
+    Button,
+    TextField,
+    Typography,
+    IconButton,
+    InputAdornment,
+    Fade,
+    Grow,
+    Stack,
+    Divider,
+} from "@mui/material";
+import {
+    Facebook,
+    Google,
+    Visibility,
+    VisibilityOff,
+} from "@mui/icons-material";
+import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext";
-import { ScrollSectionLeft, ScrollSectionRight } from '../../../components/SectionTransitionX';
+import {
+    ScrollSectionLeft,
+    ScrollSectionRight,
+} from "../../../components/SectionTransitionX";
 import { resendCode } from "../../../utils/api";
 import { useSnackbar } from "../../../contexts/SnackbarContext";
-import FullScreenLoader from '../../../components/FullScreenLoader'
-import {signInWithGoogle, facebookProvider, auth} from '../../../firebase'
+import FullScreenLoader from "../../../components/FullScreenLoader";
+import { signInWithGoogle, facebookProvider, auth } from "../../../firebase";
 import { signInWithPopup } from "firebase/auth";
-import axios from 'axios'
-// s
-
+import axios from "axios";
 
 export default function LoginForm({ onSuccess }) {
     const [email, setEmail] = useState("");
@@ -20,41 +37,44 @@ export default function LoginForm({ onSuccess }) {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const {onRegisterSuccess} = useOutletContext()
+    const { onRegisterSuccess } = useOutletContext();
     const API_URL = import.meta.env.VITE_API_URL;
     const { login } = useAuth();
-    const {showSnackbar} = useSnackbar()
+    const { showSnackbar } = useSnackbar();
     const navigate = useNavigate();
 
-    {/*Show Password*/}
-    const toggleShowPassword = () => setShowPassword(prev => !prev);
-
-    {/*Sign in with google*/}
+    const toggleShowPassword = () => setShowPassword((prev) => !prev);
     const handleGoogleSignIn = async () => {
-        setLoading(true)
+        setLoading(true);
 
         try {
-            const firebaseUser = await signInWithGoogle()
-            console.log('Logged in as: ', firebaseUser.displayName)
+            const firebaseUser = await signInWithGoogle();
+            console.log("Logged in as: ", firebaseUser.displayName);
 
             const payload = {
                 email: firebaseUser.email,
                 fullName: firebaseUser.displayName,
                 googleId: firebaseUser.uid,
-                avatar: firebaseUser.photoURL || 'https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-male-01.svg'
+                avatar:
+                    firebaseUser.photoURL ||
+                    "https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-male-01.svg",
+            };
+
+            const res = await fetch(`${API_URL}/api/auth/google-login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+
+            const data = await res.json();
+
+            if (!data.hasAccount) {
+                navigate("/auth/signup");
             }
 
-            const res = await fetch (`${API_URL}/api/auth/google-login`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(payload)
-            })
-
-            const data = await res.json()
-
             if (!res.ok) {
-                showSnackbar(data.error || 'Google login failed', 'error')
-                return
+                showSnackbar(data.error || "Google login failed", "error");
+                return;
             }
 
             login({
@@ -69,27 +89,36 @@ export default function LoginForm({ onSuccess }) {
                 email: data.email,
                 gender: data.gender,
                 googleId: data.googleId,
-            })
+            });
 
             if (onSuccess) onSuccess(data);
 
-            if (!data.address || !data.address?.region || !data.address?.province || !data.address?.city || !data.address?.street ) {
+            if (
+                !data.address ||
+                !data.address?.region ||
+                !data.address?.province ||
+                !data.address?.city ||
+                !data.address?.street
+            ) {
                 navigate(`/auth/signup/address?id=${data.userId}`);
+            } else if (data.role === "admin") {
+                navigate("/admin");
+            } else if (data.role === "staff") {
+                navigate("/staff");
+            } else {
+                navigate("/");
             }
-            else if (data.role === 'admin') {navigate('/admin');}
-            else if (data.role === 'staff') {navigate('/staff');}
-            else {navigate('/')}
+        } catch (err) {
+            console.error(err);
+            showSnackbar(err.message || "Google login failed", "error");
+        } finally {
+            setLoading(false);
         }
-        catch (err) {
-            console.error(err)
-            showSnackbar(err.message || 'Google login failed', 'error')
-        }
-        finally {
-            setLoading(false)
-        }
-    }
+    };
 
-    {/*Sign in with system*/}
+    {
+        /*Sign in with system*/
+    }
     const handleLogin = async (e) => {
         e.preventDefault();
         setError(""); // reset error
@@ -112,20 +141,23 @@ export default function LoginForm({ onSuccess }) {
                 try {
                     setLoading(true);
                     setError(data.error || "Login Failed");
-                    await resendCode({email})
-                    showSnackbar(`Verification code sent to ${email}.`, 'success')
-                    navigate(`/auth/signup/verify?email=${encodeURIComponent(email)}`);
+                    await resendCode({ email });
+                    showSnackbar(
+                        `Verification code sent to ${email}.`,
+                        "success"
+                    );
+                    navigate(
+                        `/auth/signup/verify?email=${encodeURIComponent(email)}`
+                    );
+                } catch (err) {
+                    showSnackbar(err.message, "error");
+                } finally {
+                    setLoading(false);
                 }
-                catch (err) {
-                    showSnackbar(err.message, 'error')
-                }
-                finally {
-                    setLoading(false)
-                }
-            }
+            };
 
-            if (data?.code === 'notVerified') {
-               await handleNotVerified()
+            if (data?.code === "notVerified") {
+                await handleNotVerified();
             }
 
             if (!res.ok) {
@@ -144,10 +176,9 @@ export default function LoginForm({ onSuccess }) {
                 gender: data.gender,
                 address: data.address,
                 phoneNumber: data.phoneNumber,
-                avatar: data.avatar
+                avatar: data.avatar,
             });
 
-            
             // Optional callback
             if (onSuccess) onSuccess(data);
 
@@ -155,7 +186,6 @@ export default function LoginForm({ onSuccess }) {
             if (data.role === "admin") navigate("/admin");
             else if (data.role === "staff") navigate("/staff");
             else navigate("/");
-
         } catch (err) {
             console.error(err);
             setError("Server error. Try again later.");
@@ -165,7 +195,14 @@ export default function LoginForm({ onSuccess }) {
     return (
         <form onSubmit={handleLogin}>
             <Box sx={{ my: 0.5 }}>
-                <Box sx={{display: "flex", flexDirection: "column", gap: 2, mb: 5 }}>
+                <Box
+                    sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 3,
+                        mb: 5,
+                    }}
+                >
                     <Fade in={true} timeout={800} mountOnEnter unmountOnExit>
                         <TextField
                             label="Email"
@@ -175,17 +212,24 @@ export default function LoginForm({ onSuccess }) {
                             fullWidth
                             variant="standard"
                             sx={{
-                                input: {color: 'white'},
-                                "& .MuiInputLabel-root": { color: error ? "red" : "rgba(255, 255, 255, 0.8)" },
-                                "& .MuiInputLabel-root.Mui-focused": { color: error ? "red" : "white" },
+                                input: { color: "white" },
+                                "& .MuiInputLabel-root": {
+                                    color: error
+                                        ? "red"
+                                        : "rgba(255, 255, 255, 0.8)",
+                                },
+                                "& .MuiInputLabel-root.Mui-focused": {
+                                    color: error ? "red" : "white",
+                                },
                                 "& .MuiInput-underline:before": {
-                                    borderBottomColor: "rgba(255, 255, 255, 0.5)",   // default / unfocused
+                                    borderBottomColor:
+                                        "rgba(255, 255, 255, 0.5)", // default / unfocused
                                 },
                                 "& .MuiInput-underline:hover:before": {
-                                    borderBottomColor: "white",  // hover
+                                    borderBottomColor: "white", // hover
                                 },
                                 "& .MuiInput-underline:after": {
-                                    borderBottomColor: "white",   // focused
+                                    borderBottomColor: "white", // focused
                                 },
                             }}
                         />
@@ -201,93 +245,130 @@ export default function LoginForm({ onSuccess }) {
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">
-                                        {password && 
-                                            <IconButton onClick={toggleShowPassword} edge="end">
-                                                {showPassword ? <VisibilityOff sx={{color: 'white'}}/> : <Visibility sx={{color: 'white'}}/>}
+                                        {password && (
+                                            <IconButton
+                                                onClick={toggleShowPassword}
+                                                edge="end"
+                                            >
+                                                {showPassword ? (
+                                                    <VisibilityOff
+                                                        sx={{ color: "white" }}
+                                                    />
+                                                ) : (
+                                                    <Visibility
+                                                        sx={{ color: "white" }}
+                                                    />
+                                                )}
                                             </IconButton>
-                                        }
+                                        )}
                                     </InputAdornment>
                                 ),
                             }}
                             sx={{
-                                input: {color: 'white'},
-                                "& .MuiInputLabel-root": { color: error ? "red" : "rgba(255, 255, 255, 0.8)" },
-                                "& .MuiInputLabel-root.Mui-focused": { color: error ? "red" : "white" },
+                                input: { color: "white" },
+                                "& .MuiInputLabel-root": {
+                                    color: error
+                                        ? "red"
+                                        : "rgba(255, 255, 255, 0.8)",
+                                },
+                                "& .MuiInputLabel-root.Mui-focused": {
+                                    color: error ? "red" : "white",
+                                },
                                 "& .MuiInput-underline:before": {
-                                    borderBottomColor: "rgba(255, 255, 255, 0.5)",   // default / unfocused
+                                    borderBottomColor:
+                                        "rgba(255, 255, 255, 0.5)", // default / unfocused
                                 },
                                 "& .MuiInput-underline:hover:before": {
-                                    borderBottomColor: "white",  // hover
+                                    borderBottomColor: "white", // hover
                                 },
                                 "& .MuiInput-underline:after": {
-                                    borderBottomColor: "white",   // focused
+                                    borderBottomColor: "white", // focused
                                 },
                             }}
                         />
                     </Fade>
-                    {error && 
-                        <Stack justifyContent={'center'}>
-                            <Typography 
-                                color="red" 
+                    {error && (
+                        <Stack justifyContent={"center"}>
+                            <Typography
+                                color="red"
                                 variant="body2"
                                 align="center"
                             >
                                 {error}
                             </Typography>
                         </Stack>
-                    }
+                    )}
                 </Box>
-                
-                
 
-                <Stack gap={2} sx={{my: 3}}>
+                <Stack gap={1} sx={{ my: 3 }}>
                     <Fade in={true} timeout={800} mountOnEnter unmountOnExit>
-                        <Button 
-                            type="submit" 
-                            variant="contained" 
-                            fullWidth 
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            fullWidth
                             sx={{
-                                bgcolor: 'rgba(0, 0, 0, 0.2)',
-                                border: '1px solid white',
-                                py: 1.5, 
-                                borderRadius: '999px',
+                                bgcolor: "rgba(0, 0, 0, 0.2)",
+                                border: "1px solid white",
+                                py: 1.2,
+                                borderRadius: "999px",
                             }}
                         >
                             L O G I N
                         </Button>
                     </Fade>
-                    <Stack direction={'row'} alignItems={'center'} gap={2}>
-                        <Box sx={{border: '1px solid white', height: 1, width: '100%'}}/>
-                        <Typography variant="body1" color="white"> or </Typography>
-                        <Box sx={{border: '1px solid white', height: 1, width: '100%'}}/>
-                    </Stack>
-                    <Stack alignItems={'center'} justifyContent={'center'}>
-                        <Button 
-                            variant="contained" 
-                            color="secondary" 
+                    <Divider>
+                        <Typography variant="body1" color="white">
+                            or
+                        </Typography>
+                    </Divider>
+                    <Stack alignItems={"center"} justifyContent={"center"}>
+                        <Button
+                            variant="contained"
+                            color="secondary"
                             onClick={handleGoogleSignIn}
                             fullWidth
                             sx={{
-                                bgcolor: 'rgba(0, 0, 0, 0.2)',
-                                border: '1px solid white',
-                                py: 1.5, 
-                                borderRadius: '999px',
+                                bgcolor: "rgba(0, 0, 0, 0.2)",
+                                border: "1px solid white",
+                                py: 1.2,
+                                borderRadius: "999px",
                                 "&.Mui-disabled": {
                                     backgroundColor: "rgba(255, 255, 255, 0.2)",
-                                    color: "grey",   
-                                    border: '2px solid grey'    
+                                    color: "grey",
+                                    border: "2px solid grey",
                                 },
                             }}
-                        > 
-                            <Stack direction={'row'} alignItems={'center'} gap={1}>
+                        >
+                            <Stack
+                                direction={"row"}
+                                alignItems={"center"}
+                                gap={1}
+                            >
                                 Sign in with
-                                <img src="/google-icon.svg" alt="google-icon" style={{width: 25, aspectRatio: '1/1'}} />
+                                <img
+                                    src="/google-icon.svg"
+                                    alt="google-icon"
+                                    style={{ width: 25, aspectRatio: "1/1" }}
+                                />
                             </Stack>
                         </Button>
                     </Stack>
                 </Stack>
+
+                <Link
+                    to={"/forgot-password"}
+                    style={{
+                        color: "white",
+                        display: "flex",
+                        justifyContent: "center",
+                    }}
+                >
+                    <Typography variant="body2" color="white">
+                        Forgot Password?
+                    </Typography>
+                </Link>
             </Box>
-            <FullScreenLoader open={loading}/>
+            <FullScreenLoader open={loading} />
         </form>
     );
 }

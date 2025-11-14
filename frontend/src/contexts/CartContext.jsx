@@ -79,14 +79,12 @@ export const CartProvider = ({ children }) => {
         }
 
         if (cartItems.some(item => item.productId?._id === product._id)) {
-            showSnackbar("Item is already in your cart!", "warning");
+            showSnackbar("This item is already added to your cart!", "warning");
             return;
         }
         console.log('THIS IS THE TOKEN^^^^^^^', token)
 
         try {
-
-            console.log('THIS IS THE TOKEN^^^^^^^', token)
             const res = await fetchWithAuth(
                 `${API_URL}/api/cart`,
                 {
@@ -109,7 +107,7 @@ export const CartProvider = ({ children }) => {
             setCartItems(validItems);
 
             if (validItems.some(item => item.productId?._id === product._id)){
-                showSnackbar('Item added to cart!', 'success')
+                showSnackbar(`${product.productName} added to cart!`, 'success')
             }
             else {
                 showSnackbar('Failed to add item', 'error')

@@ -1,4 +1,3 @@
-
 // src/utils/api.js
 const API_URL = import.meta.env.VITE_API_URL;
 // Generic helper for POST requests
@@ -9,7 +8,6 @@ const postRequest = async (url, payload) => {
         body: JSON.stringify(payload),
     });
 
-
     let resData;
     try {
         resData = await res.json(); // parse once
@@ -18,17 +16,14 @@ const postRequest = async (url, payload) => {
         resData = null; // fallback
     }
 
-
     if (!res.ok) {
         const errMsg = resData?.error || resData?.message || "Request failed";
         throw new Error(errMsg);
     }
 
-
     console.log("Server response data:", resData);
     return resData;
 };
-
 
 // Signup new user
 export const signupUser = async (payload) => {
@@ -53,13 +48,13 @@ export const resendCode = async (payload) => {
 // Add Update Address
 export const updateUserAddress = async (userId, address, token) => {
     //wrap in try catch
-     const res = await fetch(`${API_URL}/api/auth/${userId}/address`, {
+    const res = await fetch(`${API_URL}/api/auth/${userId}/address`, {
         method: "PATCH",
-        headers: { 
+        headers: {
             "Content-Type": "application/json",
-            'Authorization' : `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({address}),
+        body: JSON.stringify({ address }),
     });
 
     if (!res.ok) {
@@ -71,10 +66,10 @@ export const updateUserAddress = async (userId, address, token) => {
 
 export const updateUserProfile = async (userId, payload, token) => {
     const res = await fetch(`${API_URL}/api/auth/${userId}/profile`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json', // needed for JSON
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json", // needed for JSON
         },
         body: JSON.stringify(payload),
     });
@@ -83,82 +78,91 @@ export const updateUserProfile = async (userId, payload, token) => {
     try {
         resData = await res.json();
     } catch (e) {
-        console.error('Failed to parse JSON response:', e);
+        console.error("Failed to parse JSON response:", e);
         resData = null;
     }
 
     if (!res.ok) {
-        const errMsg = resData?.error || resData?.message || 'Request failed';
+        const errMsg = resData?.error || resData?.message || "Request failed";
         throw new Error(errMsg);
     }
 
-    console.log('Profile updated: ', resData);
+    console.log("Profile updated: ", resData);
     return resData;
 };
 
 export const uploadUserAvatar = async (userId, file, token) => {
     const formData = new FormData();
-    formData.append('avatar', file);
+    formData.append("avatar", file);
 
     const res = await fetch(`${API_URL}/api/auth/${userId}/avatar`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
         },
-        body: formData
+        body: formData,
     });
 
     let resData;
     try {
         resData = await res.json();
     } catch (e) {
-        console.error('Failed to parse JSON response:', e);
+        console.error("Failed to parse JSON response:", e);
         resData = null;
     }
 
     if (!res.ok) {
-        const errMsg = resData?.error || resData?.message || 'Request failed';
+        const errMsg = resData?.error || resData?.message || "Request failed";
         throw new Error(errMsg);
     }
 
-    console.log('Avatar uploaded: ', resData);
+    console.log("Avatar uploaded: ", resData);
     return resData;
 };
 
-export const updateUserPassword = async (userId, currentPassword, newPassword, token) => {
+export const updateUserPassword = async (
+    userId,
+    currentPassword,
+    newPassword,
+    token
+) => {
     const res = await fetch(`${API_URL}/api/auth/${userId}/password`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
         },
-        body: JSON.stringify({currentPassword, newPassword}),
-    })
+        body: JSON.stringify({ currentPassword, newPassword }),
+    });
 
     let resData;
     try {
-        resData = await res.json()
-    }
-    catch (e) {
-        console.error('Failed to parse JSON response:', e)
-        resData = null
+        resData = await res.json();
+    } catch (e) {
+        console.error("Failed to parse JSON response:", e);
+        resData = null;
     }
 
     if (!res.ok) {
-        const errMsg = resData?.error || resData?.message || 'Request failed';
-        throw new Error(errMsg)
+        const errMsg = resData?.error || resData?.message || "Request failed";
+        throw new Error(errMsg);
     }
 
-    console.log('Password updates: ', resData)
+    console.log("Password updates: ", resData);
     return resData;
-}
+};
 
-export const updateUserEmail = async (userId, currentPassword, newEmail, token) => {
+export const updateUserEmail = async (
+    userId,
+    currentPassword,
+    newEmail,
+    token
+) => {
     const res = await fetch(`${API_URL}/api/auth/${userId}/email`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
         },
         body: JSON.stringify({ currentPassword, newEmail }),
     });
@@ -167,25 +171,25 @@ export const updateUserEmail = async (userId, currentPassword, newEmail, token) 
     try {
         resData = await res.json();
     } catch (e) {
-        console.error('Failed to parse JSON response:', e);
+        console.error("Failed to parse JSON response:", e);
         resData = null;
     }
 
     if (!res.ok) {
-        const errMsg = resData?.error || resData?.message || 'Request failed';
+        const errMsg = resData?.error || resData?.message || "Request failed";
         throw new Error(errMsg);
     }
 
-    console.log('Email updated:', resData);
+    console.log("Email updated:", resData);
     return resData;
 };
 
 export const verifyUpdatedEmail = async (userId, code, token) => {
     const res = await fetch(`${API_URL}/api/auth/${userId}/verify-email`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
         },
         body: JSON.stringify({ code }),
     });
@@ -194,15 +198,51 @@ export const verifyUpdatedEmail = async (userId, code, token) => {
     try {
         resData = await res.json();
     } catch (e) {
-        console.error('Failed to parse JSON response:', e);
+        console.error("Failed to parse JSON response:", e);
         resData = null;
     }
 
     if (!res.ok) {
-        const errMsg = resData?.error || resData?.message || 'Verification failed';
+        const errMsg =
+            resData?.error || resData?.message || "Verification failed";
         throw new Error(errMsg);
     }
 
-    console.log('Email verification successful:', resData);
+    console.log("Email verification successful:", resData);
     return resData;
+};
+
+// Accept Terms & Conditions
+export const acceptTerms = async (userId, token) => {
+    const res = await fetch(`${API_URL}/api/auth/${userId}/accept-terms`, {
+        method: "PUT",
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+        },
+    });
+
+    let resData;
+    try {
+        resData = await res.json();
+    } catch (e) {
+        console.error("Failed to parse JSON response:", e);
+        resData = null;
+    }
+
+    if (!res.ok) {
+        const errMsg = resData?.error || resData?.message || "Request failed";
+        throw new Error(errMsg);
+    }
+
+    console.log("Terms accepted:", resData);
+    return resData;
+};
+
+export const forgotPassword = async (payload) => {
+    return postRequest(`${API_URL}/api/auth/forgot-password`, payload);
+};
+
+export const resetPassword = async (payload) => {
+    return postRequest(`${API_URL}/api/auth/reset-password`, payload);
 };

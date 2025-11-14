@@ -13,7 +13,10 @@ export const fetchNotifications = async (token) => {
         });
         return res.data;
     } catch (err) {
-        console.error("Error fetching notifications:", err.response?.data || err.message);
+        console.error(
+            "Error fetching notifications:",
+            err.response?.data || err.message
+        );
         throw err;
     }
 };
@@ -21,14 +24,37 @@ export const fetchNotifications = async (token) => {
 // Mark a notification as read
 export const markNotificationAsRead = async (id, token) => {
     try {
-        const res = await axios.patch(`${API_URL}/api/auction-notifications/${id}/read`, {}, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
+        const res = await axios.patch(
+            `${API_URL}/api/auction-notifications/${id}/read`,
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
         return res.data;
     } catch (err) {
-        console.error("Error marking notification as read:", err.response?.data || err.message);
+        console.error(
+            "Error marking notification as read:",
+            err.response?.data || err.message
+        );
         throw err;
+    }
+};
+
+export const hasUnreadNotifications = async (token) => {
+    try {
+        const res = await axios.get(
+            `${API_URL}/api/auction-notifications/has-unread`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+        return res.data.hasUnread;
+    } catch (err) {
+        console.error("Error checking unread notifications: ", err);
     }
 };

@@ -1,76 +1,97 @@
-import User from '../models/User.js';
-import Cart from '../models/Cart.js'
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import StaffPermission from '../models/StaffPermission.js';
-import { generateCode } from '../utils/generateCode.js';
-import { sendEmail } from '../utils/sendEmail.js';
-import { createClient } from '@supabase/supabase-js';
-import {v4 as uuidv4} from 'uuid'
+import User from "../models/User.js";
+import Cart from "../models/Cart.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import StaffPermission from "../models/StaffPermission.js";
+import { generateCode } from "../utils/generateCode.js";
+import { sendEmail } from "../utils/sendEmail.js";
+import { createClient } from "@supabase/supabase-js";
+import { v4 as uuidv4 } from "uuid";
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 const DEFAULT_AVATARS = {
-    male: 'https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-male-02.svg.svg',
-    female: 'https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-female-01.svg.svg',
-    other: 'https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-male-01.svg',
-}
+    male: "https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-male-02.svg.svg",
+    female: "https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-female-01.svg.svg",
+    other: "https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-male-01.svg",
+};
 
 // SIGN UP (user)
 export const signup = async (req, res) => {
     try {
-        const { email, password, fullName, phoneNumber, gender, address, googleId, avatar} = req.body;
+        const {
+            email,
+            password,
+            fullName,
+            phoneNumber,
+            gender,
+            address,
+            googleId,
+            avatar,
+            termsAccepted,
+        } = req.body;
 
-        if (!email || typeof email !== 'string') {
-            return res.status(400).json({error: 'Valid email is required'})
+        if (!email || typeof email !== "string") {
+            return res.status(400).json({ error: "Valid email is required" });
         }
-        if (!fullName || typeof fullName !== 'string') {
-            return res.status(400).json({error: 'Full name is required'})
+        if (!fullName || typeof fullName !== "string") {
+            return res.status(400).json({ error: "Full name is required" });
         }
-        if (!googleId && (!password || typeof password !== 'string' || password.length < 6)) {
-            return res.status(400).json({error: 'Password is required for local signup (min 6 chars)'})
+        if (
+            !googleId &&
+            (!password || typeof password !== "string" || password.length < 6)
+        ) {
+            return res.status(400).json({
+                error: "Password is required for local signup (min 6 chars)",
+            });
         }
         if (phoneNumber && !/^09\d{9}$/.test(phoneNumber)) {
-           return res.status(400).json({ error: 'Invalid phone number format' });
+            return res
+                .status(400)
+                .json({ error: "Invalid phone number format" });
         }
-        const orCondition = [{email}]
-        if (googleId) orCondition.push({googleId})
+        const orCondition = [{ email }];
+        if (googleId) orCondition.push({ googleId });
         // check if user already exists
-        const existingUser = await User.findOne({ 
-            $or: orCondition
+        const existingUser = await User.findOne({
+            $or: orCondition,
         });
 
         if (existingUser) {
-            return res.status(400).json({ error: 'User already exists' });
+            return res.status(400).json({ error: "User already exists" });
         }
 
         // if local or google signup
         const isGoogle = !!googleId;
         let code, expiry;
         if (!isGoogle) {
-            code = generateCode(6)
+            code = generateCode(6);
             expiry = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
         }
 
-
-        console.log('Avatar', avatar)
+        console.log("Avatar", avatar);
         const newUser = new User({
             email,
             password: isGoogle ? null : password,
             fullName,
             phoneNumber,
             address,
-            role: 'user',
+            role: "user",
             isVerified: isGoogle,
-            isLocal: !isGoogle && address?.region === '05', // if navigate google sign up to address, only google sign up
+            isLocal: !isGoogle && address?.region === "05", // if navigate google sign up to address, only google sign up
             verificationCode: code,
             verificationExpiry: expiry,
             googleId: googleId || undefined,
             gender,
-            avatar: avatar || DEFAULT_AVATARS[gender || 'other']
+            termsAccepted,
+            termsAcceptedAt: new Date(),
+            avatar: avatar || DEFAULT_AVATARS[gender || "other"],
         });
 
-        console.log('NEW USER before save:', newUser)
+        console.log("NEW USER before save:", newUser);
 
         await newUser.save();
 
@@ -78,7 +99,7 @@ export const signup = async (req, res) => {
             // send email
             await sendEmail({
                 to: email,
-                subject: 'Verify Your Account',
+                subject: "Verify Your Account",
                 text: `Your verification code is ${code}`,
                 html: `<p>Your verification code is <b>${code}</b>. It will expire in 10 minutes.</p>`,
             });
@@ -87,12 +108,12 @@ export const signup = async (req, res) => {
         const token = jwt.sign(
             { id: newUser._id, role: newUser.role, isLocal: newUser.isLocal },
             process.env.JWT_SECRET,
-            {expiresIn: '12h'}
-        )
+            { expiresIn: "12h" }
+        );
 
         if (isGoogle) {
             return res.status(201).json({
-                message: 'Google signup successful',
+                message: "Google signup successful",
                 token,
                 userId: newUser._id,
                 role: newUser.role,
@@ -102,12 +123,12 @@ export const signup = async (req, res) => {
                 email: newUser.email,
                 googleId: newUser.googleId,
                 avatar: newUser.avatar,
-                gender: newUser.gender || '',
-                phoneNumber: newUser.phoneNumber || '',
-            })
+                gender: newUser.gender || "",
+                phoneNumber: newUser.phoneNumber || "",
+            });
         }
         res.status(201).json({
-            message: 'Signup successful. Please verify your email.',
+            message: "Signup successful. Please verify your email.",
             token,
             userId: newUser._id,
             role: newUser.role,
@@ -116,66 +137,64 @@ export const signup = async (req, res) => {
             isLocal: newUser.isLocal,
             avatar: newUser.avatar,
             email: newUser.email,
-            gender: newUser.gender || '',
-            phoneNumber: newUser.phoneNumber || '',
+            gender: newUser.gender || "",
+            phoneNumber: newUser.phoneNumber || "",
         });
     } catch (err) {
-        console.error('Signup error deatils: ', err)
+        console.error("Signup error deatils: ", err);
         res.status(500).json({ error: err.message });
     }
 };
 
 export const updateAddress = async (req, res) => {
-    const {userId} = req.params;
+    const { userId } = req.params;
     const { address: wrapper } = req.body; // unwrap the frontend object
     const address = wrapper?.address || wrapper; // in case it's double-wrapped
 
     if (!address) {
-        return res.status(400).json({error: 'Address is required'})
+        return res.status(400).json({ error: "Address is required" });
     }
 
     try {
-        const isLocal = address.region === '05'
+        const isLocal = address.region === "05";
 
         const user = await User.findByIdAndUpdate(
             userId,
-            {address, isLocal},
-            {new: true},
-        )
+            { address, isLocal },
+            { new: true }
+        );
 
         if (!user) {
-            return res.status(400).json({error: 'User not found'})
+            return res.status(400).json({ error: "User not found" });
         }
 
-        console.log('USER BACKEND IS LOCAL', user.isLocal)
+        console.log("USER BACKEND IS LOCAL", user.isLocal);
 
-        const cart = await Cart.findOne({userId}).populate('items.productId')
+        const cart = await Cart.findOne({ userId }).populate("items.productId");
         if (cart) {
             cart.items = cart.items.filter(
-                item => !item.productId?.isLocal || user.isLocal
-            )
-            await cart.save()
+                (item) => !item.productId?.isLocal || user.isLocal
+            );
+            await cart.save();
         }
 
         const token = jwt.sign(
-            {id: user._id, role: user.role, isLocal: user.isLocal},
+            { id: user._id, role: user.role, isLocal: user.isLocal },
             process.env.JWT_SECRET,
-            {expiresIn: '12h'}
-        )
+            { expiresIn: "12h" }
+        );
 
         res.json({
-            message: 'Address updated successfully',
+            message: "Address updated successfully",
             address: user.address,
             isLocal: user.isLocal,
-            token
-        })
+            token,
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
     }
-    catch (err) {
-        console.error(err) 
-        res.status(500).json({error: 'Server error'})
-    }
-}
-
+};
 
 // VERIFY EMAIL
 export const verifyEmail = async (req, res) => {
@@ -183,15 +202,16 @@ export const verifyEmail = async (req, res) => {
         const { email, code } = req.body;
         const user = await User.findOne({ email });
 
-        if (!user) return res.status(400).json({ error: 'User not found' });
-        if (user.isVerified) return res.status(400).json({ error: 'Already verified' });
+        if (!user) return res.status(400).json({ error: "User not found" });
+        if (user.isVerified)
+            return res.status(400).json({ error: "Already verified" });
 
         if (
             user.verificationCode !== code ||
             !user.verificationExpiry ||
             user.verificationExpiry < new Date()
         ) {
-            return res.status(400).json({ error: 'Invalid or expired code' });
+            return res.status(400).json({ error: "Invalid or expired code" });
         }
 
         user.isVerified = true;
@@ -201,14 +221,14 @@ export const verifyEmail = async (req, res) => {
 
         // generate token after verification
         const token = jwt.sign(
-            { id: user._id, role: user.role},
+            { id: user._id, role: user.role },
 
             process.env.JWT_SECRET,
-            { expiresIn: '12h' }
+            { expiresIn: "12h" }
         );
 
         res.json({
-            message: 'Email verified successfully',
+            message: "Email verified successfully",
             token,
             userId: user._id,
             gender: user.gender,
@@ -216,7 +236,7 @@ export const verifyEmail = async (req, res) => {
             address: user.address,
             phoneNumber: user.phoneNumber,
             fullName: user.fullName,
-            avatar: user.avatar
+            avatar: user.avatar,
         });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -229,8 +249,9 @@ export const resendCode = async (req, res) => {
         const { email } = req.body;
         const user = await User.findOne({ email });
 
-        if (!user) return res.status(400).json({ error: 'User not found' });
-        if (user.isVerified) return res.status(400).json({ error: 'Already verified' });
+        if (!user) return res.status(400).json({ error: "User not found" });
+        if (user.isVerified)
+            return res.status(400).json({ error: "Already verified" });
 
         const code = generateCode(6);
         const expiry = new Date(Date.now() + 10 * 60 * 1000);
@@ -239,16 +260,14 @@ export const resendCode = async (req, res) => {
         user.verificationExpiry = expiry;
         await user.save();
 
-        await sendEmail(
-            {
-                to: email,
-                subject: 'Verify Your Account',
-                text: `Your new verification code is ${code}`,
-                html: `<p>Your verification code is <b>${code}</b>. It will expire in 10 minutes.</p>`,
-            },
-        );
+        await sendEmail({
+            to: email,
+            subject: "Verify Your Account",
+            text: `Your new verification code is ${code}`,
+            html: `<p>Your verification code is <b>${code}</b>. It will expire in 10 minutes.</p>`,
+        });
 
-        res.json({ message: 'Verification code resent' });
+        res.json({ message: "Verification code resent" });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -260,24 +279,28 @@ export const login = async (req, res) => {
         const { email, password } = req.body;
 
         const user = await User.findOne({ email });
-        if (!user) return res.status(400).json({ error: 'User not found' });
+        if (!user) return res.status(400).json({ error: "User not found" });
 
         let isLocal = null;
 
-        if (user.role !== 'admin' && user.role !== 'staff') {
-            isLocal = user.address?.region === '05'
+        if (user.role !== "admin" && user.role !== "staff") {
+            isLocal = user.address?.region === "05";
         }
 
         // ensure verified
         if (!user.isVerified) {
-            return res.status(400).json({ error: 'Please verify your email before logging in', code: 'notVerified' });
+            return res.status(400).json({
+                error: "Please verify your email before logging in",
+                code: "notVerified",
+            });
         }
 
         // compare password
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ error: 'Invalid credentials' });
+        if (!isMatch)
+            return res.status(400).json({ error: "Invalid credentials" });
 
-        const expiresIn = user.role === 'admin' ? '4h' : '12h';
+        const expiresIn = user.role === "admin" ? "4h" : "12h";
 
         const token = jwt.sign(
             { id: user._id, role: user.role, isLocal: isLocal },
@@ -286,13 +309,15 @@ export const login = async (req, res) => {
         );
 
         let allowedModules = [];
-        if (user.role === 'staff') {
-            const staffPerm = await StaffPermission.findOne({ staffId: user._id });
+        if (user.role === "staff") {
+            const staffPerm = await StaffPermission.findOne({
+                staffId: user._id,
+            });
             if (staffPerm) allowedModules = staffPerm.allowedModules;
         }
 
         res.json({
-            message: 'Login successful',
+            message: "Login successful",
             userId: user._id,
             role: user.role,
             fullName: user.fullName,
@@ -313,34 +338,45 @@ export const login = async (req, res) => {
 // GOOGLE LOGIN (user)
 export const googleLogin = async (req, res) => {
     try {
-        const {email, fullName, googleId, avatar} = req.body
+        const { email, fullName, googleId, avatar } = req.body;
 
         if (!email || !fullName || !googleId) {
-            return res.status(400).json({error: 'Incomplete Google login credenial'})
+            return res
+                .status(400)
+                .json({ error: "Incomplete Google login credential" });
         }
 
-        let user = await User.findOne({$or: [{email}, {googleId}]})
-
+        let user = await User.findOne({ $or: [{ email }, { googleId }] });
+        /*
         if (!user) {
-            user = new User ({
+            user = new User({
                 email,
                 fullName,
                 googleId,
                 avatar: avatar || DEFAULT_AVATARS,
-                role: 'user',
-                isVerified: 'true',
-                isLocal: false
-            })
-            await user.save()
+                role: "user",
+                isVerified: "true",
+                isLocal: false,
+                termsAccepted: false,
+            });
+            await user.save();
+        }
+        */
+
+        if (!user) {
+            return res.status(401).json({
+                error: "Your don't have an account yet. Create an account to proceed",
+                hasAccount: false,
+            });
         }
 
         const token = jwt.sign(
-            {id: user._id, role: user.role, isLocal: user.isLocal},
+            { id: user._id, role: user.role, isLocal: user.isLocal },
             process.env.JWT_SECRET,
-            {expiresIn: '12h'}
-        )
+            { expiresIn: "12h" }
+        );
         res.status(200).json({
-            message: 'Google login successful',
+            message: "Google login successful",
             token,
             userId: user._id,
             fullName: user.fullName,
@@ -351,41 +387,64 @@ export const googleLogin = async (req, res) => {
             googleId: user.googleId,
             phoneNumber: user.phoneNumber,
             gender: user.gender,
-            avatar: user.avatar
+            avatar: user.avatar,
         });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
     }
-    catch (err) {
-        console.error(err)
-        res.status(500).json({error: 'Server error'})
+};
+
+export const acceptTerms = async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        user.termsAccepted = true;
+        user.termsAcceptedAt = new Date();
+
+        await user.save();
+        res.status(200).json({
+            message: "Terms & Conditions accepted successfully.",
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
     }
-}
+};
 
 // UPDATE user account (user)
 export const updateUserProfile = async (req, res) => {
     try {
         const userId = req.user.id;
         const { fullName, gender, phoneNumber, address } = req.body;
-        console.log('USER', phoneNumber)
+        console.log("USER", phoneNumber);
         // Ensure at least one field is provided
         if (!fullName && !gender && !phoneNumber && !address) {
-            return res.status(400).json({ error: 'No field to update' });
+            return res.status(400).json({ error: "No field to update" });
         }
 
         const user = await User.findById(userId);
-        if (!user) return res.status(404).json({ error: 'User not found' });
+        if (!user) return res.status(404).json({ error: "User not found" });
 
         // Update fields if provided
         if (fullName) user.fullName = fullName.trim();
         if (gender) user.gender = gender;
         if (phoneNumber && !/^09\d{9}$/.test(phoneNumber)) {
-           return res.status(400).json({ error: 'Invalid phone number format' });
+            return res
+                .status(400)
+                .json({ error: "Invalid phone number format" });
         }
         user.phoneNumber = phoneNumber;
-        if (address && typeof address !== 'object') {
-            return res.status(400).json({error: 'Invlid address format'})
+        if (address && typeof address !== "object") {
+            return res.status(400).json({ error: "Invlid address format" });
         }
 
-        if (address && typeof address === 'object') {
+        if (address && typeof address === "object") {
             user.address = {
                 ...user.address,
                 ...address,
@@ -394,9 +453,9 @@ export const updateUserProfile = async (req, res) => {
 
         await user.save();
 
-        console.log('user user', user)
+        console.log("user user", user);
         res.status(200).json({
-            message: 'Profile updated successfully',
+            message: "Profile updated successfully",
             user: {
                 id: user._id,
                 googleId: user.googleId,
@@ -406,44 +465,54 @@ export const updateUserProfile = async (req, res) => {
                 phoneNumber: user.phoneNumber,
                 address: user.address,
                 role: user.role,
-            }
+            },
         });
-
     } catch (err) {
-        console.error('Error updating user profile:', err);
-        res.status(500).json({ error: 'Server error: failed to update profile' });
+        console.error("Error updating user profile:", err);
+        res.status(500).json({
+            error: "Server error: failed to update profile",
+        });
     }
 };
 
 export const forgotPassword = async (req, res) => {
     try {
-        const {email} = req.body
-        const user = await User.findOne({email})
+        const { email } = req.body;
+        const user = await User.findOne({ email });
 
+        // remove later
         if (!user) {
-            return res.status(404).json({message: 'User not found'})
+            return res.status(404).json({ message: "User not found" });
         }
 
-        
+        if (user.googleId) {
+            return res.status(401).json({
+                message: "You can't change the password for this account",
+            });
+        }
         const code = generateCode(6);
         const expiry = new Date(Date.now() + 10 * 60 * 1000);
 
         user.verificationCode = code;
-        user.verificationExpiry = expiry
-        await user.save()
+        user.verificationExpiry = expiry;
+        await user.save();
 
         await sendEmail({
             to: user.email,
             subject: "Password Reset Code",
             text: `Your password reset code is ${code}. It expires in 15 minutes.`,
-            html: `<p>Your password reset code is <b>${code}</b>.</p><p>It expires in 15 minutes.</p>`
-        })
-        res.json({ message: "Password reset code sent to your email" });
+            html: `<p>Your password reset code is <b>${code}</b>.</p><p>It expires in 15 minutes.</p>`,
+        });
+
+        res.json({
+            message: "Password reset code sent to your email",
+            isSent: true,
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Internal server error" });
     }
-}
+};
 
 export const resetPassword = async (req, res) => {
     try {
@@ -454,7 +523,11 @@ export const resetPassword = async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        if (!user.verificationCode || user.verificationCode !== code || user.verificationExpiry < new Date()) {
+        if (
+            !user.verificationCode ||
+            user.verificationCode !== code ||
+            user.verificationExpiry < new Date()
+        ) {
             return res.status(400).json({ message: "Invalid or expired code" });
         }
 
@@ -470,39 +543,44 @@ export const resetPassword = async (req, res) => {
     }
 };
 
-
 // Update user password
 export const updatePassword = async (req, res) => {
     try {
         const userId = req.user.id;
-        const {currentPassword, newPassword} = req.body;
+        const { currentPassword, newPassword } = req.body;
 
-        console.log('BODY', req.body)
-        console.log('User', userId)
-        const user = await User.findById(userId)
-        if (!user) return res.status(404).json({error: 'User not found'});
+        console.log("BODY", req.body);
+        console.log("User", userId);
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ error: "User not found" });
 
         if (user.googleId) {
-            return res.status(400).json({error: 'Google user cannot change password'})
+            return res
+                .status(400)
+                .json({ error: "Google user cannot change password" });
         }
-        console.log('_____________________________')
-        console.log('DEBUG - currentPassword:', currentPassword)
-        console.log('DEBUG - currentPassword:', newPassword)
-        console.log('DEBUG - user.password:', user.password)
-        const isMatch = await bcrypt.compare(currentPassword, user.password)
-        console.log('MATCH ', isMatch)
-        if (!isMatch) return res.status(400).json({error: 'Current password is incorrect'});
+        console.log("_____________________________");
+        console.log("DEBUG - currentPassword:", currentPassword);
+        console.log("DEBUG - currentPassword:", newPassword);
+        console.log("DEBUG - user.password:", user.password);
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        console.log("MATCH ", isMatch);
+        if (!isMatch)
+            return res
+                .status(400)
+                .json({ error: "Current password is incorrect" });
 
-        user.password = newPassword
-        await user.save()
+        user.password = newPassword;
+        await user.save();
 
-        res.status(200).json({message: 'Password updates successfully'})
+        res.status(200).json({ message: "Password updates successfully" });
+    } catch (err) {
+        console.error("Error updating password:", err);
+        res.status(500).json({
+            error: "Server error: failed to update password",
+        });
     }
-    catch (err) {
-        console.error('Error updating password:', err)
-        res.status(500).json({error: 'Server error: failed to update password'})
-    }
-}
+};
 
 // Update user email
 export const updateEmail = async (req, res) => {
@@ -511,23 +589,27 @@ export const updateEmail = async (req, res) => {
         const { newEmail, currentPassword } = req.body;
 
         const user = await User.findById(userId);
-        if (!user) return res.status(404).json({ error: 'User not found' });
+        if (!user) return res.status(404).json({ error: "User not found" });
 
         // Restrict Google users
         if (user.googleId) {
-            return res.status(400).json({ error: 'Google user cannot change email here' });
+            return res
+                .status(400)
+                .json({ error: "Google user cannot change email here" });
         }
 
         // Verify current password for security
         const isMatch = await bcrypt.compare(currentPassword, user.password);
         if (!isMatch) {
-            return res.status(400).json({ error: 'Current password is incorrect' });
+            return res
+                .status(400)
+                .json({ error: "Current password is incorrect" });
         }
 
         // Check if new email already exists
         const existingUser = await User.findOne({ email: newEmail });
         if (existingUser) {
-            return res.status(400).json({ error: 'Email already in use' });
+            return res.status(400).json({ error: "Email already in use" });
         }
 
         // Generate verification code & expiry (same as signup)
@@ -543,17 +625,18 @@ export const updateEmail = async (req, res) => {
         // Send verification email
         await sendEmail({
             to: newEmail,
-            subject: 'Verify Your New Email Address',
+            subject: "Verify Your New Email Address",
             text: `Your verification code is ${code}`,
             html: `<p>Your verification code is <b>${code}</b>. It will expire in 10 minutes.</p>`,
         });
 
         res.status(200).json({
-            message: 'Verification code sent to your new email. Please verify to complete the update.',
+            message:
+                "Verification code sent to your new email. Please verify to complete the update.",
         });
     } catch (err) {
-        console.error('Error updating email:', err);
-        res.status(500).json({ error: 'Server error: failed to update email' });
+        console.error("Error updating email:", err);
+        res.status(500).json({ error: "Server error: failed to update email" });
     }
 };
 
@@ -563,18 +646,20 @@ export const verifyNewEmail = async (req, res) => {
         const { code } = req.body;
 
         const user = await User.findById(userId);
-        if (!user) return res.status(404).json({ error: 'User not found' });
+        if (!user) return res.status(404).json({ error: "User not found" });
 
         // Check if there's a pending email
         if (!user.pendingEmail)
-        return res.status(400).json({ error: 'No pending email to verify' });
+            return res
+                .status(400)
+                .json({ error: "No pending email to verify" });
 
         // Verify code and expiry
         if (user.verificationCode !== code)
-        return res.status(400).json({ error: 'Invalid verification code' });
+            return res.status(400).json({ error: "Invalid verification code" });
 
         if (Date.now() > user.verificationExpiry)
-        return res.status(400).json({ error: 'Verification code expired' });
+            return res.status(400).json({ error: "Verification code expired" });
 
         // ✅ Update actual email and clear temp fields
         user.email = user.pendingEmail;
@@ -584,19 +669,19 @@ export const verifyNewEmail = async (req, res) => {
 
         await user.save();
 
-        res.status(200).json({ message: 'Email updated successfully' });
+        res.status(200).json({ message: "Email updated successfully" });
     } catch (err) {
-        console.error('Error verifying new email:', err);
-        res.status(500).json({ error: 'Server error: failed to verify email' });
+        console.error("Error verifying new email:", err);
+        res.status(500).json({ error: "Server error: failed to verify email" });
     }
 };
-
 
 export const updateUserAvatar = async (req, res) => {
     try {
         const userId = req.user.id;
 
-        if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+        if (!req.file)
+            return res.status(400).json({ error: "No file uploaded" });
 
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ error: "User not found" });
@@ -623,14 +708,19 @@ export const updateUserAvatar = async (req, res) => {
             .from("User-Assets")
             .getPublicUrl(fileName).data?.publicUrl;
 
-        if (!publicUrl) return res.status(500).json({ error: "Failed to generate public URL" });
+        if (!publicUrl)
+            return res
+                .status(500)
+                .json({ error: "Failed to generate public URL" });
 
         // Delete old avatar if exists
         if (user.avatar && user.avatar.includes("/User-Assets/")) {
             try {
                 const oldPath = user.avatar.split("/User-Assets/")[1];
                 if (oldPath) {
-                    await supabase.storage.from("User-Assets").remove([oldPath]);
+                    await supabase.storage
+                        .from("User-Assets")
+                        .remove([oldPath]);
                 }
             } catch (delErr) {
                 console.warn("Failed to delete old avatar:", delErr);
@@ -645,10 +735,11 @@ export const updateUserAvatar = async (req, res) => {
             message: "Avatar updated successfully",
             avatar: user.avatar,
         });
-
     } catch (err) {
         console.error("Error updating avatar:", err);
-        res.status(500).json({ error: "Server error: failed to update avatar" });
+        res.status(500).json({
+            error: "Server error: failed to update avatar",
+        });
     }
 };
 
@@ -659,14 +750,15 @@ export const createStaff = async (req, res) => {
         const adminId = req.user.id;
 
         const existingUser = await User.findOne({ email });
-        if (existingUser) return res.status(400).json({ error: 'Email already used' });
+        if (existingUser)
+            return res.status(400).json({ error: "Email already used" });
 
         const staff = new User({
             email,
             password,
             fullName,
             isVerfied: true,
-            role: 'staff',
+            role: "staff",
         });
 
         await staff.save();
@@ -679,7 +771,7 @@ export const createStaff = async (req, res) => {
         await staffPermission.save();
 
         res.status(201).json({
-            message: 'Staff created successfully',
+            message: "Staff created successfully",
             staffId: staff._id,
             fullName: staff.fullName,
             allowedModules: staffPermission.allowedModules,
@@ -695,14 +787,14 @@ export const deleteStaff = async (req, res) => {
         const { staffId } = req.params;
 
         const staff = await User.findById(staffId);
-        if (!staff || staff.role !== 'staff') {
-            return res.status(400).json({ error: 'Invalid staff account' });
+        if (!staff || staff.role !== "staff") {
+            return res.status(400).json({ error: "Invalid staff account" });
         }
 
         await User.findByIdAndDelete(staffId);
         await StaffPermission.findOneAndDelete({ staffId });
 
-        res.json({ message: 'Staff account deleted successfully' });
+        res.json({ message: "Staff account deleted successfully" });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

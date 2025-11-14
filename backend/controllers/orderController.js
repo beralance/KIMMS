@@ -1,7 +1,8 @@
 // backend/controllers/orderController.js
 import Order from "../models/Order.js";
+import Inventory from '../models/Inventory.js'
+import Product from '../models/Product.js'
 import { sendEmail } from '../utils/sendEmail.js'
-// ✅ Create a new order
 
 
 export const getOrdersForPolling = async (req, res) => {
@@ -57,9 +58,15 @@ export const createOrder = async (req, res) => {
             purchaseStatus: "pending",  
             paymentStatus: "pending",
         });
-
         const savedOrder = await newOrder.save();
 
+        if (products && products.length > 0) {
+            await Promise.all(
+                products.map(item =>
+                    Product.findByIdAndUpdate(item.productId, {purchasedBy: userId})
+                )
+            );
+        }
         console.log(
             `New ${orderType.toUpperCase()} order created: ${savedOrder._id}`
         )
@@ -86,7 +93,7 @@ export const getOrders = async (req, res) => {
                     select: 'name',
                 }
             })
-            .populate("userId", 'fullName email gender isLocal address avatar phonenumber')
+            .populate("userId", 'fullName email gender isLocal address avatar address phonenumber')
             .populate('auctionId', 'endtime starttime status reservePrice startPrice')
             .sort({createdAt: -1})
 
@@ -205,12 +212,39 @@ export const cancelOrder = async (req, res) => {
         const order = await Order.findById(req.params.id)
         if (!order) return res.status(404).json({message: 'Order not found'})
     
-        // Prevent cancel if already delivered or refunded
-        if (['delivered', 'refunded'].includes(order.purchaseStatus)){
-            return res.status(400).json({message: 'Delivered/refunded orders cannot be cancelled'})
+        if (!['admin', 'user'].includes(req.user.role)) {
+            return res.status(403).json({message: 'You are not allowed to cancel orders'})
         }
 
+        if (!req.user.role === 'admin' && ['delivered', 'processing'].includes(order.purchaseStatus)){
+            return res.status(400).json({message: 'Processing orders cannot be cancelled'})
+        }
+
+        await Promise.all(
+            order.products.map(item =>
+                Product.findByIdAndUpdate(
+                    item.productId,
+                    {
+                        highlight: 'none',
+                        purchaseStatus: 'cancelled',
+                        visibility: 'cancelled',
+                    }
+                )
+            )
+        );
+
+        await Promise.all(
+            order.products.map(async item => {
+                const product = await Product.findById(item.productId);
+                if (product && product.inventoryId) {
+                    await Inventory.findByIdAndUpdate(product.inventoryId, {status: 'available'});
+                }
+            })
+        );
+
         order.purchaseStatus = 'cancelled'
+        order.orderStatus = 'CANCELLED'
+        order.cancelledBy = req.user.id
         await order.save()
 
         console.log(`Order ${order._id} cancelled`)

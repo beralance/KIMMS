@@ -5,9 +5,11 @@ import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import OrderCard from "./OrderCard";
-import { Stack, useMediaQuery, useTheme } from '@mui/material';
+import { Divider, FormControl, InputLabel, MenuItem, Select, Stack, useMediaQuery, useTheme } from '@mui/material';
 import OrderPagination from "./OrderPagination";
 import { toTitleCase } from '../../../utils/stringUtils';
+import FullScreenLoader from '../../../components/FullScreenLoader'
+import { BlocksIcon } from 'lucide-react';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -21,7 +23,7 @@ function TabPanel(props) {
             {...other}
         >
             {value === index && (
-                <Box sx={{ p: 3 }}>
+                <Box>
                     {children}
                 </Box>
             )}
@@ -51,10 +53,11 @@ const statuses = [
     {key: 5, status: 'cancelled', label: 'Cancelled'},
 ]
 
-export default function OrderTab({orderData = [], itemsPerPage=5, selectedOrder}) {
+export default function OrderTab({orderData = [], setDateFilter, typeFilter, dateFilter, setTypeFilter, itemsPerPage=5, selectedOrder}) {
     const [value, setValue] = React.useState(0);
     const [tabPage, setTabPage] = React.useState({})
     const [openOrderId, setOpenOrderId] = React.useState(null)
+    const [loading, setLoading] = React.useState(false)
 
     const theme = useTheme()
     const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'));
@@ -70,8 +73,10 @@ export default function OrderTab({orderData = [], itemsPerPage=5, selectedOrder}
         scrollToTop();
     };
 
+    // used for SEARCH TERM
     React.useEffect(() => {
         if (selectedOrder && orderData?.length > 0) {
+            console.log('TRIGGERED!!!!!!!!!!!!!')
             const targetStatus = selectedOrder.purchaseStatus?.toLowerCase()
 
             const matchedTab = statuses.findIndex(
@@ -83,44 +88,53 @@ export default function OrderTab({orderData = [], itemsPerPage=5, selectedOrder}
             }
 
             setTimeout(() => {
-                setOpenOrderId(selectedOrder._id)
+                setOpenOrderId(selectedOrder.id)
             }, 300);
         }
-    }, [selectedOrder, orderData])
+    }, [selectedOrder])
 
-    const handleOpenDrawer = (orderId) => {
-        setOpenOrderId(orderId)
-    }
 
-    const handleCloseDrawer = () => {
+   
+
+    React.useEffect(() => {
         setOpenOrderId(null)
-    }
+    }, [value])
 
     return (
-        <Box
-            sx={{ flexGrow: 1, bgcolor: 'background.paper', height: 224 }}
-        >
+        <Box>
             <Stack direction={{xs: 'column', md: 'row'}}>
                 <Tabs
                     orientation={isMediumScreen ? 'horizontal' : 'vertical'}
                     variant='scrollable'
                     value={value}
                     onChange={handleChange}
+                    TabIndicatorProps={{
+                        sx: {
+                            height: '100%',
+                            borderRadius: '999px',
+                            bgcolor: 'secondary.main',
+                        }
+                    }}
                     sx={{ 
                         borderRight: 1, 
                         borderColor: 'divider',
-                        overflow: 'hidden'
+                        overflow: 'hidden',
                     }}
                 >
                     {statuses.map((status, index) => (
                         <Tab 
                             key={status.key} 
                             label={toTitleCase(`${status.label}`)} 
+                            sx={{
+                                zIndex: 1,
+                                "&.Mui-selected": { color: "white", fontWeight: 'bold'}
+                            }}
                             {...a11yProps(index)}
                         />
                     ))}
                 </Tabs>
                 
+                <Divider sx={{my: 2}}/>
                 {statuses.map((status, index) => {
                     const filteredOrders = orderData.filter(
                         (o) => o.purchaseStatus?.toLowerCase() === status.status.toLowerCase()
@@ -134,26 +148,62 @@ export default function OrderTab({orderData = [], itemsPerPage=5, selectedOrder}
                     
                     return (
                         <TabPanel key={index} value={value} index={index}>
-                            <Box>
-                                <Typography variant="body1" color="initial">
-                                    TOTAL {filteredOrders.length}
-                                </Typography>
-                                {currentOrders.length > 0 ? (
-                                    <>
+                            <Stack gap={2}>
+                                <Stack>
+                                    <Stack gap={2} my={2} direction={'row'} alignItems={'center'} flexWrap={'wrap'} justifyContent={'space-between'}>
+                                        <Box>
+                                            <Typography variant="body1" color="gray" fontWeight={'bold'} sx={{borderRadius: 2, px: 1, px: 2, alignItems: 'center', display: 'flex', gap: 1}}>
+                                                <BlocksIcon/>
+                                                {`Order${filteredOrders.length > 1 ? 's' : ''} ${filteredOrders.length}`}
+                                            </Typography>
+                                        </Box>
+                                        <Stack direction="row" spacing={2}>
+                                            <FormControl size="small" sx={{ minWidth: 100 }}>
+                                                <InputLabel>Order Type</InputLabel>
+                                                <Select
+                                                    value={typeFilter}
+                                                    label="Order Type"
+                                                    onChange={(e) => setTypeFilter(e.target.value)}
+                                                >
+                                                    <MenuItem value="all"><Typography variant="body2" color="secondary">All</Typography></MenuItem>
+                                                    <MenuItem value="fixed"><Typography variant="body2" color="secondary">Fixed</Typography></MenuItem>
+                                                    <MenuItem value="auction"><Typography variant="body2" color="secondary">Auction</Typography></MenuItem>
+                                                </Select>
+                                            </FormControl>
+
+                                            <FormControl size="small" sx={{ minWidth: 100 }}>
+                                                <InputLabel>Sort by Date</InputLabel>
+                                                <Select
+                                                    value={dateFilter}
+                                                    label="Sort by Date"
+                                                    onChange={(e) => setDateFilter(e.target.value)}
+                                                >
+                                                    <MenuItem value="newest"><Typography variant="body2" color="secondary">Newest</Typography></MenuItem>
+                                                    <MenuItem value="oldest"><Typography variant="body2" color="secondary">Oldest</Typography></MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </Stack>
+                                    </Stack>
+
+                                    <Stack gap={2}>
                                         {currentOrders.map((order) => (
-                                            <Box key={order._id} sx={{mb: 5}}>
+                                            <Box key={order._id}>
                                                 <OrderCard 
                                                     orderData={order} 
+                                                    op={openOrderId}
                                                     openDrawer={openOrderId === order._id} 
-                                                    onOpen={() => handleOpenDrawer(order._id)} 
-                                                    onClose={handleCloseDrawer}
                                                 />
                                             </Box>
                                         ))}
+                                    </Stack>
+                                </Stack>
+
+                                {currentOrders.length > 0 ? (
+                                    <>
                                         {totalPage > 1 && (
                                             <OrderPagination
                                                 count={totalPage}
-                                                page={page}
+                                                page={page} 
                                                 onChange={(e, value) => handlePageChangeForTab(index, value)}
                                             />
                                         )}
@@ -161,14 +211,15 @@ export default function OrderTab({orderData = [], itemsPerPage=5, selectedOrder}
                                 ) : (
                                     <Stack justifyContent={'center'} alignItems={'center'} height={'40vh'}>
                                         <img src='/smileys-sleep.svg' style={{width: '70px', height: '70px', opacity: '0.8', aspectRatio: '1/1', display: 'block'}}/>
-                                        <Typography>No orders with '{status.status}' status</Typography>
+                                        <Typography>No orders with <span>{toTitleCase(status.status.replace(/_/g, ' '))}</span> status</Typography>
                                     </Stack>
                                 )}
-                            </Box>
+                            </Stack>
                         </TabPanel>
                     )
                 })}
             </Stack>
+            <FullScreenLoader open={loading}/>
         </Box>
     );
 }

@@ -13,20 +13,20 @@ export const createNotification = async (userId, auctionId, message, label) => {
 
 // Get notifications for a user
 export const getUserNotifications = async (req, res) => {
-    console.log('USER ID', req.user.id )
+    console.log("USER ID", req.user.id);
     try {
         const notifications = await Notification.find({ userId: req.user.id })
             .populate({
-                path: 'auctionId',
-                select: 'inventoryId claimDeadline winnerClaimed startPrice reservePrice startTime endTime status description finalized createdAt updatedAt winner',
+                path: "auctionId",
+                select: "inventoryId claimDeadline winnerClaimed startPrice reservePrice startTime endTime status description finalized createdAt updatedAt winner",
                 populate: {
-                    path: 'inventoryId',
-                    select: 'productName condition isLocal category description details images',
+                    path: "inventoryId",
+                    select: "productName condition isLocal category description details images",
                     populate: {
-                        path: 'category',
-                        select: 'name'
-                    }
-                }
+                        path: "category",
+                        select: "name",
+                    },
+                },
             })
             .sort({ read: 1, createdAt: -1 });
         res.json(notifications);
@@ -34,7 +34,7 @@ export const getUserNotifications = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
- 
+
 // Mark notification as read
 export const markAsRead = async (req, res) => {
     try {
@@ -42,5 +42,23 @@ export const markAsRead = async (req, res) => {
         res.json({ message: "Notification marked as read" });
     } catch (err) {
         res.status(500).json({ error: err.message });
+    }
+};
+
+export const hasRead = async (req, res) => {
+    const userId = req.user.id;
+
+    if (!userId) return;
+    try {
+        const unreadNotif = await Notification.find({
+            user: userId,
+            read: false,
+        });
+        const hasUnread = unreadNotif.length > 0;
+
+        return res.status(200).json({ hasUnread });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Server error", err });
     }
 };

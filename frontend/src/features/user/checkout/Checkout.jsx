@@ -271,11 +271,31 @@ export default function Checkout() {
 
     if (!auctionId && !winner && !checkoutItems.length ) {
         return (
-            <Container sx={{ mt: 4 }}>
-                <Typography>No items selected</Typography>
-                <Button sx={{ mt: 2 }} variant="contained" onClick={() => navigate("/cart")}>
-                    Back to Cart
-                </Button>
+             <Container sx={{ mt: 4 }}>
+                <Stack justifyContent={'center'} alignItems={'center'} height={'80vh'}>
+                    <Box>
+                        <img 
+                            src={'/avatar-thinking-4-svgrepo-com.svg'}
+                            style={{
+                                display: 'block',
+                                width: '150px',
+                                height: '150px',
+                            }}
+                        />
+                    </Box>
+                    <Stack>
+                        <Typography variant="h4" align='center'>
+                            No item to checkout
+                        </Typography>
+                        <Typography variant='body2' sx={{ mb: 3 }} align='center'>
+                            You did not select an item yet.
+                        </Typography>
+                    </Stack>
+                    <Button variant="contained" color='secondary' sx={{borderRadius: '999px', px: 3, display: 'flex', alignItems: 'center', gap: 1}} onClick={() => navigate('/cart')}>
+                        <ChevronLeftIcon style={{color: 'white'}}/>
+                        Go back to cart
+                    </Button>
+                </Stack>
             </Container>
         );
     }
@@ -547,10 +567,11 @@ export default function Checkout() {
             <FullScreenLoader open={loading}/>
             <ConfirmDialog
                 open={checkoutConfirm}
-                title="Proceed to Checkout?"
-                content="You’re about to place your order. Continue?"
+                title="Confirm Checkout?"
+                content={`You’re about to place your order. Are you sure you want to purchase the selected item(s)?`}
                 confirmText="Yes, Continue"
                 cancelText="No, Go Back"
+                color="success"
                 onConfirm={() => codCheckout()}
                 onCancel={checkoutConfirmClose}
             />

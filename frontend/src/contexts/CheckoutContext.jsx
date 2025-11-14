@@ -110,7 +110,10 @@ export const CheckoutProvider = ({ children }) => {
                 `${API_URL}/api/checkout/cod`,
                 { 
                     userId: user.userId, 
-                    checkoutItems,
+                    products: checkoutItems.map(item => ({productId: item.productId._id})),
+                    orderType: 'fixed',
+                    totalPrice: totalAmount,
+                    finalPrice,
                 },
                 { headers: { Authorization: `Bearer ${token}` } },
             );

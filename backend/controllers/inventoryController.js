@@ -1,64 +1,82 @@
-import { createClient } from '@supabase/supabase-js';
-import Inventory from '../models/Inventory.js';
-import {generatePhysicalCode, generateProductId } from '../utils/generatedIds.js'
-import {v4 as uuidv4} from 'uuid'
-import { incrementProductCount, decrementProductCount } from './categoryController.js';
-import { io } from '../server.js';
+import { createClient } from "@supabase/supabase-js";
+import Inventory from "../models/Inventory.js";
+import {
+    generatePhysicalCode,
+    generateProductId,
+} from "../utils/generatedIds.js";
+import { v4 as uuidv4 } from "uuid";
+import {
+    incrementProductCount,
+    decrementProductCount,
+} from "./categoryController.js";
+import { io } from "../server.js";
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
 // CREATE Inventory
 export const createInventoryItem = async (req, res) => {
     try {
         const files = req.files;
-        if (!files || files.length === 0) return res.status(400).json({error: 'No files uploaded'})
+        if (!files || files.length === 0)
+            return res.status(400).json({ error: "No files uploaded" });
 
-        const addedBy = req.user?.id
-        console.log('ADDED BY', addedBy)
-        console.log('ADDED BY', req.user)
+        const addedBy = req.user?.id;
+        console.log("ADDED BY", addedBy);
+        console.log("ADDED BY", req.user);
         const uploadedFiles = [];
 
         for (const file of files) {
-
-            const sanitizedOriginal = file.originalname.replace(/[\s()]/g, '_');
-            const fileName = `products/${Date.now()}-${uuidv4()}-${sanitizedOriginal}`
-            const {data, error} = await supabase.storage
-                .from('Product-Uploads')
+            const sanitizedOriginal = file.originalname.replace(/[\s()]/g, "_");
+            const fileName = `products/${Date.now()}-${uuidv4()}-${sanitizedOriginal}`;
+            const { data, error } = await supabase.storage
+                .from("Product-Uploads")
                 .upload(fileName, file.buffer, {
-                    cacheControl: '3600',
+                    cacheControl: "3600",
                     upsert: false,
                     contentType: file.mimetype,
-                })
-            if(error) throw error;
-            
-            const publicUrl = data
-                ? supabase.storage.from('Product-Uploads').getPublicUrl(data.path).data.publicUrl
-                : null
-        
-            if (!publicUrl) throw new Error('Failed to generate public URL');
+                });
+            if (error) throw error;
 
-            console.log(supabase.storage.from('Product-Uploads').getPublicUrl(data.path))
-            
-            uploadedFiles.push(publicUrl) 
+            const publicUrl = data
+                ? supabase.storage
+                      .from("Product-Uploads")
+                      .getPublicUrl(data.path).data.publicUrl
+                : null;
+
+            if (!publicUrl) throw new Error("Failed to generate public URL");
+
+            console.log(
+                supabase.storage.from("Product-Uploads").getPublicUrl(data.path)
+            );
+
+            uploadedFiles.push(publicUrl);
         }
 
         const {
-            productName, 
-            description, 
-            price, 
-            category, 
-            details, 
-            condition, 
-            isLocal, 
+            productName,
+            description,
+            price,
+            category,
+            details,
+            condition,
+            isLocal,
             tags,
             itemWeight,
         } = req.body;
 
-        if (isLocal === 'false' || isLocal === false){
+        if (isLocal === "false" || isLocal === false) {
             if (!itemWeight)
-                return res.status(400).json({error: 'Weight is required for non-local items.'})
-            if (parseFloat(itemWeight) > 10) // change if needs additional kg
-                return res.status(400).json({error: 'Weight cannot exceed 10kg for non-local items.'})
+                return res
+                    .status(400)
+                    .json({ error: "Weight is required for non-local items." });
+            if (parseFloat(itemWeight) > 10)
+                // change if needs additional kg
+                return res.status(400).json({
+                    error: "Weight cannot exceed 10kg for non-local items.",
+                });
         }
 
         const generatedProductId = await generateProductId(category);
@@ -75,42 +93,48 @@ export const createInventoryItem = async (req, res) => {
             category,
             isLocal,
             tags,
-            weight: isLocal === 'false' || isLocal === false ? itemWeight : undefined,
+            weight:
+                isLocal === "false" || isLocal === false
+                    ? itemWeight
+                    : undefined,
             addedBy: addedBy,
-            status: 'available',
+            status: "available",
             images: uploadedFiles,
         });
 
-
         try {
-            const savedItem = await inventoryItem.save()
-            await savedItem
-                .populate('category', 'name productCount')
-            await incrementProductCount(category)
-            res.status(201).json(savedItem)
-        }
-        catch (dbError) {
+            const savedItem = await inventoryItem.save();
+            await savedItem.populate("category", "name productCount");
+            await incrementProductCount(category);
+            res.status(201).json(savedItem);
+        } catch (dbError) {
             for (const fileUrl of uploadedFiles) {
-                const path = fileUrl.split('/Product-Uploads/')[1]
-                await supabase.storage.from('Product-Uploads').remove([path])
+                const path = fileUrl.split("/Product-Uploads/")[1];
+                await supabase.storage.from("Product-Uploads").remove([path]);
             }
             throw dbError;
         }
-
     } catch (err) {
         res.status(500).json({ error: err.message });
-        console.error('Inventory creation error:', err);
+        console.error("Inventory creation error:", err);
     }
 };
 
 // GET All Inventory Items
 export const getInventoryItems = async (req, res) => {
     try {
-        const {status} = req.query
-        const filter = status ? {status} : {}
+        const { status } = req.query;
+        const filter = status ? { status } : {};
         const items = await Inventory.find(filter)
             .sort({ createdAt: -1 })
-            .populate('category', 'name productCount');
+            .populate({
+                path: "category",
+                select: "name productCount",
+            })
+            .populate({
+                path: "addedBy",
+                select: "fullName email role",
+            });
         res.json(items);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -131,18 +155,20 @@ export const getInventoryItemById = async (req, res) => {
 // UPDATE Inventory Item
 export const updateInventoryItem = async (req, res) => {
     try {
-        let uploadedFiles = JSON.parse(req.body.existingImages || '[]'); 
+        let uploadedFiles = JSON.parse(req.body.existingImages || "[]");
 
-        
         if (req.files && req.files.length > 0) {
             for (const file of req.files) {
-                const sanitizedOriginal = file.originalname.replace(/[\s()]/g, '_');
+                const sanitizedOriginal = file.originalname.replace(
+                    /[\s()]/g,
+                    "_"
+                );
                 const fileName = `products/${Date.now()}-${uuidv4()}-${sanitizedOriginal}`;
 
                 const { data, error } = await supabase.storage
-                    .from('Product-Uploads')
+                    .from("Product-Uploads")
                     .upload(fileName, file.buffer, {
-                        cacheControl: '3600',
+                        cacheControl: "3600",
                         upsert: false,
                         contentType: file.mimetype,
                     });
@@ -150,24 +176,28 @@ export const updateInventoryItem = async (req, res) => {
                 if (error) throw error;
 
                 const publicUrl = data
-                    ? supabase.storage.from('Product-Uploads').getPublicUrl(data.path).data.publicUrl
+                    ? supabase.storage
+                          .from("Product-Uploads")
+                          .getPublicUrl(data.path).data.publicUrl
                     : null;
 
-                if (!publicUrl) throw new Error('Failed to generate public URL');
+                if (!publicUrl)
+                    throw new Error("Failed to generate public URL");
                 uploadedFiles.push(publicUrl);
             }
         }
 
         const currentItem = await Inventory.findById(req.params.id);
-        if(!currentItem) return res.status(404).json({message: 'Item not found'})
+        if (!currentItem)
+            return res.status(404).json({ message: "Item not found" });
 
         let physicalCode = currentItem.physicalCode;
-        const currentCategoryId = currentItem.category.toString()
-        
-        if (req.body.category && req.body.category !== currentCategoryId) {        
-            physicalCode = await generatePhysicalCode(req.body.category)
-            await decrementProductCount(currentCategoryId)
-            await incrementProductCount(req.body.category)
+        const currentCategoryId = currentItem.category.toString();
+
+        if (req.body.category && req.body.category !== currentCategoryId) {
+            physicalCode = await generatePhysicalCode(req.body.category);
+            await decrementProductCount(currentCategoryId);
+            await incrementProductCount(req.body.category);
         }
 
         const updates = {
@@ -183,12 +213,12 @@ export const updateInventoryItem = async (req, res) => {
             weight: req.body.itemWeight,
             images: uploadedFiles,
             physicalCode,
-            
         };
 
         // ✅ Update and populate category
-        const item = await Inventory.findByIdAndUpdate(req.params.id, updates, { new: true })
-            .populate('category', 'name');
+        const item = await Inventory.findByIdAndUpdate(req.params.id, updates, {
+            new: true,
+        }).populate("category", "name");
 
         if (!item) return res.status(404).json({ message: "Item not found" });
 
@@ -209,36 +239,39 @@ export const deleteInventoryItem = async (req, res) => {
         // 2️⃣ Remove associated images from Supabase (if any)
         if (item.images && item.images.length > 0) {
             const paths = item.images
-                .map(url => url.split('/Product-Uploads/')[1]) // ✅ correct split
-                .filter(path => path);
+                .map((url) => url.split("/Product-Uploads/")[1]) // ✅ correct split
+                .filter((path) => path);
 
             if (paths.length > 0) {
-                const { error: removeError } = await supabase
-                    .storage
-                    .from('Product-Uploads')
+                const { error: removeError } = await supabase.storage
+                    .from("Product-Uploads")
                     .remove(paths);
 
                 if (removeError) {
-                    console.error("⚠️ Failed to delete one or more images from storage:", removeError.message);
+                    console.error(
+                        "⚠️ Failed to delete one or more images from storage:",
+                        removeError.message
+                    );
                 }
             }
         }
 
         await item.deleteOne();
-        await decrementProductCount(item.category)
+        await decrementProductCount(item.category);
 
-        res.json({ message: "Item and associated images deleted successfully" });
+        res.json({
+            message: "Item and associated images deleted successfully",
+        });
     } catch (err) {
         console.error("❌ Inventory deletion error:", err);
         res.status(500).json({ error: err.message });
     }
 };
 
-
 /**
  * Get inventory stats for reports
  * @param {Object} options - optional filters
- *   options.period: 'week' | 'month' | 'year' | {from: Date, to: Date} 
+ *   options.period: 'week' | 'month' | 'year' | {from: Date, to: Date}
  *   options.category: categoryId
  *   options.status: 'available' | 'sold' | 'reserved'
  *   options.condition: 'new' | 'like new' | 'used' | 'refurbished'
@@ -258,13 +291,13 @@ export const getInventoryReportStats = async (options = {}) => {
     if (period) {
         const now = new Date();
         let fromDate;
-        if (period === 'week') {
+        if (period === "week") {
             fromDate = new Date();
             fromDate.setDate(now.getDate() - 7);
-        } else if (period === 'month') {
+        } else if (period === "month") {
             fromDate = new Date();
             fromDate.setMonth(now.getMonth() - 1);
-        } else if (period === 'year') {
+        } else if (period === "year") {
             fromDate = new Date();
             fromDate.setFullYear(now.getFullYear() - 1);
         } else if (period.from && period.to) {
@@ -278,13 +311,21 @@ export const getInventoryReportStats = async (options = {}) => {
         }
     }
 
-    const allItems = await Inventory.find(filter).populate('category', 'name');
-    const newAddedItem = allItems.sort((a, b) => b.createdAt - a.createdAt).slice(0, 5)
+    const allItems = await Inventory.find(filter).populate("category", "name");
+    const newAddedItem = allItems
+        .sort((a, b) => b.createdAt - a.createdAt)
+        .slice(0, 5);
 
-    const totalProducts = allItems.filter(item => item.status === 'available' || item.status === 'reserved').length;
-    const inventoryItems = allItems.filter(item => item.status === 'available').length;
-    const activeListings = allItems.filter(item => item.status === 'reserved').length;
-    const soldItems = allItems.filter(item => item.status === 'sold').length;
+    const totalProducts = allItems.filter(
+        (item) => item.status === "available" || item.status === "reserved"
+    ).length;
+    const inventoryItems = allItems.filter(
+        (item) => item.status === "available"
+    ).length;
+    const activeListings = allItems.filter(
+        (item) => item.status === "reserved"
+    ).length;
+    const soldItems = allItems.filter((item) => item.status === "sold").length;
 
     return {
         totalProducts,
@@ -295,4 +336,3 @@ export const getInventoryReportStats = async (options = {}) => {
         filteredCount: allItems.length, // useful for frontend display
     };
 };
-

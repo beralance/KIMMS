@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { ChevronRightIcon } from 'lucide-react'
-import { Box, Stack, Typography, IconButton, Divider } from '@mui/material'
+import { Box, Stack, Typography, IconButton, Divider, Button } from '@mui/material'
 import ProductCard from './ProductCard'
 import OrderDetailsDrawer from './OrderDetailsDrawer'
 import SectionWrapper from '../../../components/SectionWrapper'
@@ -14,13 +14,13 @@ const OrderContainer = ({order}) => {
     const handleDetailsClose = () => setOpenDetails(false);
 
     const totalAmount = order.products.reduce(
-        (acc, product) => acc + product.productId.price,
+        (acc, product) => acc + product?.productId?.price,
         0
     );
 
     return (
         <Box>
-            <SectionWrapper>
+            <SectionWrapper sx={{bgcolor: '#f5f5f5ff'}}>
                <Stack sx={{gap: 2}}>
                     {/*ORDER ID*/}
                     <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'} gap={1}>
@@ -44,19 +44,21 @@ const OrderContainer = ({order}) => {
                         )}
                     </Stack>
                     <Divider/>
-                    <Stack>
-                        {order.orderType !== 'fixed' &&
-                            <Typography variant="body1" color="initial">
-                                Auction Purchase
-                            </Typography>
-                        }
-                        <Stack direction={'row'} justifyContent={'space-between'}>
-                            <Typography variant="body2" color="secondary">Paid by</Typography>
-                            <Typography variant="body2" color="secondary">{order.paymentMethod === 'gcash' ? 'GCash' : order.paymentMethod}</Typography>
-                        </Stack>
-                        <Stack direction={'row'} justifyContent={'space-between'}>
-                            <Typography variant="body2" color="secondary">Order total</Typography>
-                            <Typography variant="body2" color="secondary">{formatNumber(totalAmount)}</Typography>
+                    <Stack gap={2}>
+                        <Stack>
+                            {order.orderType !== 'fixed' &&
+                                <Typography variant="body1" color="initial">
+                                    Auction Purchase
+                                </Typography>
+                            }
+                            <Stack direction={'row'} justifyContent={'space-between'}>
+                                <Typography variant="body2" color="secondary">Paid by</Typography>
+                                <Typography variant="body2" color="secondary">{order.paymentMethod === 'gcash' ? 'GCash' : 'Cash on Delivery'}</Typography>
+                            </Stack>
+                            <Stack direction={'row'} justifyContent={'space-between'}>
+                                <Typography variant="body2" color="secondary">Order total</Typography>
+                                <Typography variant="body2" color="secondary">Php {formatNumber(totalAmount)}</Typography>
+                            </Stack>
                         </Stack>
                     </Stack>
                 </Stack>

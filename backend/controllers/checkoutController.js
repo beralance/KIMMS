@@ -50,58 +50,46 @@ export const handleCheckout = async (req, res) => {
 
 export const handleCodCheckout = async (req, res) => {
     try {
-        const {userId, checkoutItems} = req.body;
-        console.log('Checkout Items in Backend', checkoutItems)
+        const {userId, products, totalPrice, finalPrice, orderType} = req.body;
+        console.log('Checkout Items in Backend', products)
 
         if (!userId) {
             return res.status(400).json({message: 'userId are required'})
         }
 
-        if (!checkoutItems || checkoutItems.length === 0) {
+        if (!products || products.length === 0) {
             return res.status(400).json({message: 'Cart is empty'})
         }
-
-        const products = checkoutItems.map((item) => ({
-            productId: item.productId?._id
-        }))
-
-        const totalAmount = checkoutItems.reduce(
-            (sum, item) => 
-                sum + (item.productId?.price || 0) * (item.quantity || 1),
-            0
-        )
 
         const newOrder = await Order.create({
             userId,
             products,
-            totalAmount,
+            totalPrice,
+            finalPrice,
+            orderType,
             paymentMethod: 'cashOnDelivery',
-            paymentStatus: 'pending',
+            paymentStatus: 'unpaid',
             purchaseStatus: 'pending',
+            orderStatus: 'SUCCESSFUL'
         })
 
-        const productIds = checkoutItems.map(item => item.productId._id)
-
+        console.log('PRODUCTS', products)
+        const productIds = products.map(item => item.productId)
+        console.log('PRODUCT IDS ARRAY', productIds)
+        
         await Product.updateMany(
             { _id: { $in: productIds} },
-            { $set: { visibility: 'pending', purchaseStatus: "pending" } }
+            { $set: { visibility: 'pending', purchaseStatus: "pending", purchasedBy: userId} }
         );
 
         const prod = await Product.find({_id: {$in: productIds}})
-        if (!prod.length) {
-            return res.status(404).json({error: 'No products found'})
-        }
-
         const inventoryIds = prod.map(p => p.inventoryId)
-        if (!inventoryIds.length) {
-            console.log('No inventory IDs found for these products')
-            return res.status(404).json({error: 'No inventory IDs found'})
+        if (inventoryIds.length) {
+            await Inventory.updateMany(
+                {_id: {$in: inventoryIds}},
+                {$set: {status: 'sold'}},
+            )
         }
-        await Inventory.updateMany(
-            {_id: {$in: inventoryIds}},
-            {$set: {status: 'sold'}},
-        )
-
         const userCart = await Cart.findOne({ userId });
         if (userCart) {
             userCart.items = userCart.items.filter(
@@ -109,10 +97,8 @@ export const handleCodCheckout = async (req, res) => {
             );
             await userCart.save();
         }
-        req.io.emit('removeCartItem', {
-            userId,
-            productIds,
-        })
+
+        req.io.emit('removeCartItem', { userId, productIds, })
         req.io.emit('productSold', productIds)
 
         res.status(201).json({

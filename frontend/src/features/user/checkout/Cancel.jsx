@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Container, Typography, Button } from '@mui/material';
+import { Container, Typography, Button, Box, Stack } from '@mui/material';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export default function Cancel() {
@@ -28,15 +28,30 @@ export default function Cancel() {
 
     return (
         <Container sx={{ mt: 4 }}>
-            <Typography variant="h4" gutterBottom>
-                Payment Cancelled
-            </Typography>
-            <Typography sx={{ mb: 3 }}>
-                Your payment was not completed.
-            </Typography>
-            <Button variant="contained" onClick={() => navigate('/cart')}>
-                Back to Checkout
-            </Button>
+            <Stack alignItems={'center'} justifyContent={'center'} height={'80vh'}>
+                <Box sx={{mb: 1}}>
+                    <img 
+                        src={'/shocked-shock.svg'}
+                        style={{
+                            display: 'block',
+                            width: '80px',
+                            height: '80px',
+                            opacity: '0.8'
+                        }}
+                    />
+                </Box>
+                <Stack>
+                    <Typography variant="h4" align='center'>
+                        Payment Cancelled
+                    </Typography>
+                    <Typography variant='body2' sx={{ mb: 3 }} align='center'>
+                        Your order was not completed.
+                    </Typography>
+                </Stack>
+                <Button variant="contained" color='secondary' sx={{borderRadius: '999px', px: 3}} onClick={() => navigate('/cart')}>
+                    Go back to cart
+                </Button>
+            </Stack>
         </Container>
     );
 }

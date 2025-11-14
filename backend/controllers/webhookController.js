@@ -116,6 +116,7 @@ export const handleWebhook = async (req, res) => {
                 order.paymentId = payment._id;
                 order.paymentMethod = paymentMethod //|| 'gcash'
                 order.transactionReference = paymongoId
+                order.orderStatus = 'SUCCESSFUL',
                 order.isActive = true
                 await order.save();
                 console.log('order updated via webhook:', order )
