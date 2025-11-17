@@ -1,260 +1,264 @@
-import { useEffect, useState } from "react";
-import { useReport } from "../../../contexts/ReportContext";
+import React from "react";
 import {
     Box,
-    Typography,
-    Card,
-    CardContent,
-    Grid,
-    CircularProgress,
-    Alert,
     Divider,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    Stack,
+    Typography,
 } from "@mui/material";
+import { fetchFullReport } from "../../../utils/fullReportApi";
+import { useState } from "react";
+import FullScreenLoader from "../../../components/FullScreenLoader";
+import SectionWrapper from "../../../components/SectionWrapper";
+import { useEffect } from "react";
+import { formatNumber } from "../../../utils/stringUtils";
+import ReusablePieChart from "./components/ReusablePieChart";
+import { SalesPerDayChart } from "./components/SalesPerDayChart";
+import LocationBarChart from "./components/LocationBarChart";
+import StockSizeBar from "./components/StockSizeBar";
+import ReusableBarChart from "./components/ReusableBarChart";
+import SalesBySizeGraph from "./components/SalesBySizeGraph";
+import TopSalesBasedOnCategory from "./components/TopSalesBasedOnCategory";
 
 const Reports = () => {
-    const {
-        fetchReports,
-        loading,
-        error,
-        alerts,
-        closedAuctions,
-        endedAuctions,
-        liveAuctions,
-        pendingAuctions,
-        totalAuctions,
+    const [report, setReport] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [reportDate, setReportDate] = useState("week");
 
-        activeListings,
-        filteredCount,
-        soldItems,
-        totalProducts,
-
-        auctionOrders,
-        averageOrderValue,
-        failedPayments,
-        fixedOrders,
-        paidOrders,
-        pendingPayments,
-        refundedOrders,
-        totalOrders,
-        totalRevenue,
-
-        activeProducts,
-        averagePrice,
-        categoryBreakdown,
-        inactiveProducts,
-        mostViewed,
-        pendingProducts,
-        purchaseStatusSummary,
-        recentlySold,
-        soldProducts,
-        totalProductsCount,
-    } = useReport();
-    
-    // make this by pick
     useEffect(() => {
-        fetchReports({ period: "month" });
-    }, []);
+        const getReport = async () => {
+            try {
+                const data = await fetchFullReport(reportDate);
+                setReport(data);
+                console.log("Report Data", data);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    if (loading)
+        getReport();
+    }, [reportDate]);
+
+    if (loading) return <FullScreenLoader open={loading} />;
+    if (!report)
         return (
-            <Box textAlign="center" mt={5}>
-                <CircularProgress />
-            </Box>
+            <FullScreenLoader open={loading} message="Fetching Reports..." />
         );
 
-    if (error)
-        return (
-            <Box mt={5}>
-                <Alert severity="error">{error}</Alert>
-            </Box>
-        );
+    return (
+        <Box sx={{ pb: 15, bgcolor: "#f0f0f0" }}>
+            <Stack gap={2} p={2} position={"relative"}>
+                <Stack>
+                    <Typography variant="subtitle1" color="secondary">
+                        Reports
+                    </Typography>
+                    <Typography variant="body2" color="gray">
+                        Reports and other stuff kase
+                    </Typography>
+                </Stack>
+                <Stack
+                    sx={{
+                        position: "sticky",
+                        top: 80,
+                        zIndex: 1000,
+                        bgcolor: "rgba(255, 255, 255, 0.2)",
+                        backdropFilter: "blur(20px)",
+                    }}
+                >
+                    <FormControl>
+                        <InputLabel id="report-date-label">Range</InputLabel>
+                        <Select
+                            labelId="report-date-label"
+                            value={reportDate}
+                            onChange={(e) => setReportDate(e.target.value)}
+                            label="Range"
+                        >
+                            <MenuItem value="week">Week</MenuItem>
+                            <MenuItem value="month">Month</MenuItem>
+                            <MenuItem value="year">Year</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Stack>
+                <SectionWrapper>
+                    <Box>
+                        <Typography variant="body1" color="initial">
+                            Total Sales: Php {formatNumber(report.totalSales)}
+                        </Typography>
+                    </Box>
+                    <Box>
+                        {/*change to 10 users join the website*/}
+                        <Typography variant="body1" color="initial">
+                            New Users this {reportDate}: {report.newUsers}
+                        </Typography>
+                    </Box>
+                </SectionWrapper>
+                <SectionWrapper>
+                    <Stack gap={4}>
+                        <Stack>
+                            <Typography variant="body1" color="secondary">
+                                Products by Category
+                            </Typography>
+                            <Typography variant="body2" color="gray">
+                                cate cate this test test test
+                            </Typography>
+                        </Stack>
+                        <Box>
+                            {report?.categoryPie?.length > 0 && (
+                                <ReusablePieChart
+                                    data={report?.categoryPie || {}}
+                                    dataKey="count"
+                                    nameKey="_id"
+                                />
+                            )}
+                        </Box>
+                    </Stack>
+                </SectionWrapper>
+                <SectionWrapper>
+                    <Stack gap={4}>
+                        <Stack>
+                            <Typography variant="body1" color="secondary">
+                                Sales this {reportDate}
+                            </Typography>
+                            <Typography variant="body2" color="gray">
+                                Sales this test test test
+                            </Typography>
+                        </Stack>
+                        <Box>
+                            {report?.salesPerDay?.length > 0 && (
+                                <SalesPerDayChart
+                                    salesPerDay={report.salesPerDay}
+                                />
+                            )}
+                        </Box>
+                    </Stack>
+                </SectionWrapper>
 
-  return (
-    <Box p={3}>
-      <Typography variant="h4" gutterBottom>
-        Admin Reports
-      </Typography>
+                <SectionWrapper>
+                    <Stack gap={4}>
+                        <Stack>
+                            <Typography variant="body1" color="secondary">
+                                Local and International Users
+                            </Typography>
+                            <Typography variant="body2" color="gray">
+                                cate cate this test test test
+                            </Typography>
+                        </Stack>
+                        <LocationBarChart
+                            data={[
+                                {
+                                    name: "International",
+                                    value: Number(
+                                        report.userLocation.international
+                                    ),
+                                },
+                                {
+                                    name: "Local",
+                                    value: Number(
+                                        report.userLocation.localPercent
+                                    ),
+                                },
+                            ]}
+                        />
+                        <Stack>
+                            <Typography
+                                variant="body2"
+                                color="gray"
+                                fontWeight={"bold"}
+                            >
+                                NOTE:
+                            </Typography>
+                            <Typography variant="body2" color="gray">
+                                <b>Local</b> users can view and purchase both
+                                large and small products. <b>International</b>{" "}
+                                users can only view and purchase small products.
+                            </Typography>
+                        </Stack>
+                    </Stack>
+                </SectionWrapper>
+                <SectionWrapper>
+                    <Stack gap={4}>
+                        <Stack>
+                            <Typography variant="body1" color="secondary">
+                                Small and Large Products
+                            </Typography>
+                            <Typography variant="body2" color="gray">
+                                Total count of posted product based on size
+                                (small and large items)
+                            </Typography>
+                        </Stack>
+                        <Box>
+                            <StockSizeBar
+                                data={report.stockSize.map((item) => ({
+                                    name: item._id ? "Large" : "Small",
+                                    value: item.count,
+                                }))}
+                            />
+                        </Box>
+                    </Stack>
+                </SectionWrapper>
 
-        <>
-          {/* Inventory Stats */}
-          <Typography variant="h6" mt={3} mb={1}>
-            Inventory Overview
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={4}>
-              <Card>
-                <CardContent>
-                  <Typography>Total Products</Typography>
-                  <Typography variant="h5">
-                    {totalProducts}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Card>
-                <CardContent>
-                  <Typography>Active Listings</Typography>
-                  <Typography variant="h5">
-                    {activeListings}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Card>
-                <CardContent>
-                  <Typography>Sold Items</Typography>
-                  <Typography variant="h5">
-                    {soldItems}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
+                <SectionWrapper>
+                    <Stack gap={4}>
+                        <Stack>
+                            <Typography variant="body1" color="secondary">
+                                Sales by Category, Condition and Product Size
+                            </Typography>
+                            <Typography variant="body2" color="gray">
+                                cate cate this test test test
+                            </Typography>
+                        </Stack>
+                        <Stack gap={4}>
+                            <Stack gap={2}>
+                                <Typography variant="body1" color="initial">
+                                    Sales by Category
+                                </Typography>
+                                <ReusableBarChart
+                                    data={report.salesByCategory}
+                                    labelKey="_id"
+                                    valueKey="sales"
+                                />
+                            </Stack>
+                            <Divider />
+                            <Stack gap={2}>
+                                <Typography variant="body1" color="initial">
+                                    Sales by Condition
+                                </Typography>
+                                <ReusableBarChart
+                                    data={report.salesByCondition}
+                                    labelKey="_id"
+                                    valueKey="sales"
+                                />
+                            </Stack>
+                            <Divider />
+                            <Stack gap={2}>
+                                <Typography variant="body1" color="initial">
+                                    Sales by Size-based
+                                </Typography>
 
-          <Divider sx={{ my: 4 }} />
-
-          {/* Auctions Stats */}
-          <Typography variant="h6" mt={3} mb={1}>
-            Auction Overview
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={3}>
-              <Card>
-                <CardContent>
-                  <Typography>Total Auctions</Typography>
-                  <Typography variant="h5">
-                    {totalAuctions}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <Card>
-                <CardContent>
-                  <Typography>Live Auctions</Typography>
-                  <Typography variant="h5">
-                    {liveAuctions}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <Card>
-                <CardContent>
-                  <Typography>Pending Auctions</Typography>
-                  <Typography variant="h5">
-                    {pendingAuctions}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <Card>
-                <CardContent>
-                  <Typography>Ended Auctions</Typography>
-                  <Typography variant="h5">
-                    {endedAuctions}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-
-          {alerts.length > 0 && (
-            <Box mt={3}>
-              <Typography variant="subtitle1" color="error">
-                Alerts
-              </Typography>
-              {alerts.map((alert, i) => (
-                <Alert key={i} severity="warning" sx={{ my: 1 }}>
-                  {alert.message}
-                </Alert>
-              ))}
-            </Box>
-          )}
-
-          <Divider sx={{ my: 4 }} />
-
-          {/* Products Stats */}
-          <Typography variant="h6" mt={3} mb={1}>
-            Product Overview
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={4}>
-              <Card>
-                <CardContent>
-                  <Typography>Total Products</Typography>
-                  <Typography variant="h5">
-                    {totalProductsCount}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Card>
-                <CardContent>
-                  <Typography>Active Products</Typography>
-                  <Typography variant="h5">
-                    {activeProducts}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Card>
-                <CardContent>
-                  <Typography>Sold Products</Typography>
-                  <Typography variant="h5">
-                    {soldProducts}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-
-          <Divider sx={{ my: 4 }} />
-
-          {/* Orders Stats */}
-          <Typography variant="h6" mt={3} mb={1}>
-            Orders Overview
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={4}>
-              <Card>
-                <CardContent>
-                  <Typography>Total Orders</Typography>
-                  <Typography variant="h5">
-                    {totalOrders}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Card>
-                <CardContent>
-                  <Typography>Completed Orders</Typography>
-                  <Typography variant="h5">
-                    {paidOrders}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Card>
-                <CardContent>
-                  <Typography>Pending Orders</Typography>
-                  <Typography variant="h5">
-                    {pendingPayments}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-        </>
-    </Box>
-  );
+                                <SalesBySizeGraph data={report.salesBySize} />
+                                <Stack>
+                                    <Typography variant="body2" color="gray">
+                                        <b>Small items</b> are products that are
+                                        handled or shipped by logistics.{" "}
+                                        <b>Large items</b> are mainly handled by
+                                        own courier.
+                                    </Typography>
+                                </Stack>
+                            </Stack>
+                        </Stack>
+                    </Stack>
+                </SectionWrapper>
+                <SectionWrapper>
+                    <TopSalesBasedOnCategory data={report.topCategorySales}/>
+                </SectionWrapper>
+            </Stack>
+        </Box>
+    );
 };
 
 export default Reports;
