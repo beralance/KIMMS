@@ -1,8 +1,14 @@
-import * as React from 'react';
-import { Box, Container, IconButton, Stack } from '@mui/material';
-import { NavLink, useLocation } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { LayoutDashboardIcon, Package2, PackageIcon, UserPenIcon, ChartColumnBigIcon } from 'lucide-react';
+import * as React from "react";
+import { Box, Container, IconButton, Stack } from "@mui/material";
+import { NavLink, useLocation } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import {
+    LayoutDashboardIcon,
+    Package2,
+    PackageIcon,
+    UserPenIcon,
+    ChartColumnBigIcon,
+} from "lucide-react";
 
 export default function CustomBottomNav() {
     const location = useLocation();
@@ -10,18 +16,54 @@ export default function CustomBottomNav() {
 
     const navItemsByRole = {
         admin: [
-            { value: "dashboard", icon: <LayoutDashboardIcon style={{width: '18px', }}/>, path: '/admin' },
-            { value: "inventory", icon: <Package2 style={{width: '18px'}}/>, path: '/admin/inventory/manage-inventory' },
-            { value: "orders", icon: <PackageIcon style={{width: '18px'}}/>, path: '/admin/orders' },
-            { value: "reports", icon: <ChartColumnBigIcon style={{width: '18px'}}/>, path: '/admin/reports' },
-            { value: "staff", icon: <UserPenIcon style={{width: '18px'}}/>, path: '/admin/manage-staff' },
+            {
+                value: "dashboard",
+                icon: <LayoutDashboardIcon style={{ width: "18px" }} />,
+                path: "/admin",
+            },
+            {
+                value: "inventory",
+                icon: <Package2 style={{ width: "18px" }} />,
+                path: "/admin/inventory/manage-inventory",
+            },
+            {
+                value: "orders",
+                icon: <PackageIcon style={{ width: "18px" }} />,
+                path: "/admin/orders",
+            },
+            {
+                value: "reports",
+                icon: <ChartColumnBigIcon style={{ width: "18px" }} />,
+                path: "/admin/reports",
+            },
+            {
+                value: "staff",
+                icon: <UserPenIcon style={{ width: "18px" }} />,
+                path: "/admin/manage-staff",
+            },
         ],
         staff: [
-            { value: "dashboard", icon: <LayoutDashboardIcon style={{width: '18px'}}/>, path: '/staff' },
-            { value: "inventory", icon: <Package2 style={{width: '18px'}}/>, path: '/staff/inventory/manage-inventory' },
-            { value: "orders", icon: <PackageIcon style={{width: '18px'}}/>, path: '/staff/orders' },
-            { value: "reports", icon: <ChartColumnBigIcon style={{width: '18px'}}/>, path: '/staff/reports' },
-        ]
+            {
+                value: "dashboard",
+                icon: <LayoutDashboardIcon style={{ width: "18px" }} />,
+                path: "/staff",
+            },
+            {
+                value: "inventory",
+                icon: <Package2 style={{ width: "18px" }} />,
+                path: "/staff/inventory/manage-inventory",
+            },
+            {
+                value: "orders",
+                icon: <PackageIcon style={{ width: "18px" }} />,
+                path: "/staff/orders",
+            },
+            {
+                value: "reports",
+                icon: <ChartColumnBigIcon style={{ width: "18px" }} />,
+                path: "/staff/reports",
+            },
+        ],
     };
     const navItems = navItemsByRole[user?.role] || [];
 
@@ -34,9 +76,14 @@ export default function CustomBottomNav() {
             "/staff/inventory/manage-product",
             "/staff/inventory/manage-auction",
         ];
-        if (inventoryPaths.some(path => location.pathname.startsWith(path))) return "inventory";
+        if (inventoryPaths.some((path) => location.pathname.startsWith(path)))
+            return "inventory";
         const matched = navItems
-            .filter(item => location.pathname === item.path || location.pathname.startsWith(item.path + "/"))
+            .filter(
+                (item) =>
+                    location.pathname === item.path ||
+                    location.pathname.startsWith(item.path + "/")
+            )
             .sort((a, b) => b.path.length - a.path.length)[0];
         return matched?.value || "dashboard";
     })();
@@ -45,74 +92,95 @@ export default function CustomBottomNav() {
         <>
             <Box
                 sx={{
-                    position: 'fixed',
+                    position: "fixed",
                     bottom: 10,
-                    left: '5%',
-                    right: '5%',
-                    display: {xs: 'flex', md: 'none'},
-                    justifyContent: 'center',
-                    margin: '0 auto',
-                    maxWidth: '400px',
+                    left: "5%",
+                    right: "5%",
+                    display: { xs: "flex", md: "none" },
+                    justifyContent: "center",
+                    margin: "0 auto",
+                    maxWidth: "400px",
+                    zIndex: 1000,
                 }}
             >
-                <Stack 
-                    direction={'row'} 
-                    justifyContent={'space-around'} 
-                    alignItems={'center'}
-                    flex={1} 
+                <Stack
+                    direction={"row"}
+                    justifyContent={"space-around"}
+                    alignItems={"center"}
+                    flex={1}
                     sx={{
-                        bgcolor: 'rgba(0, 0, 0, 0.5)',
-                        backdropFilter: 'blur(10px)',
-                        borderRadius: '999px',
+                        bgcolor: "rgba(0, 0, 0, 0.5)",
+                        backdropFilter: "blur(10px)",
+                        borderRadius: "999px",
                         py: 1,
-                        transition: 'all .5 ease',
+                        transition: "all .5 ease",
                         boxShadow: 20,
-
                     }}
                 >
                     <Box
                         sx={{
-                            position: 'absolute',
+                            position: "absolute",
                             left: 0,
                             bottom: 5,
                             height: 5,
-                            justifyContent: 'center',
-                            display: 'flex',
+                            justifyContent: "center",
+                            display: "flex",
                             width: `${100 / navItems.length}%`,
                             minWidth: 20,
-                            borderRadius: '999px',
-                            transition: 'transform 0.3s ease',
-                            transform: `translateX(${navItems.findIndex(i => i.value === currentValue) * 100}%)`,
+                            borderRadius: "999px",
+                            transition: "transform 0.3s ease",
+                            transform: `translateX(${
+                                navItems.findIndex(
+                                    (i) => i.value === currentValue
+                                ) * 100
+                            }%)`,
                         }}
                     >
-                        <Box sx={{width: '20px', zIndex: 1, borderRadius: '999px', height: 1, bgcolor: 'white'}}/>
-                    </Box>
-                    {navItems.map(item =>
-                        <Box key={item .value}
+                        <Box
                             sx={{
-                                transition: 'all .3s ease-out',
-                                transform: currentValue === item.value ? 'translateY(-8px)' : 'none',
-                                bgcolor: currentValue === item.value ? 'transparent' : 'none',
+                                width: "20px",
+                                zIndex: 1,
+                                borderRadius: "999px",
+                                height: 1,
+                                bgcolor: "white",
+                            }}
+                        />
+                    </Box>
+                    {navItems.map((item) => (
+                        <Box
+                            key={item.value}
+                            sx={{
+                                transition: "all .3s ease-out",
+                                transform:
+                                    currentValue === item.value
+                                        ? "translateY(-8px)"
+                                        : "none",
+                                bgcolor:
+                                    currentValue === item.value
+                                        ? "transparent"
+                                        : "none",
                                 opacity: currentValue === item.value ? 1 : 0.5,
                                 //outline: currentValue === item.value ? '.5px solid white' : 'none',
-                                borderRadius: '999px',
+                                borderRadius: "999px",
                                 zIndex: 1000,
                             }}
-                        > 
-                            <IconButton
-                                component={NavLink}
-                                to={item.path}
-                            >
+                        >
+                            <IconButton component={NavLink} to={item.path}>
                                 {React.cloneElement(item.icon, {
-                                    color: 'white',
-                                    border: currentValue === item.value ? '1px solid blue' : 'white',
-                                    transition: 'all .5s ease',
-                                    fill: currentValue === item.value ? 'white' : 'none',
+                                    color: "white",
+                                    border:
+                                        currentValue === item.value
+                                            ? "1px solid blue"
+                                            : "white",
+                                    transition: "all .5s ease",
+                                    fill:
+                                        currentValue === item.value
+                                            ? "white"
+                                            : "none",
                                 })}
                             </IconButton>
                         </Box>
-                        
-                    )}
+                    ))}
                 </Stack>
             </Box>
         </>

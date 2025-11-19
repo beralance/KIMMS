@@ -51,7 +51,7 @@ export const hasRead = async (req, res) => {
     if (!userId) return;
     try {
         const unreadNotif = await Notification.find({
-            user: userId,
+            userId: userId,
             read: false,
         });
         const hasUnread = unreadNotif.length > 0;

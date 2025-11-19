@@ -50,6 +50,7 @@ import {
     TagIcon,
     HomeIcon,
 } from "lucide-react";
+import { createNotification } from "../../../backend/controllers/auctionNotificationController";
 function HideOnScroll({ children }) {
     const trigger = useScrollTrigger();
     return (
@@ -148,9 +149,10 @@ export default function UserHeader() {
         const unreadNotification = async () => {
             const notification = await hasUnreadNotifications(user?.token);
             setHasUserNotification(notification);
+            console.log("s", notification);
         };
         unreadNotification();
-    }, [user]);
+    }, [user, hasUnreadNotifications(user?.token)]);
 
     const handleUserDrawerClick = () => {
         if (!user) {

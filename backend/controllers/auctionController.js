@@ -1,8 +1,8 @@
 // controllers/auctionController.js
 import Auction from "../models/Auction.js";
 import Inventory from "../models/Inventory.js"; // ✅ Auction uses Inventory as source
-import Bid from '../models/Bid.js'
-import {createNotification} from '../controllers/auctionNotificationController.js'
+import Bid from "../models/Bid.js";
+import { createNotification } from "../controllers/auctionNotificationController.js";
 /**
  * Create a new auction
  */
@@ -20,7 +20,9 @@ export const createAuction = async (req, res) => {
         // ✅ Validate inventory exists
         const inventoryItem = await Inventory.findById(inventoryId);
         if (!inventoryItem) {
-            return res.status(404).json({ message: "Inventory item not found" });
+            return res
+                .status(404)
+                .json({ message: "Inventory item not found" });
         }
 
         // ✅ Prevent double posting
@@ -61,12 +63,12 @@ export const getAuctions = async (req, res) => {
     try {
         const auctions = await Auction.find()
             .populate({
-                path: "inventoryId", 
+                path: "inventoryId",
                 select: "productName price isLocal category status description details condition images",
                 populate: {
-                    path: 'category',
-                    select: 'name',
-                }
+                    path: "category",
+                    select: "name",
+                },
             })
             .sort({ createdAt: -1 });
 
@@ -78,7 +80,7 @@ export const getAuctions = async (req, res) => {
                     .limit(3)
                     .populate({
                         path: "userId",
-                        select: "fullName email"
+                        select: "fullName email",
                     });
 
                 return {
@@ -104,15 +106,14 @@ export const getAuctions = async (req, res) => {
  */
 export const getAuctionById = async (req, res) => {
     try {
-        const auction = await Auction.findById(req.params.id)
-            .populate({
-                path: "inventoryId",
-                select: "productName category condition details images status createdAt description",
-                populate: {
-                    path: 'category',
-                    select: 'name',
-                }
-            })
+        const auction = await Auction.findById(req.params.id).populate({
+            path: "inventoryId",
+            select: "productName category condition details images status createdAt description",
+            populate: {
+                path: "category",
+                select: "name",
+            },
+        });
 
         if (!auction) {
             return res.status(404).json({ message: "Auction not found" });
@@ -126,32 +127,33 @@ export const getAuctionById = async (req, res) => {
 
 export const deletePendingAuction = async (req, res) => {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
 
-        const auction = await Auction.findById(id).populate('inventoryId')
+        const auction = await Auction.findById(id).populate("inventoryId");
 
-        console.log('Auction found', auction)
+        console.log("Auction found", auction);
         if (!auction) {
-            return res.status(404).json({message: 'Auction not found'})
+            return res.status(404).json({ message: "Auction not found" });
         }
 
-        if (auction.status !== 'PENDING') {
-            return res.status(400).json({message: 'Only pending auctions can be deleted.'})
+        if (auction.status !== "PENDING") {
+            return res
+                .status(400)
+                .json({ message: "Only pending auctions can be deleted." });
         }
 
         if (auction.inventoryId) {
-            auction.inventoryId.status = 'available';
+            auction.inventoryId.status = "available";
             await auction.inventoryId.save();
         }
 
-        await Auction.findByIdAndDelete(id)
+        await Auction.findByIdAndDelete(id);
 
-        res.json({message: 'Auction deleted successfully'})
+        res.json({ message: "Auction deleted successfully" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
-    catch (err) {
-        res.status(500).json({error: err.message})
-    }
-}
+};
 
 /**
  * Finalize auction (mark as closed & sold if winner exists)
@@ -166,7 +168,9 @@ export const finalizeAuction = async (req, res) => {
         }
 
         if (auction.finalized) {
-            return res.status(400).json({ message: "Auction already finalized" });
+            return res
+                .status(400)
+                .json({ message: "Auction already finalized" });
         }
 
         // Mark auction as closed
@@ -197,9 +201,9 @@ export const getPastAuctions = async (req, res) => {
                 path: "inventoryId",
                 select: "productName images condition category details description",
                 populate: {
-                    path: 'category',
-                    select: 'name'
-                }
+                    path: "category",
+                    select: "name",
+                },
             })
             .sort({ endTime: -1 })
             .lean(); // convert to plain JS object
@@ -220,39 +224,50 @@ export const getPastAuctions = async (req, res) => {
 
 export const claimAuctionItem = async (req, res) => {
     try {
-        const {auctionId} = req.params;
-        const userId = req.user.id
-        
+        const { auctionId } = req.params;
+        const userId = req.user.id;
+
         const auction = await Auction.findById(auctionId)
-            .populate('winner', 'fullName email phoneNumber address')
-            .populate('inventoryId', 'productName category condition isLocal physicalCode')
+            .populate("winner", "fullName email phoneNumber address")
+            .populate(
+                "inventoryId",
+                "productName category condition isLocal physicalCode"
+            );
 
-        if (!auction) return res.status(404).json({message: 'Auction not found'})
-        if (auction.status !== 'PENDING_CLAIM')
-            return res.status(400).json({message: 'Auction not open for claiming'})
+        if (!auction)
+            return res.status(404).json({ message: "Auction not found" });
+        if (auction.status !== "PENDING_CLAIM")
+            return res
+                .status(400)
+                .json({ message: "Auction not open for claiming" });
         if (auction.winner.toString() !== userId.toString())
-            return res.status(403).json({message: 'You are not the winner'})
+            return res.status(403).json({ message: "You are not the winner" });
         if (auction.claimDeadline && auction.claimDeadline < new Date())
-            return res.status(400).json({ message: "Claim period has expired" });
+            return res
+                .status(400)
+                .json({ message: "Claim period has expired" });
 
-        res.status(200).json({message: 'Item successfully claimed', auction})
+        res.status(200).json({ message: "Item successfully claimed", auction });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
-    catch (err) {
-        res.status(500).json({message: err.message})
-    }
-}
+};
 
 export const confirmAuctionDelivery = async (req, res) => {
     try {
         const { auctionId } = req.params;
 
-        const auction = await Auction.findById(auctionId).populate('inventoryId winner', 'productName fullName');
-        if (!auction) return res.status(404).json({ message: 'Auction not found' });
+        const auction = await Auction.findById(auctionId).populate(
+            "inventoryId winner",
+            "productName fullName"
+        );
+        if (!auction)
+            return res.status(404).json({ message: "Auction not found" });
 
-        if (auction.status === 'CLAIMED')
-            return res.status(400).json({ message: 'Item already claimed or already processed' });
-
-        
+        if (auction.status === "CLAIMED")
+            return res
+                .status(400)
+                .json({ message: "Item already claimed or already processed" });
 
         await auction.save();
 
@@ -262,7 +277,10 @@ export const confirmAuctionDelivery = async (req, res) => {
             `Your item "${auction.inventoryId.productName}" has been successfully delivered. Thank you for participating!`
         );
 
-        res.status(200).json({ message: 'Auction successfully marked as completed', auction });
+        res.status(200).json({
+            message: "Auction successfully marked as completed",
+            auction,
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -273,16 +291,18 @@ export const auctionCloseCron = async () => {
         const sevenDaysAgo = new Date(Date.now() - 1 * 24 * 60 * 60 * 1000); // return to 7days
 
         const completedAuctions = await Auction.find({
-            status: 'COMPLETED',
+            status: "COMPLETED",
             deliveredAt: { $lt: sevenDaysAgo },
         });
 
         for (const auction of completedAuctions) {
-            auction.status = 'CLOSED';
+            auction.status = "CLOSED";
             await auction.save();
         }
 
-        console.log(`${completedAuctions.length} auctions closed successfully.`);
+        console.log(
+            `${completedAuctions.length} auctions closed successfully.`
+        );
     } catch (err) {
         console.error("auctionCloseCron error:", err);
     }
@@ -307,17 +327,20 @@ export const getAuctionReportStats = async (options = {}) => {
     // Period filter
     if (period) {
         let fromDate;
-        if (period === 'week') {
+        if (period === "week") {
             fromDate = new Date();
             fromDate.setDate(now.getDate() - 7);
-        } else if (period === 'month') {
+        } else if (period === "month") {
             fromDate = new Date();
             fromDate.setMonth(now.getMonth() - 1);
-        } else if (period === 'year') {
+        } else if (period === "year") {
             fromDate = new Date();
             fromDate.setFullYear(now.getFullYear() - 1);
         } else if (period.from && period.to) {
-            filter.createdAt = { $gte: new Date(period.from), $lte: new Date(period.to) };
+            filter.createdAt = {
+                $gte: new Date(period.from),
+                $lte: new Date(period.to),
+            };
         }
 
         if (fromDate && !filter.createdAt) {
@@ -329,49 +352,66 @@ export const getAuctionReportStats = async (options = {}) => {
     if (inventoryId) filter.inventoryId = inventoryId;
 
     // Fetch auctions and populate inventory
-    const auctions = await Auction.find(filter).populate('inventoryId', 'productName category');
+    const auctions = await Auction.find(filter).populate(
+        "inventoryId",
+        "productName category"
+    );
 
     // Category filter (after populate)
     const filteredAuctions = category
-        ? auctions.filter(a => a.inventoryId?.category?.toString() === category.toString())
+        ? auctions.filter(
+              (a) => a.inventoryId?.category?.toString() === category.toString()
+          )
         : auctions;
 
     // Counts
     const totalAuctions = filteredAuctions.length;
-    const liveAuctions = filteredAuctions.filter(a => a.status === 'LIVE').length;
-    const pendingAuctions = filteredAuctions.filter(a => a.status === 'PENDING').length;
-    const endedAuctions = filteredAuctions.filter(a => a.status === 'ENDED').length;
-    const closedAuctions = filteredAuctions.filter(a => a.status === 'CLOSED').length;
+    const liveAuctions = filteredAuctions.filter(
+        (a) => a.status === "LIVE"
+    ).length;
+    const pendingAuctions = filteredAuctions.filter(
+        (a) => a.status === "PENDING"
+    ).length;
+    const endedAuctions = filteredAuctions.filter(
+        (a) => a.status === "ENDED"
+    ).length;
+    const closedAuctions = filteredAuctions.filter(
+        (a) => a.status === "CLOSED"
+    ).length;
 
     // Alerts
     const alerts = [];
 
     // Pending auctions starting soon
     filteredAuctions
-        .filter(a => a.status === 'PENDING')
-        .forEach(a => {
+        .filter((a) => a.status === "PENDING")
+        .forEach((a) => {
             const diffMs = new Date(a.startTime) - now;
             if (diffMs > 0 && diffMs <= pendingHours * 60 * 60 * 1000) {
                 const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-                const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                const diffMinutes = Math.floor(
+                    (diffMs % (1000 * 60 * 60)) / (1000 * 60)
+                );
                 alerts.push({
-                    type: 'pending_start',
-                    message: `Auction '${a.inventoryId.productName}' starts in ${diffHours}h ${diffMinutes}m.`
+                    type: "pending_start",
+                    message: `Auction '${a.inventoryId.productName}' starts in ${diffHours}h ${diffMinutes}m.`,
                 });
             }
         });
 
-   // Live auctions ending soon
+    // Live auctions ending soon
     filteredAuctions
-        .filter(a => a.status === 'LIVE')
-        .forEach(a => {
+        .filter((a) => a.status === "LIVE")
+        .forEach((a) => {
             const diffMs = new Date(a.endTime) - now;
             if (diffMs > 0 && diffMs <= liveHours * 60 * 60 * 1000) {
                 const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-                const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                const diffMinutes = Math.floor(
+                    (diffMs % (1000 * 60 * 60)) / (1000 * 60)
+                );
                 alerts.push({
-                    type: 'live_end',
-                    message: `Auction '${a.inventoryId.productName}' ending in ${diffHours}h ${diffMinutes}m.`
+                    type: "live_end",
+                    message: `Auction '${a.inventoryId.productName}' ending in ${diffHours}h ${diffMinutes}m.`,
                 });
             }
         });
@@ -382,6 +422,6 @@ export const getAuctionReportStats = async (options = {}) => {
         pendingAuctions,
         endedAuctions,
         closedAuctions,
-        alerts
+        alerts,
     };
-}
+};
