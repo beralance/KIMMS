@@ -24,6 +24,7 @@ import {
     markNotificationAsRead,
 } from "../../../utils/notificationApi";
 import { useAuth } from "../../../contexts/AuthContext";
+import FullScreenLoader from "../../../components/FullScreenLoader";
 import { useNavigate } from "react-router-dom";
 import {} from "lucide-react";
 

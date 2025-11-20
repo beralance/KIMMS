@@ -1,6 +1,7 @@
 import Bid from "../models/Bid.js";
 import Auction from "../models/Auction.js";
 import User from "../models/User.js";
+import Order from "../models/Order.js";
 
 // Place a bid (sealed)
 export const placeBid = async (req, res) => {
@@ -11,6 +12,12 @@ export const placeBid = async (req, res) => {
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ message: "User not found" });
 
+        if (user.auctionRestriction) {
+            return res.status(403).json({
+                message:
+                    "You cannot participate in auction due to bad activities",
+            });
+        }
         const missingFields = [];
 
         if (!user.fullName?.trim()) missingFields.push("fullName");
@@ -40,6 +47,38 @@ export const placeBid = async (req, res) => {
             });
         }
 
+        const totalSuccessfulPurchases = await Order.aggregate([
+            {
+                $match: {
+                    userId: user._id,
+                    orderStatus: "SUCCESSFUL",
+                    paymentStatus: "paid",
+                    orderType: "fixed",
+                },
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalAmount: { $sum: "$finalPrice" },
+                },
+            },
+        ]);
+
+        const totalAmount = totalSuccessfulPurchases[0]?.totalAmount
+            ? totalSuccessfulPurchases[0].totalAmount
+            : 0;
+
+        console.log("total Amount", totalAmount);
+
+        if (totalAmount < 10000) {
+            return res.status(400).json({
+                message:
+                    "You do not meet the minimum purchase requirement to join this auction.",
+                required: 10000,
+                currentTotal: totalAmount,
+            });
+        }
+
         // ✅ Validate auction exists
         const auction = await Auction.findById(auctionId);
         if (!auction)
@@ -57,8 +96,30 @@ export const placeBid = async (req, res) => {
                 .json({ message: `Bid must be at least ${minAllowed}` });
         }
 
-        // ✅ Save bid (sealed: no real-time visibility)
-        const bid = new Bid({ auctionId, userId, amount });
+        let bid = await Bid.findOne({ auctionId, userId, status: "ACTIVE" });
+        console.log("BID", bid);
+        if (bid) {
+            if (!bid.canEdit) {
+                return res
+                    .status(400)
+                    .json({ message: "You already edited your bid once" });
+            }
+            bid.amount = amount;
+            bid.canEdit = false;
+            await bid.save();
+            return res
+                .status(200)
+                .json({ message: "Bid updated successfully" });
+        }
+
+        bid = new Bid({
+            auctionId,
+            userId,
+            amount,
+            canEdit: true,
+            canCancel: true,
+            status: "ACTIVE",
+        });
         await bid.save();
 
         res.status(201).json({ message: "Bid placed successfully" });
@@ -84,6 +145,59 @@ export const getBidsByAuction = async (req, res) => {
 
         res.json(bids);
     } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+export const cancelBid = async (req, res) => {
+    try {
+        const { auctionId } = req.body;
+        const userId = req.user.id;
+
+        const bid = await Bid.findOne({ auctionId, userId, status: "ACTIVE" });
+        if (!bid)
+            return res
+                .status(404)
+                .json({ message: "No active bid found to cancel" });
+
+        if (!bid.canCancel) {
+            return res
+                .status(400)
+                .json({ message: "You have already used your cancel option" });
+        }
+
+        const auction = await Auction.findById(auctionId);
+        if (!auction)
+            return res.status(404).json({ message: "Auction not found" });
+
+        const now = new Date();
+        const auctionEnd = new Date(auction.endTime);
+        const diffMinutes = (auctionEnd - now) / (1000 * 60);
+
+        if (diffMinutes <= 10) {
+            return res.status(400).json({
+                message: "Cannot cancel withing 10 minutes of auction end",
+            });
+        }
+
+        bid.status = "CANCELLED";
+        bid.canCancel = false;
+        bid.canEdit = false;
+        await bid.save();
+
+        const user = await User.findById(userId);
+        user.badRecords += 1;
+        if (user.badRecords >= 5) {
+            user.auctionRestriction = true;
+            console.log(
+                `Auction Finalize: User ${user.fullName} is RESTRICTED to participate in auction.`
+            );
+        }
+        await user.save();
+
+        res.status(200).json({ message: "Bid cancelled successfully" });
+    } catch (err) {
+        console.error("Error cancelling bid:", err);
         res.status(500).json({ error: err.message });
     }
 };

@@ -10,13 +10,13 @@ import {
     FormControl,
     FormHelperText,
     Stack,
-    Divider
+    Divider,
 } from "@mui/material";
 import axios from "axios";
 import { useAuth } from "../../../../contexts/AuthContext";
 import { toTitleCase } from "../../../../utils/stringUtils";
 import { Category, ChevronRightRounded } from "@mui/icons-material";
-import {useSnackbar} from '../../../../contexts/SnackbarContext'
+import { useSnackbar } from "../../../../contexts/SnackbarContext";
 import { InventoryContext } from "../../../../contexts/InventoryContext";
 import { useContext } from "react";
 
@@ -29,59 +29,60 @@ const ManageAuction = () => {
     const [description, setDescription] = useState("");
     const [errors, setErrors] = useState({});
     const [message, setMessage] = useState("");
-    const { token } = useAuth()
-    const [loading, setLoading] = useState(false)
-    const [fixedAmount, setFixedAmount] = useState(0)
-    const [duration, setDuration] = useState('')
-    const [search, setSearch] = useState('')
-    const {showSnackbar} = useSnackbar()
-    const { inventoryItems, fetchInventoryItems} = useContext(InventoryContext)
+    const { token } = useAuth();
+    const [loading, setLoading] = useState(false);
+    const [fixedAmount, setFixedAmount] = useState(0);
+    const [duration, setDuration] = useState("");
+    const [search, setSearch] = useState("");
+    const { showSnackbar } = useSnackbar();
+    const { inventoryItems, fetchInventoryItems } =
+        useContext(InventoryContext);
     const API_URL = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
         if (startTime && endTime) {
             const start = new Date(startTime);
-            const end = new Date(endTime)
+            const end = new Date(endTime);
 
             if (end > start) {
                 const diffMs = end - start;
-                const diffHours = diffMs / (1000 * 60 * 60)
+                const diffHours = diffMs / (1000 * 60 * 60);
                 const days = Math.floor(diffHours / 24);
-                const hours = Math.floor(diffHours % 24)
-                const minutes = Math.round((diffHours * 60) % 60)
+                const hours = Math.floor(diffHours % 24);
+                const minutes = Math.round((diffHours * 60) % 60);
 
-                let durationStr = ''
-                if (days > 0) durationStr += `${days} day${days > 1 ? 's ' : ' '}`
-                if (hours > 0) durationStr += `${hours} hour${hours > 1 ? 's ' : ' '}`
-                if (minutes > 0) durationStr += `${minutes} min${minutes > 1 ? 's ' : ' '}`
-                
-                setDuration(durationStr.trim())
+                let durationStr = "";
+                if (days > 0)
+                    durationStr += `${days} day${days > 1 ? "s " : " "}`;
+                if (hours > 0)
+                    durationStr += `${hours} hour${hours > 1 ? "s " : " "}`;
+                if (minutes > 0)
+                    durationStr += `${minutes} min${minutes > 1 ? "s " : " "}`;
+
+                setDuration(durationStr.trim());
+            } else {
+                setDuration("");
             }
-            else {
-                setDuration('')
-            }
+        } else {
+            setDuration("");
         }
-        else {
-            setDuration('')
-        }
-    }, [startTime, endTime])
-    
+    }, [startTime, endTime]);
+
     useEffect(() => {
-        fetchInventoryItems()
-    }, [])
-    
+        fetchInventoryItems();
+    }, []);
+
     useEffect(() => {
         if (selectedItem) {
-            const item = inventoryItems.find(i => i._id === selectedItem);
-            if(item) {
-                setStartPrice(item.price)
+            const item = inventoryItems.find((i) => i._id === selectedItem);
+            if (item) {
+                setStartPrice(item.price);
             }
         }
-    }, [selectedItem, inventoryItems])
-    
-    const filteredInventory = inventoryItems.filter((item) => {
+    }, [selectedItem, inventoryItems]);
 
-    const query = search.toLowerCase();
+    const filteredInventory = inventoryItems.filter((item) => {
+        const query = search.toLowerCase();
         return (
             item.productName.toLowerCase().includes(query) ||
             item.category?.name?.toLowerCase().includes(query) ||
@@ -91,14 +92,15 @@ const ManageAuction = () => {
     });
 
     const validate = () => {
-        const errs = {};    
+        const errs = {};
         const now = new Date();
         const fiveMinFromNow = new Date(now.getTime() + 1 * 60 * 1000); // change to 5 min
         const minDurationMs = 1 * 60 * 1000; // change to 1 hour
         const maxDurationMs = 7 * 24 * 60 * 60 * 1000; // 7 days
 
         if (!selectedItem) errs.selectedItem = "Select an inventory item.";
-        if (!startPrice || startPrice <= 0) errs.startPrice = "Starting price must be greater than 0.";
+        if (!startPrice || startPrice <= 0)
+            errs.startPrice = "Starting price must be greater than 0.";
         if (!reservePrice || reservePrice <= 0) {
             errs.reservePrice = "Reserve price must be greater than 0.";
         } else if (reservePrice < startPrice) {
@@ -138,7 +140,7 @@ const ManageAuction = () => {
         if (Object.keys(errs).length > 0) return;
 
         try {
-            setLoading(true)
+            setLoading(true);
             await axios.post(
                 `${API_URL}/api/auctions`,
                 {
@@ -152,9 +154,9 @@ const ManageAuction = () => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 
-            showSnackbar("Auction created successfully!", 'success');
-            
-            await fetchInventoryItems()
+            showSnackbar("Auction created successfully!", "success");
+
+            await fetchInventoryItems();
 
             setSelectedItem("");
             setStartPrice("");
@@ -163,12 +165,12 @@ const ManageAuction = () => {
             setReservePrice("");
             setDescription("");
             setErrors({});
-            
         } catch (err) {
             console.error("Auction create error:", err);
-            setMessage(err.response?.data?.message || "Failed to create auction");
-        }
-        finally {
+            setMessage(
+                err.response?.data?.message || "Failed to create auction"
+            );
+        } finally {
             setLoading(false);
         }
     };
@@ -176,25 +178,40 @@ const ManageAuction = () => {
     const minDateTime = new Date().toISOString().slice(0, 16);
 
     return (
-        <Box sx={{mx: "auto"}}>
-            <Stack direction={'row'} alignItems={'center'} gap={2} sx={{m: 2}}>
-                <img src="/time.svg" alt="time" style={{width: 50, opacity: .8}}/>
+        <Box sx={{ mx: "auto" }}>
+            <Stack
+                direction={"row"}
+                alignItems={"center"}
+                gap={2}
+                sx={{ m: 2 }}
+            >
+                <img
+                    src="/time.svg"
+                    alt="time"
+                    style={{ width: 50, opacity: 0.8 }}
+                />
                 <Box>
                     <Typography variant="body2" color="grey">
-                        "Fill in the item details to include them in the auction list. Complete and clear information helps attract more bidders."
+                        "Fill in the item details to include them in the auction
+                        list. Complete and clear information helps attract more
+                        bidders."
                     </Typography>
                 </Box>
             </Stack>
             <form onSubmit={handleSubmit}>
-                <FormControl fullWidth margin="normal" error={!!errors.selectedItem} >
+                <FormControl
+                    fullWidth
+                    margin="normal"
+                    error={!!errors.selectedItem}
+                >
                     <InputLabel id="inventory-label">Inventory Item</InputLabel>
                     <Select
                         MenuProps={{
                             MenuListProps: {
                                 sx: {
                                     paddingTop: 2,
-                                }
-                            }
+                                },
+                            },
                         }}
                         labelId="inventory-label"
                         value={selectedItem}
@@ -203,52 +220,81 @@ const ManageAuction = () => {
                         {filteredInventory.length > 0 ? (
                             filteredInventory.map((item) => (
                                 <MenuItem key={item._id} value={item._id}>
-                                    <Stack direction={'row'} alignItems={'center'} gap={2} width={'100%'} sx={{pr: 2}}>
-                                        <img 
-                                            src={`${item.images[0]}`} 
-                                            alt={item.productName} 
+                                    <Stack
+                                        direction={"row"}
+                                        alignItems={"center"}
+                                        gap={2}
+                                        width={"100%"}
+                                        sx={{ pr: 2 }}
+                                    >
+                                        <img
+                                            src={`${item.images[0]}`}
+                                            alt={item.productName}
                                             style={{
-                                                aspectRatio: '1/1', 
-                                                borderRadius: 5, 
-                                                width: 80, 
+                                                aspectRatio: "1/1",
+                                                borderRadius: 5,
+                                                width: 80,
                                                 height: 80,
-                                                objectFit: 'cover'
+                                                objectFit: "cover",
                                             }}
                                         />
-                                        <Stack width={'100%'}>
-                                            <Typography variant="body1" color="initial">
+                                        <Stack width={"100%"}>
+                                            <Typography
+                                                variant="body1"
+                                                color="initial"
+                                            >
                                                 {item.productName}
                                             </Typography>
-                                            <Divider/>
-                                            <Typography variant="body2" noWrap maxWidth={200} color="grey">
-                                                {`Php ${item.price} | ${item.isLocal ? 'Local' : 'international'}`}
+                                            <Divider />
+                                            <Typography
+                                                variant="body2"
+                                                noWrap
+                                                maxWidth={200}
+                                                color="grey"
+                                            >
+                                                {`Php ${item.price} | ${
+                                                    item.isLocal
+                                                        ? "Large"
+                                                        : "Small"
+                                                } item`}
                                             </Typography>
-                                            <Typography variant="body2" color="grey">
+                                            <Typography
+                                                variant="body2"
+                                                color="grey"
+                                            >
                                                 {`${item.category?.name} | ${item.condition}`}
                                             </Typography>
                                         </Stack>
-
                                     </Stack>
                                 </MenuItem>
-                                )))
-                                :
-                                (
-                                    <MenuItem disabled>
-                                        <Stack sx={{width: '100%', my: 2}} justifyContent={'center'} alignItems={'center'}>
-                                            <img src="/emoji-sick-svgrepo-com.svg" alt="emoji-sick" style={{width: 50}}/>
-                                            <Typography variant="body2" color="initial">
-                                                No Items found
-                                            </Typography>
-                                        </Stack>
-                                    </MenuItem>
-                                )
-                            }
+                            ))
+                        ) : (
+                            <MenuItem disabled>
+                                <Stack
+                                    sx={{ width: "100%", my: 2 }}
+                                    justifyContent={"center"}
+                                    alignItems={"center"}
+                                >
+                                    <img
+                                        src="/emoji-sick-svgrepo-com.svg"
+                                        alt="emoji-sick"
+                                        style={{ width: 50 }}
+                                    />
+                                    <Typography variant="body2" color="initial">
+                                        No Items found
+                                    </Typography>
+                                </Stack>
+                            </MenuItem>
+                        )}
                     </Select>
-                    {errors.selectedItem && <FormHelperText>{errors.selectedItem}</FormHelperText>}
+                    {errors.selectedItem && (
+                        <FormHelperText>{errors.selectedItem}</FormHelperText>
+                    )}
                 </FormControl>
 
                 <Typography variant="body2" color="grey">
-                    * The starting price for the auction item will be set based on its current inventory price.
+                    * The starting price for the auction item will be set based
+                    on its current inventory price.
                 </Typography>
                 <TextField
                     label="Starting Price"
@@ -259,10 +305,11 @@ const ManageAuction = () => {
                     margin="normal"
                     error={!!errors.startPrice}
                     helperText={errors.startPrice}
-                    InputProps={{readOnly: true}}
+                    InputProps={{ readOnly: true }}
                 />
                 <Typography variant="body2" color="grey">
-                    * The reserve price sets the minimum acceptable bid. The product will not be sold unless this price is reached.
+                    * The reserve price sets the minimum acceptable bid. The
+                    product will not be sold unless this price is reached.
                 </Typography>
                 <TextField
                     label="Reserve Price"
@@ -277,7 +324,8 @@ const ManageAuction = () => {
                 />
 
                 <Typography variant="body2" color="grey">
-                    * Please double-check the auction start-end date and time to ensure accuracy to avoid scheduling issues.
+                    * Please double-check the auction start-end date and time to
+                    ensure accuracy to avoid scheduling issues.
                 </Typography>
                 <TextField
                     label="Start Time"
@@ -291,7 +339,7 @@ const ManageAuction = () => {
                     error={!!errors.startTime}
                     helperText={errors.startTime}
                 />
-                
+
                 <TextField
                     label="End Time"
                     type="datetime-local"
@@ -306,7 +354,11 @@ const ManageAuction = () => {
                 />
                 {duration && (
                     <Stack>
-                        <Typography variant="body2" color="secondary" sx={{ml: .5}}>
+                        <Typography
+                            variant="body2"
+                            color="secondary"
+                            sx={{ ml: 0.5 }}
+                        >
                             <b>Duration:</b> {duration}
                         </Typography>
                     </Stack>
@@ -321,13 +373,20 @@ const ManageAuction = () => {
                     multiline
                     rows={3}
                 />
-                <Stack direction={'row'} alignItems={'center'}>
+                <Stack direction={"row"} alignItems={"center"}>
                     <Typography variant="body2" color="grey">
-                        <b>Note: </b> Make sure everything is correct before finalizing the auction entry.
+                        <b>Note: </b> Make sure everything is correct before
+                        finalizing the auction entry.
                     </Typography>
-                    <Box sx={{ py: 2}}>
-                        <Button type="submit" variant="contained" color="secondary" sx={{width: 150 }} disabled={loading}>
-                            {loading ? 'Creating...' : 'Create Auction'}
+                    <Box sx={{ py: 2 }}>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            color="secondary"
+                            sx={{ width: 150 }}
+                            disabled={loading}
+                        >
+                            {loading ? "Creating..." : "Create Auction"}
                         </Button>
                     </Box>
                 </Stack>

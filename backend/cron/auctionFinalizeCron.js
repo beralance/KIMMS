@@ -9,7 +9,7 @@ export const auctionFinalizeCron = () => {
     cron.schedule("* * * * *", async () => {
         try {
             const now = new Date();
-
+            const MAX_BAD_RECORDS = 5;
             const stage1Auctions = await Auction.find({
                 status: "ENDED",
                 cooldownUntil: { $lte: now },
@@ -120,7 +120,7 @@ export const auctionFinalizeCron = () => {
                         auction.status = "PENDING_CLAIM";
                         auction.claimStage = 1;
                         auction.claimDeadline = new Date(
-                            Date.now() + 24 * 60 * 60 * 1000
+                            Date.now() + 5 * 60 * 1000
                         );
                         auction.winnerNotified = "Top1";
 
@@ -170,27 +170,55 @@ export const auctionFinalizeCron = () => {
                     const bids = await Bid.find({ auctionId: auction._id })
                         .sort({ amount: -1, createdAt: 1 })
                         .limit(3)
-                        .populate("userId", "fullName email");
+                        .populate(
+                            "userId",
+                            "fullName email badRecords auctionRestriction"
+                        );
 
                     if (auction.winnerClaimed === false) {
                         auction.claimStage = 2;
                         auction.claimDeadline = new Date(
-                            Date.now() + 24 * 60 * 60 * 1000
+                            Date.now() + 5 * 60 * 1000
                         );
                         auction.winnerNotified = "Top2";
 
-                        if (bids[1]) auction.winner = bids[1].userId;
+                        const firstBidder = bids[0]?.userId || null;
+                        const secondBidder = bids[1]?.userId || null;
 
-                        if (bids[0])
+                        if (firstBidder) {
+                            firstBidder.badRecords += 1;
+
+                            if (firstBidder.badRecords > MAX_BAD_RECORDS) {
+                                firstBidder.auctionRestriction = true;
+                                console.log(
+                                    `Auction Finalize: User ${firstBidder.fullName} is RESTRICTED to participate in auction.`
+                                );
+                            }
+                            await firstBidder.save();
+                        } else {
+                            console.log(
+                                "No 1st bidder — skipping bad record increment."
+                            );
+                        }
+
+                        if (secondBidder) {
+                            auction.winner = secondBidder._id;
+                        } else {
+                            auction.winner = null;
+                            auction.claimStage = 3;
+                            auction.claimDeadline = new Date();
+                        }
+
+                        if (firstBidder)
                             await createNotification(
-                                bids[0].userId._id,
+                                firstBidder._id,
                                 auction._id,
                                 `You failed to claim "${auction.inventoryId?.productName}". You can no longer purchase the item.`,
                                 "Claim Period Expired"
                             );
-                        if (bids[1])
+                        if (secondBidder)
                             await createNotification(
-                                bids[1].userId._id,
+                                secondBidder._id,
                                 auction._id,
                                 `You are now the top bidder of "${auction.inventoryId?.productName}"! Please claim and pay within 24 hours.`,
                                 "You're Now the Top Bidder"
@@ -223,22 +251,50 @@ export const auctionFinalizeCron = () => {
                     if (auction.winnerClaimed === false) {
                         auction.claimStage = 3;
                         auction.claimDeadline = new Date(
-                            Date.now() + 24 * 60 * 60 * 1000
+                            Date.now() + 5 * 60 * 1000
                         );
                         auction.winnerNotified = "Top3";
 
-                        if (bids[2]) auction.winner = bids[2].userId;
+                        const secondBidder = bids[1]?.userId || null;
+                        const thirdBidder = bids[2]?.userId || null;
 
-                        if (bids[1])
+                        console.log("secondBidder", secondBidder);
+                        console.log("thirdBidder", thirdBidder);
+
+                        if (secondBidder) {
+                            secondBidder.badRecords += 1;
+
+                            if (secondBidder.badRecords >= MAX_BAD_RECORDS) {
+                                secondBidder.auctionRestriction = true;
+                                console.log(
+                                    `Auction Finalize: User ${secondBidder.fullName} is RESTRICTED to participate in auction.`
+                                );
+                            }
+                            await secondBidder.save();
+                        } else {
+                            console.log(
+                                "No 2nd bidder — skipping bad record increment."
+                            );
+                        }
+
+                        if (thirdBidder) {
+                            auction.winner = thirdBidder._id;
+                        } else {
+                            auction.winner = null;
+                            auction.claimStage = 3;
+                            auction.claimDeadline = new Date();
+                        }
+
+                        if (secondBidder)
                             await createNotification(
-                                bids[1].userId._id,
+                                secondBidder._id,
                                 auction._id,
                                 `You failed to claim "${auction.inventoryId?.productName}". You can no longer purchase the item.`,
                                 "Claim Period Expired"
                             );
-                        if (bids[2])
+                        if (thirdBidder)
                             await createNotification(
-                                bids[2].userId._id,
+                                thirdBidder._id,
                                 auction._id,
                                 `You are now the top bidder of "${auction.inventoryId?.productName}"! Please claim and pay within 24 hours.`,
                                 "You're Now the Top Bidder"
@@ -279,13 +335,33 @@ export const auctionFinalizeCron = () => {
                         auction.winnerNotified = "No notification claim";
                         auction.winner = null;
                         auction.finalized = true;
-                        if (bids[2])
+
+                        const thirdBidder = bids[2]?.userId || null;
+
+                        if (thirdBidder) {
+                            thirdBidder.badRecords += 1;
+
+                            if (thirdBidder.badRecords >= MAX_BAD_RECORDS) {
+                                thirdBidder.auctionRestriction = true;
+                                console.log(
+                                    `User ${thirdBidder.fullName} reached max bad records and is now restricted.`
+                                );
+                            }
+                            await thirdBidder.save();
+                        } else {
+                            console.log(
+                                "No 3rd bidder — skipping bad record increment."
+                            );
+                        }
+
+                        if (thirdBidder)
                             await createNotification(
-                                bids[2].userId._id,
+                                thirdBidder._id,
                                 auction._id,
                                 `You failed to claim "${auction.inventoryId?.productName}". You can no longer purchase the item.`,
                                 "Claim Period Expired"
                             );
+
                         await auction.save();
 
                         const inventoryItem = await Inventory.findById(

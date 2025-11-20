@@ -719,15 +719,8 @@ export default function ProductForm({ productId, onClose }) {
                 </FormControl>
 
                 {/*IsLocal or International SWITCH*/}
-                <Stack sx={{ mb: 2 }}>
+                <Stack sx={{ mb: 2, gap: 2 }}>
                     <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-                        <Typography
-                            variant="body1"
-                            fontWeight="bold"
-                            color="secondary"
-                        >
-                            Availability:
-                        </Typography>
                         <Box
                             sx={{
                                 display: "flex",
@@ -736,9 +729,19 @@ export default function ProductForm({ productId, onClose }) {
                                 width: "100%",
                             }}
                         >
-                            <Typography variant="body1" color="secondary">
-                                {isLocal ? "Local" : "International"}
-                            </Typography>
+                            <Stack>
+                                <Typography
+                                    variant="body2"
+                                    fontWeight="bold"
+                                    color="secondary"
+                                >
+                                    Available for:
+                                </Typography>
+                                <Typography variant="body1" color="secondary">
+                                    {isLocal ? "Local" : "International"}{" "}
+                                    customers
+                                </Typography>
+                            </Stack>
                             <FormControlLabel
                                 control={
                                     <Switch

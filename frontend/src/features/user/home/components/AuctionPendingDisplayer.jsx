@@ -1,19 +1,7 @@
-import React from 'react'
-import {} from 'lucide-react'
-import { Box, Stack } from '@mui/material'
+import React from "react";
 
+const AuctionPendingDisplayer = ({ data }) => {
+    return <div></div>;
+};
 
-const AuctionPendingDisplayer = ({auction}) => {
-    return (
-        <>
-           
-            <Box>
-                <Stack>
-                </Stack>
-            </Box>
-          
-        </>
-    )
-}
-
-export default AuctionPendingDisplayer
+export default AuctionPendingDisplayer;

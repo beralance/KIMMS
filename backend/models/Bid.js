@@ -7,6 +7,9 @@ const bidSchema = new mongoose.Schema(
             ref: "Auction",
             required: true,
         },
+        canEdit: {type: Boolean, default: true},
+        canCancel: {type: Boolean, default: true},
+        status: {type: String, enum: ['ACTIVE', 'CANCELLED']},
         userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",

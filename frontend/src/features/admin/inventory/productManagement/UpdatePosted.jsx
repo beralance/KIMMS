@@ -200,7 +200,7 @@ export default function ProductForm({productId, productData, onClose}) {
                                 <Typography variant="body2" color="secondary" fontWeight={'bold'}>Tags: </Typography>
                                 <Stack direction={'row'} gap={1} alignItems={'flex-start'} flexWrap={'wrap'}>
                                     <Stack direction={'row'} sx={{border: '1px solid gray', width: 'auto', px: 2, py: .5, borderRadius: '999px'}} alignItems={'center'} gap={1}>
-                                        <Typography variant="body2" noWrap color="secondary">{productData.isLocal ? 'Local' : 'International'}</Typography>
+                                        <Typography variant="body2" noWrap color="secondary">{productData.isLocal ? 'Large' : 'Small'} item</Typography>
                                     </Stack>
                                     <Stack direction={'row'} sx={{border: '1px solid gray', px: 2, py: .5, borderRadius: '999px'}} alignItems={'center'} gap={1}>
                                         <Typography variant="body2" noWrap color="secondary">{productData.condition}</Typography>

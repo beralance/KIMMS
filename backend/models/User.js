@@ -43,6 +43,8 @@ const userSchema = new mongoose.Schema(
         },
         termsAccepted: { type: Boolean, default: false },
         termsAcceptedAt: Date,
+        badRecords: { type: Number, default: 0 },
+        auctionRestriction: { type: Boolean, default: false },
 
         // Verify fields
         isVerified: { type: Boolean, default: false },
