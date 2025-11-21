@@ -14,10 +14,9 @@ const ProductCard = ({ product }) => {
                         <Box sx={{ height: 150, width: 150 }}>
                             <img
                                 src={
-                                    product.productId?.images?.[0] ||
+                                    (product.productId?.images?.[0] || product.inventoryId?.images?.[0]) ||
                                     "/placeholder-image.svg"
                                 }
-                                alt={product.productId?.productName}
                                 style={{
                                     width: "100%",
                                     height: "100%",
@@ -37,10 +36,10 @@ const ProductCard = ({ product }) => {
                             noWrap
                             sx={{ textOverflow: "ellipsis" }}
                         >
-                            {product.productId?.productName}
+                            {product.productId?.productName || product.inventoryId?.productName}
                         </Typography>
                         <Typography variant="body2" color="secondary">
-                            PHP {formatNumber(product.productId?.price)}
+                            PHP {formatNumber(product.productId?.price || product.inventoryId?.price)}
                         </Typography>
                         <Divider sx={{ my: 1 }} />
                         <Stack gap={2}>
@@ -56,7 +55,7 @@ const ProductCard = ({ product }) => {
                                         borderRadius: "999px",
                                     }}
                                 >
-                                    {product.productId?.category?.name}
+                                    {product.productId?.category?.name || product.inventoryId?.category?.name}
                                 </Typography>
                                 <Divider
                                     orientation="vertical"
@@ -73,7 +72,7 @@ const ProductCard = ({ product }) => {
                                         borderRadius: "999px",
                                     }}
                                 >
-                                    {product.productId?.condition}
+                                    {product.productId?.condition || product.inventoryId?.condition}
                                 </Typography>
                             </Stack>
                             <Box sx={{ width: "100%" }}>
@@ -91,7 +90,7 @@ const ProductCard = ({ product }) => {
                                     }}
                                 >
                                     -{" "}
-                                    {product.productId?.isLocal
+                                    {product.productId?.isLocal || product.inventoryId?.isLocal
                                         ? "Large"
                                         : "Small"}{" "}
                                     item -{" "}

@@ -21,7 +21,7 @@ const OrderContainer = ({ order }) => {
     const handleDetailsClose = () => setOpenDetails(false);
 
     const totalAmount = order.products.reduce(
-        (acc, product) => acc + product?.productId?.price,
+        (acc, product) => acc + product?.productId?.price || product?.inventoryId?.price,
         0
     );
 

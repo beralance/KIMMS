@@ -108,7 +108,7 @@ export const getAuctionById = async (req, res) => {
     try {
         const auction = await Auction.findById(req.params.id).populate({
             path: "inventoryId",
-            select: "productName category condition details images status createdAt description",
+            select: "productName category condition details images status createdAt description weight",
             populate: {
                 path: "category",
                 select: "name",
