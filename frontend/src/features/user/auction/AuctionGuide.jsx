@@ -51,7 +51,7 @@ const guideline = [
     },
 ];
 const AuctionGuide = () => {
-    const [guideOpen, setGuideOpen] = useState(true);
+    const [guideOpen, setGuideOpen] = useState(false);
 
     return (
         <Stack gap={2}>

@@ -54,8 +54,7 @@ const InventoryChart = () => {
         };
 
         allInventoryItems.forEach((item) => {
-            if (item.status === "available") totals.available += 1;
-            if (item.status === "reserved") totals.reserve += 1;
+            if (item.status === "available" && item.status === 'available') totals.available += 1;
         });
 
         return totals;
@@ -63,18 +62,6 @@ const InventoryChart = () => {
     return (
         <Stack gap={2}>
             <Box sx={{ bgcolor: "#f8f8f8", borderRadius: 3, p: 2 }}>
-                <ButtonGroup fullWidth color="secondary" variant="outlined">
-                    {["all", "available", "reserved"].map((status) => (
-                        <Button
-                            variant="outlined"
-                            sx={{ borderRadius: 2 }}
-                            key={status}
-                            onClick={() => setSelectedStatus(status)}
-                        >
-                            {status.toUpperCase()}
-                        </Button>
-                    ))}
-                </ButtonGroup>
                 <Chart
                     onClick={(data) => setSelectedCategory(data.category)}
                     data={Array.isArray(chartData) ? chartData : []}

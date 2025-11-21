@@ -89,9 +89,7 @@ export default function OrderTab({
     // used for SEARCH TERM
     React.useEffect(() => {
         if (selectedOrder && orderData?.length > 0) {
-            console.log("TRIGGERED!!!!!!!!!!!!!");
             const targetStatus = selectedOrder.purchaseStatus?.toLowerCase();
-
             const matchedTab = statuses.findIndex(
                 (s) => s.status.toLowerCase() === targetStatus
             );

@@ -42,9 +42,9 @@ export default function ProductCardSimple ({ product, onNavigate, addToCart }) {
                 </Box>
                 <Box>
                     <Stack alignItems={'center'} gap={2}>
-                        <Stack sx={{alignItems: 'center'}}>
-                            <Stack alignItems={'center'} width={'80%'}>
-                                <Typography variant="body1" align='center' color='secondary' noWrap sx={{fontWeight: 'bold', textOverflow: 'ellipsis'}}>
+                        <Stack sx={{alignItems: 'center'}} p={1}>
+                            <Stack alignItems={'center'}>
+                                <Typography variant="body1" align='center' color='secondary' sx={{fontWeight: 'bold', textOverflow: 'ellipsis'}}>
                                     {product.productName}
                                 </Typography>
                             </Stack>

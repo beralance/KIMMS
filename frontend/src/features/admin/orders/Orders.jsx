@@ -27,7 +27,7 @@ const Orders = () => {
         const filtered = orders.filter(o => {
             try {
                 const filtered = orders.filter(o => {
-                    if (o.isActive && o.orderStatus === 'SUCCESSFUL') {
+                    if ((o.isActive && o.orderStatus === 'SUCCESSFUL') || (o.isActive && o.orderStatus === 'CANCELLED' && o.purchaseStatus === 'cancelled')) {
                         return true;
                     }
                     else {
@@ -68,6 +68,7 @@ const Orders = () => {
             handleSearch()
         }
     }
+
     return (
         <>
             <Stack bgcolor={'#f0f0f0'} height={'100%'} pb={5} py={2}>

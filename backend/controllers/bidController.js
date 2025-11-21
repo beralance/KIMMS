@@ -70,7 +70,7 @@ export const placeBid = async (req, res) => {
 
         console.log("total Amount", totalAmount);
 
-        if (totalAmount < 10000) {
+        if (totalAmount < 5000) {
             return res.status(400).json({
                 message:
                     "You do not meet the minimum purchase requirement to join this auction.",

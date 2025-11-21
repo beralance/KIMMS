@@ -21,7 +21,7 @@ const InventoryChart = ({ data, onClick }) => {
                         if(!payload || payload.length === 0) return null;
                         const data = payload[0].payload;
                         return (
-                            <Stack gap={1} sx={{bgcolor: 'white', p: 2, borderRadius: 2, boxShadow: 5}}>
+                            <Stack gap={1} sx={{bgcolor: 'white', p: 2, borderRadius: 2, boxShadow: 5, zIndex: 2000}}>
                                 <Stack>
                                     <Typography fontWeight={'bold'} variant="body1" color="secondary">
                                         {toTitleCase(label)}

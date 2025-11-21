@@ -98,9 +98,6 @@ export default function Checkout() {
             localFlag = checkoutItems.some((item) => item.productId.isLocal)
             nonLocalFlag = checkoutItems.some((item) => !item.productId.isLocal)
         }
-        console.log('SYETTT', auctionForShipping)
-        console.log('AHHHHH', localFlag)
-        console.log('HAAAAA', nonLocalFlag)
         
         if (user.isLocal) {
             const isFreeShipping = freeShippinZones.some(
@@ -110,17 +107,23 @@ export default function Checkout() {
             )
             if (isFreeShipping) {
                 fee = 0;
+                console.log("FEEEE 1", fee)
             }
             else if (localFlag && nonLocalFlag) {
                 fee = calculateShipping()
+                console.log("FEEEE 2", fee)
             }
             else if (localFlag && !nonLocalFlag) {
                 fee = calculateShipping()
+                console.log("FEEEE 3", fee)
             }
             else if (!localFlag && nonLocalFlag) {
                 let totalWeight 
                 if (auctionId || winner) {
                     totalWeight = auction?.inventoryId?.weight;
+                    console.log("WEIGHT 1", totalWeight)
+                    console.log("WEIGHT 1", auction)
+                    console.log("WEIGHT 1", auction?.inventoryId)
                 }
                 else {
                     totalWeight = checkoutItems.reduce((sum, item) => sum + (item.productId?.weight || 0), 0);
@@ -160,9 +163,11 @@ export default function Checkout() {
             }
         }
 
+        console.log('FEE FEE FEE', fee)
         setAnyProductIsLocal(localFlag)
         setAnyProductIsNotLocal(nonLocalFlag)
         setShippingFee(fee)
+
     }, [auctionForShipping, checkoutItems, auctionId, winner, user, freeShippinZones])
 
     console.log('SHIPPING FEE', shippingFee)
@@ -207,21 +212,12 @@ export default function Checkout() {
                     return;
                 }
                 
-                console.log('SF', shippingFee)
-                console.log('AMOUNT', amount)
-                console.log('INSIDE', amount + shippingFee)
-
                 setWinnerBid(amount)
                 setBidder(findBidder)
                 setAuction(matchAuction)
                 setSubtotal(amount + shippingFee)
                 setFinalPrice(amount + shippingFee)
                 setAuctionCheckout(matchAuction)
-                console.log('AUCTIONS', auctions)
-                console.log('AUCTIONS', bidders)
-                console.log('FOUND AUCTION USING PARAMS ', matchAuction)
-                console.log('FOUND BIDDER ', findBidder)
-                
             }
             catch (err) {
                 console.error('Problem fetching auction:', err)

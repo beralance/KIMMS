@@ -253,9 +253,11 @@ const Reports = () => {
                         </Stack>
                     </Stack>
                 </SectionWrapper>
+                {/*
                 <SectionWrapper>
                     <TopSalesBasedOnCategory data={report.topCategorySales}/>
                 </SectionWrapper>
+                */}
             </Stack>
         </Box>
     );

@@ -102,8 +102,8 @@ function ProductManagement() {
                                         }}
                                     >
                                         <MenuItem value="all">All</MenuItem>
-                                        {categories.map((cat) => (
-                                            <MenuItem key={cat} value={cat}>{cat}</MenuItem>
+                                        {categories.map((cat, index) => (
+                                            <MenuItem key={index} value={cat}>{cat}</MenuItem>
                                         ))}
                                     </Select>
                                 </FormControl>

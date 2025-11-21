@@ -49,7 +49,7 @@ const RequirementDrawer = ({
         );
         console.log("Total Purchase", totalPurchase);
 
-        if (totalPurchase > 10000) {
+        if (totalPurchase > 5000) {
             console.log("Valid for AUCTION!!");
             setHasValidPurchase(true);
         }

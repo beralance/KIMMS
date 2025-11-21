@@ -32,7 +32,10 @@ export const CheckoutProvider = ({ children }) => {
 
     // online checkout
     const checkout = async () => {
+        console.log('NO AUCTION CHECKOUT')
         if (!checkoutItems.length && !auctionCheckout) return;
+        console.log('Auction Checkout', auctionCheckout)
+
         console.log('auction checkout', auctionCheckout)
 
         if (auctionCheckout.length > 0){
@@ -49,7 +52,7 @@ export const CheckoutProvider = ({ children }) => {
 
         const isAuction = auctionCheckout && Object.keys(auctionCheckout).length > 0;
         const productType = isAuction 
-            ? [{ productId: auctionCheckout?.inventoryId?._id }]
+            ? [{ inventoryId: auctionCheckout?.inventoryId?._id }]
             : checkoutItems.map(item => ({productId: item.productId._id}))
         try {
             setIsProcessing(true);

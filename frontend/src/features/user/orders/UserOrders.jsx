@@ -5,11 +5,13 @@ import { Box, Divider, Container, Stack, Typography } from '@mui/material'
 import OrderContainer from './OrderContainer'
 import OrderTab from './OrderTab'
 import SectionWrapper from '../../../components/SectionWrapper'
+import {useAuth} from '../../../contexts/AuthContext'
 import FullScreenLoader from '../../../components/FullScreenLoader'
 import MostViewedProducs from './MostViewedProducs'
 
 
 const UserOrders = () => {
+    const {user} = useAuth()
     const {orders, fetchOrders} = useContext(OrderContext)
     const {products} = useContext(ProductContext)
     const [loading, setLoading] = useState(false)
@@ -29,7 +31,9 @@ const UserOrders = () => {
     }, [])
 
     const successOrders = orders.filter(o => 
-        o.isActive === true && o.orderStatus === 'SUCCESSFUL'
+        o.isActive === true &&
+        o.orderStatus === 'SUCCESSFUL' &&
+        o.userId?._id === user.userId
     );
 
     const mostViewedProduct = products

@@ -132,7 +132,7 @@ export default function OrderDetailsDrawer({open, onClose, orderData}) {
 
 
     return (
-        <Drawer anchor="bottom" open={open} onClose={onClose} sx={{ position: 'relative', width: "100%", display: {xs: 'block', md: 'none'}, }} PaperProps={{sx: {height: '90vh'}}}>
+        <Drawer anchor="bottom" open={open} onClose={onClose} sx={{ position: 'relative', width: "100%", display: {xs: 'block', md: 'none'}, }} PaperProps={{sx: {height: '80vh'}}}>
             <IconButton onClick={onClose} sx={{position: 'absolute', top: 5, right: 5}}>
                 <CloseIcon sx={{color: 'gray'}}/>
             </IconButton>

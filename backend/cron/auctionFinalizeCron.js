@@ -246,7 +246,7 @@ export const auctionFinalizeCron = () => {
                     const bids = await Bid.find({ auctionId: auction._id })
                         .sort({ amount: -1, createdAt: 1 })
                         .limit(3)
-                        .populate("userId", "fullName email");
+                        .populate("userId", "fullName email badRecords auctionRestriction");
 
                     if (auction.winnerClaimed === false) {
                         auction.claimStage = 3;
@@ -323,7 +323,7 @@ export const auctionFinalizeCron = () => {
                     const bids = await Bid.find({ auctionId: auction._id })
                         .sort({ amount: -1, createdAt: 1 })
                         .limit(3)
-                        .populate("userId", "fullName email");
+                        .populate("userId", "fullName email badRecords auctionRestriction");
 
                     if (auction.winnerClaimed === false) {
                         console.log(

@@ -178,6 +178,10 @@ export const updateOrderStatus = async (req, res) => {
         const order = await Order.findById(req.params.id);
         if (!order) return res.status(404).json({ message: "Order not found" });
 
+        if (order.paymentMethod === 'cashOnDelivery' && order.purchaseStatus === 'out_for_delivery' && paymentStatus !== 'paid') {
+            order.paymentStatus = 'paid';
+        }
+
         if (purchaseStatus) order.purchaseStatus = purchaseStatus;
         if (paymentStatus) order.paymentStatus = paymentStatus;
         if (adminNote) order.adminNote = adminNote;
