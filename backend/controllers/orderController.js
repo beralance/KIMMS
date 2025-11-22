@@ -32,6 +32,7 @@ export const getOrdersForPolling = async (req, res) => {
                 "auctionId",
                 "endtime starttime status reservePrice startPrice"
             )
+            .populate("cancelledBy", "fullName email address isLocal role")
             .sort({ createdAt: -1 });
         res.json(orders);
     } catch (err) {
@@ -202,8 +203,12 @@ export const updateOrderStatus = async (req, res) => {
         const order = await Order.findById(req.params.id);
         if (!order) return res.status(404).json({ message: "Order not found" });
 
-        if (order.paymentMethod === 'cashOnDelivery' && order.purchaseStatus === 'out_for_delivery' && paymentStatus !== 'paid') {
-            order.paymentStatus = 'paid';
+        if (
+            order.paymentMethod === "cashOnDelivery" &&
+            order.purchaseStatus === "out_for_delivery" &&
+            paymentStatus !== "paid"
+        ) {
+            order.paymentStatus = "paid";
         }
 
         if (purchaseStatus) order.purchaseStatus = purchaseStatus;
@@ -275,26 +280,55 @@ export const cancelOrder = async (req, res) => {
                 .json({ message: "Processing orders cannot be cancelled" });
         }
 
-        await Promise.all(
-            order.products.map((item) =>
-                Product.findByIdAndUpdate(item.productId, {
-                    highlight: "none",
-                    purchaseStatus: "cancelled",
-                    visibility: "cancelled",
-                })
-            )
-        );
+        const hasProductItems = order.products.some((p) => p.productId);
+        if (hasProductItems) {
+            await Promise.all(
+                order.products
+                    .filter((item) => item.productId)
+                    .map((item) =>
+                        Product.findByIdAndUpdate(item.productId, {
+                            highlight: "none",
+                            purchaseStatus: "cancelled",
+                            visibility: "cancelled",
+                        })
+                    )
+            );
 
-        await Promise.all(
-            order.products.map(async (item) => {
-                const product = await Product.findById(item.productId);
-                if (product && product.inventoryId) {
-                    await Inventory.findByIdAndUpdate(product.inventoryId, {
-                        status: "available",
-                    });
-                }
-            })
-        );
+            await Promise.all(
+                order.products
+                    .filter((item) => item.productId)
+                    .map(async (item) => {
+                        const product = await Product.findById(item.productId);
+                        if (product?.inventoryId) {
+                            return Inventory.findByIdAndUpdate(
+                                product.inventoryId,
+                                {
+                                    status: "available",
+                                }
+                            );
+                        }
+                    })
+            );
+            console.log(
+                `Cancelled -REGULAR- order: ORDER "${order._id}" update successful`
+            );
+        }
+
+        const hasInventoryItems = order.products.some((p) => p.inventoryId);
+        if (hasInventoryItems) {
+            await Promise.all(
+                order.products
+                    .filter((item) => item.inventoryId)
+                    .map((item) =>
+                        Inventory.findByIdAndUpdate(item.inventoryId, {
+                            status: "available",
+                        })
+                    )
+            );
+            console.log(
+                `Cancelled -AUCTION- order: ORDER "${order._id}" update successful`
+            );
+        }
 
         order.purchaseStatus = "cancelled";
         order.orderStatus = "CANCELLED";
@@ -357,29 +391,34 @@ export const getOrderReportStats = async (options = {}) => {
 
     const orders = await Order.find(filter);
 
-    const totalOrders = orders.length;
+    const totalOrders = orders.filter(
+        (o) => o.orderStatus === "SUCCESSFUL"
+    ).length;
     const paidOrders = orders.filter((o) => o.paymentStatus === "paid").length;
     const pendingPayments = orders.filter(
-        (o) => o.paymentStatus === "pending"
+        (o) => o.paymentStatus === "pending" && o.orderStatus === "SUCCESSFUL"
     ).length;
-    const failedPayments = orders.filter(
-        (o) => o.paymentStatus === "failed"
-    ).length;
-    const refundedOrders = orders.filter(
-        (o) => o.paymentStatus === "refunded"
-    ).length;
-
     const pendingOrders = orders.filter(
-        (o) => o.purchaseStatus === "pending"
+        (o) => o.purchaseStatus === "pending" && o.orderStatus === "SUCCESSFUL"
     ).length;
     const confirmedOrders = orders.filter(
-        (o) => o.purchaseStatus === "confirmed"
+        (o) =>
+            o.purchaseStatus === "confirmed" && o.orderStatus === "SUCCESSFUL"
     ).length;
     const processingOrders = orders.filter(
-        (o) => o.purchaseStatus === "processing"
+        (o) =>
+            o.purchaseStatus === "processing" && o.orderStatus === "SUCCESSFUL"
     ).length;
     const outForDeliveryOrders = orders.filter(
-        (o) => o.purchaseStatus === "out_for_delivery"
+        (o) =>
+            o.purchaseStatus === "out_for_delivery" &&
+            o.orderStatus === "SUCCESSFUL"
+    ).length;
+    const auctionOrders = orders.filter(
+        (o) => o.orderType === "auction" && o.orderStatus === "SUCCESSFUL"
+    ).length;
+    const fixedOrders = orders.filter(
+        (o) => o.orderType === "fixed" && o.orderStatus === "SUCCESSFUL"
     ).length;
 
     const totalRevenue = orders
@@ -388,17 +427,10 @@ export const getOrderReportStats = async (options = {}) => {
 
     const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
-    const fixedOrders = orders.filter((o) => (o.orderType = "fixed")).length;
-    const auctionOrders = orders.filter(
-        (o) => (o.orderType = "auction")
-    ).length;
-
     return {
         totalOrders,
         paidOrders,
         pendingPayments,
-        failedPayments,
-        refundedOrders,
         totalRevenue,
         averageOrderValue,
         fixedOrders,

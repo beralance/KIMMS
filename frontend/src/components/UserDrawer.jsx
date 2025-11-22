@@ -11,6 +11,8 @@ import { useAuth } from "../contexts/AuthContext";
 import CustomPopover from "../components/CustomPopover";
 import ProfilePicker from "./ProfilePicker";
 import { hasUnreadNotifications } from "../utils/notificationApi";
+import { LogOutIcon } from "lucide-react";
+import { LogoutRounded } from "@mui/icons-material";
 
 export default function UserDrawer({
     open,
@@ -202,7 +204,8 @@ export default function UserDrawer({
                                             <Box sx={{ pr: 2 }}>
                                                 <Badge
                                                     variant={
-                                                        label === "Notification"
+                                                        label ===
+                                                        "Auction Notification"
                                                             ? hasUserNotification
                                                                 ? "dot"
                                                                 : undefined
@@ -237,8 +240,14 @@ export default function UserDrawer({
                                 fullWidth
                                 color="secondary"
                                 onClick={logout}
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 2,
+                                }}
                             >
                                 Logout
+                                <LogoutRounded color="white" />
                             </Button>
                         </Box>
                     </>

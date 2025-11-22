@@ -71,6 +71,13 @@ export const categoryCountReport = async () => {
     ]);
 };
 
+export const conditionCountReport = async () => {
+    return await Product.aggregate([
+        { $match: { visibility: "active", purchaseStatus: "available" } },
+        { $group: { _id: "$condition", count: { $sum: 1 } } },
+    ]);
+};
+
 export const userCreatedReport = async (range) => {
     const dateFilter = getDateFilter(range);
 
@@ -204,7 +211,7 @@ export const auctionSalesReport = async (range) => {
                 ...dateFilter,
             },
         },
-        { $group: { _id: null, total: { $sum: "finalPrice" } } },
+        { $group: { _id: null, total: { $sum: "$finalPrice" } } },
     ]);
 };
 
@@ -219,7 +226,7 @@ export const fixedSalesReport = async (range) => {
                 ...dateFilter,
             },
         },
-        { $group: { _id: null, total: { $sum: "finalPrice" } } },
+        { $group: { _id: null, total: { $sum: "$finalPrice" } } },
     ]);
 };
 
@@ -292,7 +299,6 @@ export const topProductsReport = async (range) => {
 export const getFullReport = async (req, res) => {
     try {
         const range = req.query.range || "all";
-        console.log("Test", range);
 
         const [
             totalSales,
@@ -309,6 +315,7 @@ export const getFullReport = async (req, res) => {
             topCategorySales,
             topProducts,
             salesPerDay,
+            conditionCount,
         ] = await Promise.all([
             totalSalesReport(range),
             categoryCountReport(),
@@ -324,6 +331,7 @@ export const getFullReport = async (req, res) => {
             topCategorySalesReport(range),
             topProductsReport(range),
             salesPerDayReport(range),
+            conditionCountReport(range),
         ]);
 
         res.status(200).json({

@@ -225,7 +225,7 @@ export default function OrderTab({
                                                     <MenuItem value="fixed">
                                                         <Typography
                                                             variant="body2"
-                                                            color="secondary"
+                                                            color="primary"
                                                         >
                                                             Fixed
                                                         </Typography>
@@ -233,7 +233,7 @@ export default function OrderTab({
                                                     <MenuItem value="auction">
                                                         <Typography
                                                             variant="body2"
-                                                            color="secondary"
+                                                            color="warning"
                                                         >
                                                             Auction
                                                         </Typography>

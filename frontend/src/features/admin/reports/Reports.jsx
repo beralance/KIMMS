@@ -8,6 +8,7 @@ import {
     Select,
     Stack,
     Typography,
+    Grid,
 } from "@mui/material";
 import { fetchFullReport } from "../../../utils/fullReportApi";
 import { useState } from "react";
@@ -22,6 +23,12 @@ import StockSizeBar from "./components/StockSizeBar";
 import ReusableBarChart from "./components/ReusableBarChart";
 import SalesBySizeGraph from "./components/SalesBySizeGraph";
 import TopSalesBasedOnCategory from "./components/TopSalesBasedOnCategory";
+import SalesByOrderType from "./components/SalesByOrderType";
+import {
+    BedRounded,
+    CategoryRounded,
+    HealingRounded,
+} from "@mui/icons-material";
 
 const Reports = () => {
     const [report, setReport] = useState(null);
@@ -58,7 +65,8 @@ const Reports = () => {
                         Reports
                     </Typography>
                     <Typography variant="body2" color="gray">
-                        Reports and other stuff kase
+                        Track sales trends, user growth, and product analytics
+                        over time
                     </Typography>
                 </Stack>
                 <Stack
@@ -68,6 +76,9 @@ const Reports = () => {
                         zIndex: 1000,
                         bgcolor: "rgba(255, 255, 255, 0.2)",
                         backdropFilter: "blur(20px)",
+                        p: 2,
+                        py: 1.5,
+                        borderRadius: 2,
                     }}
                 >
                     <FormControl>
@@ -85,17 +96,64 @@ const Reports = () => {
                     </FormControl>
                 </Stack>
                 <SectionWrapper>
-                    <Box>
-                        <Typography variant="body1" color="initial">
-                            Total Sales: Php {formatNumber(report.totalSales)}
-                        </Typography>
-                    </Box>
-                    <Box>
-                        {/*change to 10 users join the website*/}
-                        <Typography variant="body1" color="initial">
-                            New Users this {reportDate}: {report.newUsers}
-                        </Typography>
-                    </Box>
+                    <Grid container spacing={1}>
+                        <Grid size={{ xs: 6 }}>
+                            <Stack
+                                alignItems={"center"}
+                                sx={{
+                                    height: 150,
+                                    bgcolor: "#7fbed6ff",
+                                    p: 2,
+                                    borderRadius: 2,
+                                    justifyContent: "center",
+                                }}
+                            >
+                                {/*change to 10 users join the website*/}
+                                <Typography
+                                    variant="h5"
+                                    color="white"
+                                    align="center"
+                                >
+                                    Php {formatNumber(report.totalSales)}
+                                </Typography>
+                                <Typography
+                                    variant="body2"
+                                    color="white"
+                                    align="center"
+                                >
+                                    total sales this {reportDate}
+                                </Typography>
+                            </Stack>
+                        </Grid>
+                        <Grid size={{ xs: 6 }}>
+                            <Stack
+                                alignItems={"center"}
+                                sx={{
+                                    height: 150,
+                                    bgcolor: "#7f8fd6ff",
+                                    p: 2,
+                                    borderRadius: 2,
+                                    justifyContent: "center",
+                                }}
+                            >
+                                {/*change to 10 users join the website*/}
+                                <Typography
+                                    variant="h4"
+                                    color="white"
+                                    align="center"
+                                >
+                                    {report.newUsers}
+                                </Typography>
+                                <Typography
+                                    variant="body2"
+                                    color="white"
+                                    align="center"
+                                >
+                                    new users this {reportDate}
+                                </Typography>
+                            </Stack>
+                        </Grid>
+                    </Grid>
                 </SectionWrapper>
                 <SectionWrapper>
                     <Stack gap={4}>
@@ -104,7 +162,7 @@ const Reports = () => {
                                 Products by Category
                             </Typography>
                             <Typography variant="body2" color="gray">
-                                cate cate this test test test
+                                Monitor the volume of products in each category.
                             </Typography>
                         </Stack>
                         <Box>
@@ -125,7 +183,7 @@ const Reports = () => {
                                 Sales this {reportDate}
                             </Typography>
                             <Typography variant="body2" color="gray">
-                                Sales this test test test
+                                View total sales for the selected time period.
                             </Typography>
                         </Stack>
                         <Box>
@@ -137,7 +195,21 @@ const Reports = () => {
                         </Box>
                     </Stack>
                 </SectionWrapper>
-
+                <SectionWrapper>
+                    <Stack>
+                        <Typography variant="body1" color="secondary">
+                            Sales by Order Type
+                        </Typography>
+                        <Typography variant="body2" color="gray">
+                            Compare total sales between fixed-price and auction
+                            orders
+                        </Typography>
+                    </Stack>
+                    <SalesByOrderType
+                        fixedData={report?.fixedSales}
+                        auctionData={report?.auctionSales}
+                    />
+                </SectionWrapper>
                 <SectionWrapper>
                     <Stack gap={4}>
                         <Stack>
@@ -145,7 +217,8 @@ const Reports = () => {
                                 Local and International Users
                             </Typography>
                             <Typography variant="body2" color="gray">
-                                cate cate this test test test
+                                Distribution of users by local and international
+                                regions
                             </Typography>
                         </Stack>
                         <LocationBarChart
@@ -209,12 +282,23 @@ const Reports = () => {
                                 Sales by Category, Condition and Product Size
                             </Typography>
                             <Typography variant="body2" color="gray">
-                                cate cate this test test test
+                                Analyze sales distribution across product
+                                categories, condition, and size over selected
+                                time periods.
                             </Typography>
                         </Stack>
                         <Stack gap={4}>
                             <Stack gap={2}>
-                                <Typography variant="body1" color="initial">
+                                <Typography
+                                    variant="body1"
+                                    color="initial"
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 1,
+                                    }}
+                                >
+                                    <CategoryRounded />
                                     Sales by Category
                                 </Typography>
                                 <ReusableBarChart
@@ -225,7 +309,16 @@ const Reports = () => {
                             </Stack>
                             <Divider />
                             <Stack gap={2}>
-                                <Typography variant="body1" color="initial">
+                                <Typography
+                                    variant="body1"
+                                    color="initial"
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 1,
+                                    }}
+                                >
+                                    <HealingRounded />
                                     Sales by Condition
                                 </Typography>
                                 <ReusableBarChart
@@ -236,7 +329,16 @@ const Reports = () => {
                             </Stack>
                             <Divider />
                             <Stack gap={2}>
-                                <Typography variant="body1" color="initial">
+                                <Typography
+                                    variant="body1"
+                                    color="initial"
+                                    sx={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 1,
+                                    }}
+                                >
+                                    <BedRounded />
                                     Sales by Size-based
                                 </Typography>
 

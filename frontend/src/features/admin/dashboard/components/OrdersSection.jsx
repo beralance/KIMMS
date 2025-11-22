@@ -8,6 +8,8 @@ const OrderSection = ({
     processingOrders,
     confirmedOrders,
     pendingOrders,
+    auctionOrders,
+    fixedOrders,
     totalOrders,
 }) => {
     return (
@@ -38,6 +40,16 @@ const OrderSection = ({
                         label: "In Transit Orders",
                         value: outForDeliveryOrders,
                         subLabel: "on the way to customer",
+                    },
+                    {
+                        label: "Auction Orders",
+                        value: auctionOrders,
+                        subLabel: "auction orders",
+                    },
+                    {
+                        label: "Fixed Orders",
+                        value: fixedOrders,
+                        subLabel: "regular orders",
                     },
                 ].map((item, index) => (
                     <Grid size={{ xs: 6 }} key={index}>

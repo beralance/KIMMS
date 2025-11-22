@@ -40,6 +40,7 @@ const Notification = () => {
             try {
                 const data = await fetchNotifications(token);
                 setNotifications(data);
+                console.log("notification data", data);
             } catch (err) {
                 console.error("Failed to load notifications:", err);
             } finally {
@@ -196,7 +197,8 @@ const Notification = () => {
                                                 {notif.auctionId?.winner ===
                                                     user.userId &&
                                                     !notif.auctionId
-                                                        ?.winnerClaimed && (
+                                                        ?.winnerClaimed &&
+                                                    notif.showClaimButton && (
                                                         <Stack>
                                                             <Button
                                                                 variant="contained"

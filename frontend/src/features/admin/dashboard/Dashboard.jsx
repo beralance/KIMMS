@@ -65,6 +65,7 @@ const Dashboard = () => {
         fixedOrders,
         paidOrders,
         pendingPayments,
+        activeProducts,
         totalOrders,
         conditionBreakdown,
     } = useReport();
@@ -211,12 +212,12 @@ const Dashboard = () => {
                             </Typography>
                         </Stack>
                         <BasicDataSection
-                            totalProducts={totalProducts}
+                            totalProducts={activeProducts + inventoryItems}
                             inventoryItems={inventoryItems}
                             totalOrders={totalOrders}
                             totalRevenue={totalRevenue}
                             liveAuctions={liveAuctions}
-                            activeListings={activeListings}
+                            activeProducts={activeProducts}
                         />
                     </SectionWrapper>
                     {/* ORDER data section*/}
@@ -236,15 +237,10 @@ const Dashboard = () => {
                             processingOrders={processingOrders}
                             outForDeliveryOrders={outForDeliveryOrders}
                             totalOrders={totalOrders}
+                            auctionOrders={auctionOrders}
+                            fixedOrders={fixedOrders}
                         />
                     </SectionWrapper>
-                    <Box>
-                        <ChartSection
-                            categoryData={categoryData}
-                            conditionData={conditionData}
-                            totalRevenue={totalRevenue}
-                        />
-                    </Box>
                     <SectionWrapper sx={{ gap: 2 }}>
                         <Stack>
                             <Typography variant="subtitle2" color="initial">

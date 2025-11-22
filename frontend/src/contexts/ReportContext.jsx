@@ -30,11 +30,9 @@ export const ReportProvider = ({ children }) => {
     // Orders
     const [auctionOrders, setAuctionOrders] = useState(0);
     const [averageOrderValue, setAverageOrderValue] = useState(0);
-    const [failedPayments, setFailedPayments] = useState(0);
     const [fixedOrders, setFixedOrders] = useState(0);
     const [paidOrders, setPaidOrders] = useState(0);
     const [pendingPayments, setPendingPayments] = useState(0);
-    const [refundedOrders, setRefundedOrders] = useState(0);
     const [totalOrders, setTotalOrders] = useState(0);
     const [totalRevenue, setTotalRevenue] = useState(0);
     const [pendingOrders, setPendingOrders] = useState(0);
@@ -66,6 +64,7 @@ export const ReportProvider = ({ children }) => {
             const data = await getCombinedReport();
             if (!data) return console.log("No data from report context");
 
+            console.log("dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", data);
             // --- Auctions ---
             setAlerts((prev) =>
                 JSON.stringify(prev) !== JSON.stringify(data.auctions.alerts)
@@ -141,11 +140,6 @@ export const ReportProvider = ({ children }) => {
                     ? data.orders.averageOrderValue
                     : prev
             );
-            setFailedPayments((prev) =>
-                prev !== data.orders.failedPayments
-                    ? data.orders.failedPayments
-                    : prev
-            );
             setFixedOrders((prev) =>
                 prev !== data.orders.fixedOrders
                     ? data.orders.fixedOrders
@@ -157,11 +151,6 @@ export const ReportProvider = ({ children }) => {
             setPendingPayments((prev) =>
                 prev !== data.orders.pendingPayments
                     ? data.orders.pendingPayments
-                    : prev
-            );
-            setRefundedOrders((prev) =>
-                prev !== data.orders.refundedOrders
-                    ? data.orders.refundedOrders
                     : prev
             );
             setTotalOrders((prev) =>
@@ -297,11 +286,9 @@ export const ReportProvider = ({ children }) => {
                 //orders
                 auctionOrders,
                 averageOrderValue,
-                failedPayments,
                 fixedOrders,
                 paidOrders,
                 pendingPayments,
-                refundedOrders,
                 totalOrders,
                 totalRevenue,
                 pendingOrders,

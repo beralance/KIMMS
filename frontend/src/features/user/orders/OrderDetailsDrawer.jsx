@@ -47,7 +47,8 @@ const OrderDetailsDrawer = ({ order, open, onClose }) => {
     const address = order.userId?.address;
     const fullAddress = `${address?.street}, ${address?.city}, ${address?.province}, ${address?.region}, ${address?.postalCode}`;
     const totalAmount = order.products.reduce(
-        (acc, product) => acc + product?.productId?.price,
+        (acc, product) =>
+            acc + product?.productId?.price || product?.inventoryId?.price,
         0
     );
 
@@ -231,11 +232,9 @@ const OrderDetailsDrawer = ({ order, open, onClose }) => {
                                                     <img
                                                         src={
                                                             product.productId
+                                                                ?.images?.[0] ||
+                                                            product.inventoryId
                                                                 ?.images?.[0]
-                                                        }
-                                                        alt={
-                                                            product.productId
-                                                                ?.productName
                                                         }
                                                         style={{
                                                             display: "block",
@@ -258,16 +257,18 @@ const OrderDetailsDrawer = ({ order, open, onClose }) => {
                                                     gutterBottom
                                                     color="secondary"
                                                 >
-                                                    {
-                                                        product.productId
-                                                            ?.productName
-                                                    }
+                                                    {product.productId
+                                                        ?.productName ||
+                                                        product.inventoryId
+                                                            ?.productName}
                                                 </Typography>
                                                 <Typography
                                                     variant="body2"
                                                     color="secondary"
                                                 >
-                                                    {product.productId?.isLocal
+                                                    {product.productId
+                                                        ?.isLocal ||
+                                                    product.inventoryId?.isLocal
                                                         ? "Large"
                                                         : "Small"}{" "}
                                                     item
@@ -285,7 +286,12 @@ const OrderDetailsDrawer = ({ order, open, onClose }) => {
                                                     >
                                                         {toTitleCase(
                                                             product.productId
-                                                                ?.category?.name
+                                                                ?.category
+                                                                ?.name ||
+                                                                product
+                                                                    .inventoryId
+                                                                    ?.category
+                                                                    ?.name
                                                         )}
                                                     </Typography>
                                                     <Divider
@@ -304,7 +310,10 @@ const OrderDetailsDrawer = ({ order, open, onClose }) => {
                                                     >
                                                         {toTitleCase(
                                                             product.productId
-                                                                ?.condition
+                                                                ?.condition ||
+                                                                product
+                                                                    .inventoryId
+                                                                    ?.condition
                                                         )}
                                                     </Typography>
                                                 </Stack>
@@ -317,7 +326,10 @@ const OrderDetailsDrawer = ({ order, open, onClose }) => {
                                                 >
                                                     PHP{" "}
                                                     {formatNumber(
-                                                        product.productId?.price
+                                                        product.productId
+                                                            ?.price ||
+                                                            product.inventoryId
+                                                                ?.price
                                                     )}
                                                 </Typography>
                                             </Stack>

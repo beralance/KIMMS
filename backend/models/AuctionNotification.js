@@ -8,6 +8,7 @@ const notificationSchema = new mongoose.Schema({
     },
     auctionId: { type: mongoose.Schema.Types.ObjectId, ref: "Auction" },
     message: { type: String, required: true },
+    showClaimButton: { type: Boolean, default: false },
     label: { type: String, required: true },
     read: { type: Boolean, default: false }, // for marking notifications as read
     createdAt: { type: Date, default: Date.now },

@@ -124,106 +124,115 @@ const AdminAuctionMonitor = ({ searchTerm }) => {
     return (
         <Box>
             <SectionWrapper sx={{ bgcolor: "#F0F0F0" }}>
-                <Stack
-                    direction={"row"}
-                    alignItems={"center"}
-                    justifyContent={"space-between"}
-                    sx={{ mb: 2 }}
-                >
-                    <Stack direction={"row"}>
-                        <Typography variant="body1" color="initial">
-                            All Products
-                        </Typography>
+                <Stack gap={2}>
+                    <Stack
+                        direction={"row"}
+                        alignItems={"center"}
+                        justifyContent={"space-between"}
+                    >
+                        <Stack>
+                            <Typography variant="body1" color="secondary">
+                                All Auctioned item
+                            </Typography>
+                            <Typography variant="body2" color="gray">
+                                See every auctioned product and its progress.
+                            </Typography>
+                        </Stack>
+
+                        <IconButton
+                            onClick={fetchAuctions}
+                            sx={{ border: "1px solid gray", borderRadius: 1 }}
+                        >
+                            <RefreshRounded sx={{ color: "#37353E" }} />
+                        </IconButton>
                     </Stack>
 
-                    <IconButton onClick={fetchAuctions}>
-                        <RefreshRounded sx={{ color: "#37353E" }} />
-                    </IconButton>
-                </Stack>
-
-                {/*MD TO TOP*/}
-                <Box
-                    sx={{
-                        position: "sticky",
-                        top: 120,
-                        minWidth: 100,
-                        display: { xs: "none", sm: "inline-block" },
-                        width: "auto",
-                        transition: "all .5s ease",
-                        p: 1,
-                        borderRadius: "999px",
-                        bgcolor: "transparent",
-                        backdropFilter: "blur(10px)",
-                    }}
-                >
-                    <Stack>
-                        <ButtonGroup color="secondary">
-                            {auctionStatusFilter.map((status) => (
-                                <Button
-                                    sx={{
-                                        transition: "all 1s ease",
-                                        borderRadius:
+                    {/*MD TO TOP*/}
+                    <Box
+                        sx={{
+                            position: "sticky",
+                            top: 120,
+                            minWidth: 100,
+                            display: { xs: "none", sm: "inline-block" },
+                            width: "auto",
+                            transition: "all .5s ease",
+                            p: 1,
+                            borderRadius: "999px",
+                            bgcolor: "transparent",
+                            backdropFilter: "blur(10px)",
+                        }}
+                    >
+                        <Stack>
+                            <ButtonGroup color="secondary">
+                                {auctionStatusFilter.map((status) => (
+                                    <Button
+                                        sx={{
+                                            transition: "all 1s ease",
+                                            borderRadius:
+                                                filterStatus === status.status
+                                                    ? "999px !important"
+                                                    : 2,
+                                            mx:
+                                                filterStatus === status.status
+                                                    ? "2px !important"
+                                                    : 0,
+                                            minWidth: 10,
+                                            fontWeight:
+                                                filterStatus === status.status
+                                                    ? "bold"
+                                                    : "400",
+                                            opacity:
+                                                filterStatus === status.status
+                                                    ? "1"
+                                                    : "1",
+                                            px: 2,
+                                            color:
+                                                filterStatus === status.status
+                                                    ? "white"
+                                                    : "#37353E",
+                                            boxShadow:
+                                                filterStatus === status.status
+                                                    ? 20
+                                                    : 0,
+                                            zIndex:
+                                                filterStatus === status.status
+                                                    ? 2
+                                                    : 1,
+                                        }}
+                                        key={status.key}
+                                        color={
                                             filterStatus === status.status
-                                                ? "999px !important"
-                                                : 2,
-                                        mx:
+                                                ? status.color
+                                                : "secondary"
+                                        }
+                                        variant={
                                             filterStatus === status.status
-                                                ? "2px !important"
-                                                : 0,
-                                        minWidth: 10,
-                                        fontWeight:
-                                            filterStatus === status.status
-                                                ? "bold"
-                                                : "400",
-                                        opacity:
-                                            filterStatus === status.status
-                                                ? "1"
-                                                : "1",
-                                        px: 2,
-                                        color:
-                                            filterStatus === status.status
-                                                ? "white"
-                                                : "#37353E",
-                                        boxShadow:
-                                            filterStatus === status.status
-                                                ? 20
-                                                : 0,
-                                        zIndex:
-                                            filterStatus === status.status
-                                                ? 2
-                                                : 1,
-                                    }}
-                                    key={status.key}
-                                    color={
-                                        filterStatus === status.status
-                                            ? status.color
-                                            : "secondary"
-                                    }
-                                    variant={
-                                        filterStatus === status.status
-                                            ? "contained"
-                                            : "text"
-                                    }
-                                    onClick={() =>
-                                        handleStatusFilter(status.status)
-                                    }
-                                >
-                                    <Stack
-                                        gap={1}
-                                        direction={"row"}
-                                        alignItems={"center"}
-                                        sx={{}}
+                                                ? "contained"
+                                                : "text"
+                                        }
+                                        onClick={() =>
+                                            handleStatusFilter(status.status)
+                                        }
                                     >
-                                        {status.key !== 0 ? status.icon : ""}
-                                        {filterStatus !== status.status
-                                            ? toTitleCase(status.status)
-                                            : status.status}
-                                    </Stack>
-                                </Button>
-                            ))}
-                        </ButtonGroup>
-                    </Stack>
-                </Box>
+                                        <Stack
+                                            gap={1}
+                                            direction={"row"}
+                                            alignItems={"center"}
+                                            sx={{}}
+                                        >
+                                            {status.key !== 0
+                                                ? status.icon
+                                                : ""}
+                                            {filterStatus !== status.status
+                                                ? toTitleCase(status.status)
+                                                : status.status}
+                                        </Stack>
+                                    </Button>
+                                ))}
+                            </ButtonGroup>
+                        </Stack>
+                    </Box>
+                </Stack>
 
                 {/*XS TO SM*/}
                 <Box

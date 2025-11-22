@@ -64,11 +64,15 @@ export const getAuctions = async (req, res) => {
         const auctions = await Auction.find()
             .populate({
                 path: "inventoryId",
-                select: "productName price isLocal category status description details condition images weight",
+                select: "productName price isLocal category status description physicalCode details condition images weight",
                 populate: {
                     path: "category",
                     select: "name",
                 },
+            })
+            .populate({
+                path: "claimedBy",
+                select: "fullname email number address",
             })
             .sort({ createdAt: -1 });
 

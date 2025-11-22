@@ -21,7 +21,8 @@ const OrderContainer = ({ order }) => {
     const handleDetailsClose = () => setOpenDetails(false);
 
     const totalAmount = order.products.reduce(
-        (acc, product) => acc + product?.productId?.price || product?.inventoryId?.price,
+        (acc, product) =>
+            acc + product?.productId?.price || product?.inventoryId?.price,
         0
     );
 
@@ -59,7 +60,7 @@ const OrderContainer = ({ order }) => {
                     <Stack gap={2}>
                         <Stack>
                             {order.orderType !== "fixed" && (
-                                <Typography variant="body1" color="initial">
+                                <Typography variant="body1" color="warning">
                                     Auction Purchase
                                 </Typography>
                             )}

@@ -50,7 +50,7 @@ import {
     TagIcon,
     HomeIcon,
 } from "lucide-react";
-import { createNotification } from "../../../backend/controllers/auctionNotificationController";
+
 function HideOnScroll({ children }) {
     const trigger = useScrollTrigger();
     return (
@@ -120,7 +120,7 @@ export default function UserHeader() {
             icon: <Package2Icon style={{ color: "black", width: 17 }} />,
         },
         {
-            label: "Notification",
+            label: "Auction Notification",
             to: "/notification",
             icon: <BellIcon style={{ color: "black", width: 17 }} />,
         },

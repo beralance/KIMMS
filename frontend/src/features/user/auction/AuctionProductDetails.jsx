@@ -108,7 +108,11 @@ const AuctionProductDetails = () => {
         const getAllBidders = async () => {
             try {
                 const data = await getBidders(auction._id, token);
-                setAllBidders(data.length);
+                console.log("test", data);
+                const activeCount = data.filter(
+                    (b) => b.status === "ACTIVE"
+                ).length;
+                setAllBidders(activeCount);
 
                 const userBid = data.find(
                     (bid) => bid.userId?._id === user.userId
@@ -194,6 +198,7 @@ const AuctionProductDetails = () => {
         return;
     }
 
+    console.log("auction", allBidders);
     return (
         <Box sx={{ maxWidth: 600, mx: "auto" }}>
             <Stack>

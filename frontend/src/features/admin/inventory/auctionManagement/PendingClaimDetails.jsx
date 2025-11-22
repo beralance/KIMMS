@@ -64,7 +64,7 @@ const PendingClaimDetails = ({ data }) => {
                     {data.topBidders?.map((top, index) => (
                         <SectionWrapper
                             sx={{
-                                boxShadow: data.winner === top.userId ? 2 : 1,
+                                boxShadow: data.winner === top.userId ? 4 : 2,
                                 m: data.winner === top.userId ? 0 : 1,
                                 bgcolor:
                                     data.winner === top.userId
@@ -81,7 +81,7 @@ const PendingClaimDetails = ({ data }) => {
                                             color={
                                                 data.winner === top.userId
                                                     ? "success"
-                                                    : "warning"
+                                                    : "gray"
                                             }
                                         >
                                             Top {index + 1} bidder

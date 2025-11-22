@@ -3,14 +3,13 @@ import Inventory from "../models/Inventory.js";
 
 export const getProductsForPolling = async (req, res) => {
     try {
-        const products = await Product.find().populate('category', 'name');
+        const products = await Product.find().populate("category", "name");
         res.json(products);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Failed to fetch orders" });
     }
-    catch (err) {
-        console.error(err)
-        res.status(500).json({error: 'Failed to fetch orders'})
-    }
-}
+};
 
 // POST Inventory item to Products collection (publish to shop)
 export const postProduct = async (req, res) => {
@@ -20,13 +19,20 @@ export const postProduct = async (req, res) => {
 
         // Find the inventory item
         const inventoryItem = await Inventory.findById(inventoryId);
-        if (!inventoryItem) return res.status(404).json({ message: "Inventory item not found" });
+        if (!inventoryItem)
+            return res
+                .status(404)
+                .json({ message: "Inventory item not found" });
 
         if (inventoryItem.status !== "available") {
-            return res.status(400).json({ message: "Item is not available for posting" });
+            return res
+                .status(400)
+                .json({ message: "Item is not available for posting" });
         }
 
-        const weight = !inventoryItem.isLocal ? inventoryItem.weight : undefined;
+        const weight = !inventoryItem.isLocal
+            ? inventoryItem.weight
+            : undefined;
 
         // Create new Product from Inventory data
         const product = new Product({
@@ -51,7 +57,7 @@ export const postProduct = async (req, res) => {
         await product.save();
 
         // Update inventory status to prevent double posting
-        inventoryItem.status = "reserved"; 
+        inventoryItem.status = "reserved";
         await inventoryItem.save();
 
         res.status(201).json(product);
@@ -64,21 +70,21 @@ export const postProduct = async (req, res) => {
 export const getProducts = async (req, res) => {
     try {
         const user = req.user;
-        let query = {visibility: 'active'}
-        
+        let query = { visibility: "active" };
+
         if (user) {
-            if (user.role === 'admin' || user.role === 'staff') {
+            if (user.role === "admin" || user.role === "staff") {
             } else {
                 query.isLocal = user.isLocal;
             }
         }
 
         const products = await Product.find(query)
-                                      .sort({ createdAt: -1 })
-                                      .populate('category', 'name');
+            .sort({ createdAt: -1 })
+            .populate("category", "name");
         res.json(products);
     } catch (err) {
-        console.error(err)
+        console.error(err);
         res.status(500).json({ error: err.message });
     }
 };
@@ -87,33 +93,34 @@ export const getProducts = async (req, res) => {
 export const getNewestProducts = async (req, res) => {
     try {
         const user = req.user;
-        let query = {visibility: 'active'}
+        let query = { visibility: "active" };
 
-         if (user) {
-            if (user.role === 'admin' || user.role === 'staff') {
+        if (user) {
+            if (user.role === "admin" || user.role === "staff") {
                 // see all products
             } else {
                 query.isLocal = user.isLocal;
             }
         }
 
-        const products = await Product
-            .find({visibility: 'active'})
-            .sort({createdAt: -1})
+        const products = await Product.find({ visibility: "active" })
+            .sort({ createdAt: -1 })
             .limit(10)
-            .populate('category', 'name')
-        res.json(products)
+            .populate("category", "name");
+        res.json(products);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
-    catch (err) {
-        res.status(500).json({error: err.message})
-    }
-}
+};
 
 // GET single product (for product detail page)
 export const getProductById = async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id).populate("inventoryId").populate('category', 'name');
-        if (!product) return res.status(404).json({ message: "Product not found" });
+        const product = await Product.findById(req.params.id)
+            .populate("inventoryId")
+            .populate("category", "name");
+        if (!product)
+            return res.status(404).json({ message: "Product not found" });
 
         // Optional: increment views automatically
         await Product.findByIdAndUpdate(req.params.id, { $inc: { views: 1 } });
@@ -128,19 +135,25 @@ export const getProductById = async (req, res) => {
 export const updateProduct = async (req, res) => {
     try {
         const updates = req.body;
-        const product = await Product.findByIdAndUpdate(req.params.id, updates, { new: true }).populate('category', 'name');
+        const product = await Product.findByIdAndUpdate(
+            req.params.id,
+            updates,
+            { new: true }
+        ).populate("category", "name");
 
-        if (!product) return res.status(404).json({ message: "Product not found" });
-        
+        if (!product)
+            return res.status(404).json({ message: "Product not found" });
+
         // Sync critical fields back to inventory
         const syncFields = {};
 
         if (updates.price !== undefined) syncFields.price = updates.price;
-        if (updates.condition !== undefined) syncFields.condition = updates.condition;
-        if (updates.details != undefined) syncFields.details = updates.details
+        if (updates.condition !== undefined)
+            syncFields.condition = updates.condition;
+        if (updates.details != undefined) syncFields.details = updates.details;
 
         if (Object.keys(syncFields).length > 0) {
-            await Inventory.findByIdAndUpdate(product.inventoryId, syncFields)
+            await Inventory.findByIdAndUpdate(product.inventoryId, syncFields);
         }
         res.json(product);
     } catch (err) {
@@ -155,14 +168,20 @@ export const deleteProduct = async (req, res) => {
             req.params.id,
             { visibility: "inactive" },
             { new: true }
-        ).populate('category', 'name');
+        ).populate("category", "name");
 
-        if (!product) return res.status(404).json({ message: "Product not found" });
+        if (!product)
+            return res.status(404).json({ message: "Product not found" });
 
         // Reset Inventory item status back to "available"
-        await Inventory.findByIdAndUpdate(product.inventoryId, { status: "available" });
+        await Inventory.findByIdAndUpdate(product.inventoryId, {
+            status: "available",
+        });
 
-        res.json({ message: "Product marked inactive and inventory reset", product });
+        res.json({
+            message: "Product marked inactive and inventory reset",
+            product,
+        });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -180,12 +199,13 @@ export const searchProducts = async (req, res) => {
             $or: [
                 { productName: regex },
                 { description: regex },
-                { condition: regex},
-                { tags: regex},
-                { 'category.name': regex }
-
+                { condition: regex },
+                { tags: regex },
+                { "category.name": regex },
             ],
-        }).sort({ createdAt: -1 }).populate('category', 'name');
+        })
+            .sort({ createdAt: -1 })
+            .populate("category", "name");
 
         res.json(products);
     } catch (err) {
@@ -198,24 +218,30 @@ export const getProductsByHighlight = async (req, res) => {
     try {
         const { type } = req.params;
 
-        if (!['featured', 'mostViewed', 'none'].includes(type)) {
-            return res.status(400).json({ message: 'Invalid highlight type' });
+        if (!["featured", "mostViewed", "none"].includes(type)) {
+            return res.status(400).json({ message: "Invalid highlight type" });
         }
 
         let products;
-        if (type === 'mostViewed') {
-            products = await Product.find({ visibility: 'active' })
-                                    .sort({ views: -1 })
-                                    .limit(10); // limit max 20: change 5 to 20
-        } else if (type === 'featured') {
-            products = await Product.find({ visibility: 'active', highlight: type })
-                                    .sort({ createdAt: -1 })
-                                    .limit(10)
-                                    .populate('category', 'name');
+        if (type === "mostViewed") {
+            products = await Product.find({ visibility: "active" })
+                .sort({ views: -1 })
+                .limit(10); // limit max 20: change 5 to 20
+        } else if (type === "featured") {
+            products = await Product.find({
+                visibility: "active",
+                highlight: type,
+            })
+                .sort({ createdAt: -1 })
+                .limit(10)
+                .populate("category", "name");
         } else {
-            products = await Product.find({ visibility: 'active', highlight: type })
-                                    .sort({ createdAt: -1 })
-                                    .populate('category', 'name');
+            products = await Product.find({
+                visibility: "active",
+                highlight: type,
+            })
+                .sort({ createdAt: -1 })
+                .populate("category", "name");
         }
 
         res.json(products);
@@ -228,17 +254,20 @@ export const getProductsByHighlight = async (req, res) => {
 export const updateProductHighlight = async (req, res) => {
     try {
         const { highlight } = req.body;
-        const validHighlights = ['mostViewed', 'featured', 'none'];
+        const validHighlights = ["mostViewed", "featured", "none"];
 
         if (!validHighlights.includes(highlight)) {
             return res.status(400).json({ message: "Invalid highlight value" });
         }
 
         // Enforce limit only for featured or mostViewed
-        if (highlight === 'featured' || highlight === 'mostViewed') {
+        if (highlight === "featured" || highlight === "mostViewed") {
             const count = await Product.countDocuments({ highlight });
-            if (count >= 10) { // max 20
-                return res.status(400).json({ message: `${highlight} limit reached (max 5)` });
+            if (count >= 10) {
+                // max 20
+                return res
+                    .status(400)
+                    .json({ message: `${highlight} limit reached (max 5)` });
             }
         }
 
@@ -246,9 +275,10 @@ export const updateProductHighlight = async (req, res) => {
             req.params.id,
             { highlight },
             { new: true }
-        ).populate('category', 'name');
+        ).populate("category", "name");
 
-        if (!product) return res.status(404).json({ message: "Product not found" });
+        if (!product)
+            return res.status(404).json({ message: "Product not found" });
 
         res.json(product);
     } catch (err) {
@@ -265,7 +295,8 @@ export const incrementProductViews = async (req, res) => {
             { new: true }
         );
 
-        if (!product) return res.status(404).json({ message: "Product not found" });
+        if (!product)
+            return res.status(404).json({ message: "Product not found" });
         res.json(product);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -282,16 +313,16 @@ export const getProductReportStats = async ({ period, category }) => {
         let startDate;
 
         switch (period) {
-            case 'daily':
+            case "daily":
                 startDate = new Date(now.setHours(0, 0, 0, 0));
                 break;
-            case 'weekly':
+            case "weekly":
                 startDate = new Date(now.setDate(now.getDate() - 7));
                 break;
-            case 'monthly':
+            case "monthly":
                 startDate = new Date(now.setMonth(now.getMonth() - 1));
                 break;
-            case 'yearly':
+            case "yearly":
                 startDate = new Date(now.setFullYear(now.getFullYear() - 1));
                 break;
             default:
@@ -301,7 +332,7 @@ export const getProductReportStats = async ({ period, category }) => {
         if (startDate) filter.createdAt = { $gte: startDate };
     }
 
-    const products = await Product.find(filter).populate('category', 'name');
+    const products = await Product.find(filter).populate("category", "name");
 
     if (!products.length) {
         return {
@@ -311,41 +342,44 @@ export const getProductReportStats = async ({ period, category }) => {
             sold: 0,
             pending: 0,
             available: 0,
-            mostViewed: 'N/A',
-            recentlySold: 'N/A',
+            mostViewed: "N/A",
+            recentlySold: "N/A",
             averagePrice: 0,
             categoryBreakdown: {},
         };
     }
- 
-    const newPostedProduct = products.sort((a, b) => b.createdAt - a.createdAt).slice(0, 5)
+
+    const newPostedProduct = products
+        .sort((a, b) => b.createdAt - a.createdAt)
+        .slice(0, 5);
 
     const visibilityCounts = { active: 0, inactive: 0, sold: 0, pending: 0 };
     const purchaseCounts = { available: 0, pending: 0, sold: 0 };
     let totalPrice = 0;
     const categoryBreakdown = {};
-    const conditionBreakdown = {}; 
+    const conditionBreakdown = {};
 
     products.forEach((p) => {
         visibilityCounts[p.visibility]++;
         purchaseCounts[p.purchaseStatus]++;
         totalPrice += p.price;
 
-        const catName = p.category?.name || 'Uncategorized';
+        const catName = p.category?.name || "Uncategorized";
         categoryBreakdown[catName] = (categoryBreakdown[catName] || 0) + 1;
 
-        const cond = p.condition || 'Unknown';
+        const cond = p.condition || "Unknown";
         conditionBreakdown[cond] = (conditionBreakdown[cond] || 0) + 1;
     });
 
     const mostViewed = products.sort((a, b) => b.views - a.views).slice(0, 5);
     const recentlySold = products
-        .filter((p) => p.purchaseStatus === 'sold')
+        .filter((p) => p.purchaseStatus === "sold")
         .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
         .slice(0, 5);
     const averagePrice = totalPrice / products.length;
-    const activeProducts = products.filter((p) => p.visibility === 'active' && p.purchaseStatus === 'available').length
-
+    const activeProducts = products.filter(
+        (p) => p.visibility === "active" && p.purchaseStatus === "available"
+    ).length;
 
     return {
         totalProducts: products.length,

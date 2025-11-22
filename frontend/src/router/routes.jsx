@@ -38,6 +38,7 @@ import InventoryManagement from "../features/admin/inventory/inventoryManagement
 import ProductManagement from "../features/admin/inventory/productManagement/ProductManagement";
 import AuctionManagement from "../features/admin/inventory/auctionManagement/AuctionManagement";
 import StaffDashboard from "../features/staff/StaffDashboard";
+import AdminAuctionHistory from "../features/admin/inventory/auctionManagement/AuctionHistory";
 
 // Public Pages
 import NotFound from "../pages/NotFound";
@@ -261,6 +262,10 @@ export default function AppRoutes() {
                     <Route
                         path="manage-auction"
                         element={<AuctionManagement />}
+                    />
+                    <Route
+                        path="manage-auction/auction"
+                        element={<AdminAuctionHistory />}
                     />
                 </Route>
                 <Route path="orders" element={<Orders />} />

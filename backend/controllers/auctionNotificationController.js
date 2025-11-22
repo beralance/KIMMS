@@ -1,9 +1,21 @@
 import Notification from "../models/AuctionNotification.js";
 
 // Create a new notification
-export const createNotification = async (userId, auctionId, message, label) => {
+export const createNotification = async (
+    userId,
+    auctionId,
+    message,
+    label,
+    showClaimButton
+) => {
     try {
-        const notif = new Notification({ userId, auctionId, message, label });
+        const notif = new Notification({
+            userId,
+            auctionId,
+            message,
+            label,
+            showClaimButton,
+        });
         await notif.save();
         return notif;
     } catch (err) {

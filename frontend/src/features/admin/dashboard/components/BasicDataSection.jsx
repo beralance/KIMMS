@@ -11,7 +11,7 @@ const BasicDataSection = ({
     totalOrders,
     totalRevenue,
     liveAuctions,
-    activeListings,
+    activeProducts,
 }) => {
     return (
         <>
@@ -34,7 +34,7 @@ const BasicDataSection = ({
                     },
                     {
                         label: "Active Listings",
-                        value: activeListings,
+                        value: activeProducts,
                         subLabel: "posted products",
                     },
                 ].map((item, index) => (

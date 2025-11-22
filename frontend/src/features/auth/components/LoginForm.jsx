@@ -307,13 +307,13 @@ export default function LoginForm({ onSuccess }) {
                             variant="contained"
                             fullWidth
                             sx={{
-                                bgcolor: "rgba(0, 0, 0, 0.2)",
+                                bgcolor: "rgba(255, 255, 255, 0.2)",
                                 border: "1px solid white",
                                 py: 1.2,
                                 borderRadius: "999px",
                             }}
                         >
-                            L O G I N
+                            SIGN IN
                         </Button>
                     </Fade>
                     <Divider>

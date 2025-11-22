@@ -9,12 +9,7 @@ const DataCard = ({ subLabel, img, label, value, icon }) => {
                 <Typography variant="h4" color="primary" align="center">
                     {value}
                 </Typography>
-                <Typography
-                    variant="body2"
-                    color="gray"
-                    fontWeight={"bold"}
-                    align="center"
-                >
+                <Typography variant="body2" color="gray" align="center">
                     {subLabel}
                 </Typography>
             </Stack>

@@ -44,8 +44,8 @@ export default function Home() {
             const data = await fetchAuctions();
             setAuctions(data);
 
-            const liveAuctionsData = data.filter((l) => l.status === "LIVE");
-            const pendingAuctionsData = data.filter(
+            const liveAuctionsData = data?.filter((l) => l.status === "LIVE");
+            const pendingAuctionsData = data?.filter(
                 (p) => p.status === "PENDING"
             );
 

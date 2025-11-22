@@ -92,6 +92,7 @@ export const auctionFinalizeCron = () => {
                         await createNotification(
                             bid.userId._id,
                             auction._id,
+                            false,
                             `You did not win the auction for ${auction.inventoryId?.productName}. Better luck next time!`,
                             "Auction Ended"
                         );
@@ -130,6 +131,7 @@ export const auctionFinalizeCron = () => {
                             await createNotification(
                                 bids[0].userId._id,
                                 auction._id,
+                                true,
                                 `You are the top bidder for ${auction.inventoryId?.productName}! Please claim and pay within 24 hours.`,
                                 "Congratulation! You're the Winner"
                             );
@@ -137,6 +139,7 @@ export const auctionFinalizeCron = () => {
                             await createNotification(
                                 bids[1].userId._id,
                                 auction._id,
+                                false,
                                 `You did not win but you still have a chance to get the item. We will notify you soon.`,
                                 "Almost there! You Still Have a Chance"
                             );
@@ -144,6 +147,7 @@ export const auctionFinalizeCron = () => {
                             await createNotification(
                                 bids[2].userId._id,
                                 auction._id,
+                                false,
                                 `You did not win but you still have a chance to get the item. We will notify you soon.`,
                                 "Almost there! You Still Have a Chance"
                             );
@@ -178,7 +182,7 @@ export const auctionFinalizeCron = () => {
                     if (auction.winnerClaimed === false) {
                         auction.claimStage = 2;
                         auction.claimDeadline = new Date(
-                            Date.now() + 5 * 60 * 1000
+                            Date.now() + 24 * 60 * 60 * 1000
                         );
                         auction.winnerNotified = "Top2";
 
@@ -213,6 +217,7 @@ export const auctionFinalizeCron = () => {
                             await createNotification(
                                 firstBidder._id,
                                 auction._id,
+                                false,
                                 `You failed to claim "${auction.inventoryId?.productName}". You can no longer purchase the item.`,
                                 "Claim Period Expired"
                             );
@@ -220,6 +225,7 @@ export const auctionFinalizeCron = () => {
                             await createNotification(
                                 secondBidder._id,
                                 auction._id,
+                                true,
                                 `You are now the top bidder of "${auction.inventoryId?.productName}"! Please claim and pay within 24 hours.`,
                                 "You're Now the Top Bidder"
                             );
@@ -246,7 +252,10 @@ export const auctionFinalizeCron = () => {
                     const bids = await Bid.find({ auctionId: auction._id })
                         .sort({ amount: -1, createdAt: 1 })
                         .limit(3)
-                        .populate("userId", "fullName email badRecords auctionRestriction");
+                        .populate(
+                            "userId",
+                            "fullName email badRecords auctionRestriction"
+                        );
 
                     if (auction.winnerClaimed === false) {
                         auction.claimStage = 3;
@@ -257,9 +266,6 @@ export const auctionFinalizeCron = () => {
 
                         const secondBidder = bids[1]?.userId || null;
                         const thirdBidder = bids[2]?.userId || null;
-
-                        console.log("secondBidder", secondBidder);
-                        console.log("thirdBidder", thirdBidder);
 
                         if (secondBidder) {
                             secondBidder.badRecords += 1;
@@ -289,6 +295,7 @@ export const auctionFinalizeCron = () => {
                             await createNotification(
                                 secondBidder._id,
                                 auction._id,
+                                false,
                                 `You failed to claim "${auction.inventoryId?.productName}". You can no longer purchase the item.`,
                                 "Claim Period Expired"
                             );
@@ -296,6 +303,7 @@ export const auctionFinalizeCron = () => {
                             await createNotification(
                                 thirdBidder._id,
                                 auction._id,
+                                true,
                                 `You are now the top bidder of "${auction.inventoryId?.productName}"! Please claim and pay within 24 hours.`,
                                 "You're Now the Top Bidder"
                             );
@@ -323,7 +331,10 @@ export const auctionFinalizeCron = () => {
                     const bids = await Bid.find({ auctionId: auction._id })
                         .sort({ amount: -1, createdAt: 1 })
                         .limit(3)
-                        .populate("userId", "fullName email badRecords auctionRestriction");
+                        .populate(
+                            "userId",
+                            "fullName email badRecords auctionRestriction"
+                        );
 
                     if (auction.winnerClaimed === false) {
                         console.log(
@@ -358,6 +369,7 @@ export const auctionFinalizeCron = () => {
                             await createNotification(
                                 thirdBidder._id,
                                 auction._id,
+                                false,
                                 `You failed to claim "${auction.inventoryId?.productName}". You can no longer purchase the item.`,
                                 "Claim Period Expired"
                             );
@@ -398,6 +410,7 @@ export const auctionFinalizeCron = () => {
                             await createNotification(
                                 bids[0].userId._id,
                                 auction._id,
+                                false,
                                 `Auction item "${auction.inventoryId?.productName}" has been added to your orders and ready to be processed. Thank you for choosing us!`,
                                 "Auction Order Completed"
                             );
@@ -405,6 +418,7 @@ export const auctionFinalizeCron = () => {
                             await createNotification(
                                 bids[1].userId._id,
                                 auction._id,
+                                false,
                                 `The auction item "${auction.inventoryId?.productName}" has been claimed. Claiming chances is closed`,
                                 "Auction Claiming Closed"
                             );
@@ -412,6 +426,7 @@ export const auctionFinalizeCron = () => {
                             await createNotification(
                                 bids[2].userId._id,
                                 auction._id,
+                                false,
                                 `The auction item "${auction.inventoryId?.productName}" has been claimed. Claiming chances is closed`,
                                 "Auction Claiming Closed"
                             );

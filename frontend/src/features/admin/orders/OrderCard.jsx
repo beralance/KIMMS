@@ -52,7 +52,12 @@ const OrderCard = ({ orderData, op, openDrawer = false }) => {
     return (
         <>
             <Box>
-                <SectionWrapper sx={{ boxShadow: 2 }}>
+                <SectionWrapper
+                    sx={{
+                        boxShadow: orderData?.auctionId ? 4 : 2,
+                        position: "relative",
+                    }}
+                >
                     <Stack sx={{ borderRadius: 2 }} gap={2}>
                         <Stack
                             direction={"row"}
@@ -60,66 +65,99 @@ const OrderCard = ({ orderData, op, openDrawer = false }) => {
                             alignItems={"center"}
                             sx={{ position: "relative" }}
                         >
+                            {orderData?.auctionId ? (
+                                <Box
+                                    sx={{
+                                        width: 10,
+                                        height: 50,
+                                        borderRadius: "5px",
+                                        bgcolor: "warning.main",
+                                    }}
+                                />
+                            ) : (
+                                <Box
+                                    sx={{
+                                        width: 10,
+                                        height: 50,
+                                        borderRadius: "5px",
+                                        bgcolor: "primary.main",
+                                    }}
+                                />
+                            )}
                             <Stack
+                                direction={"row"}
+                                gap={2}
                                 alignItems={"center"}
                                 sx={{ position: "relative" }}
                             >
-                                <img
-                                    src={orderData.userId?.avatar}
-                                    style={{
-                                        boxShadow:
-                                            "0px 0px 5px rgba(0, 0, 0, 0.5)",
-                                        width: "50px",
-                                        height: "50px",
-                                        display: "block",
-                                        objectFit: "cover",
-                                        borderRadius: "999px",
-                                    }}
-                                />
-                            </Stack>
-                            <Stack sx={{ width: "100%", overflow: "hidden" }}>
-                                <Typography
-                                    variant="body1"
-                                    color="secondary"
-                                    fontWeight={"bold"}
-                                    sx={{
-                                        maxWidth: "70%",
-                                        textOverflow: "ellipsis",
-                                        whiteSpace: "nowrap",
-                                    }}
-                                >
-                                    {orderData?.userId?.fullName}
-                                </Typography>
                                 <Stack
-                                    direction={"row"}
-                                    gap={1}
                                     alignItems={"center"}
+                                    sx={{ position: "relative" }}
                                 >
-                                    <Typography variant="body2" color="initial">
-                                        {orderData.orderId || ""}
+                                    <img
+                                        src={orderData.userId?.avatar}
+                                        style={{
+                                            boxShadow:
+                                                "0px 0px 5px rgba(0, 0, 0, 0.5)",
+                                            width: "50px",
+                                            height: "50px",
+                                            display: "block",
+                                            objectFit: "cover",
+                                            borderRadius: "999px",
+                                        }}
+                                    />
+                                </Stack>
+                                <Stack
+                                    sx={{ width: "100%", overflow: "hidden" }}
+                                >
+                                    <Typography
+                                        variant="body1"
+                                        color="secondary"
+                                        fontWeight={"bold"}
+                                        sx={{
+                                            maxWidth: "70%",
+                                            textOverflow: "ellipsis",
+                                            whiteSpace: "nowrap",
+                                        }}
+                                    >
+                                        {orderData?.userId?.fullName}
                                     </Typography>
-                                    <Tooltip title="Copy Order ID">
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => {
-                                                navigator.clipboard.writeText(
-                                                    orderData.orderId || ""
-                                                );
-                                                setCopied(true);
-                                                setTimeout(() => {
-                                                    setCopied(false);
-                                                }, 2000);
-                                            }}
+                                    <Stack
+                                        direction={"row"}
+                                        gap={1}
+                                        alignItems={"center"}
+                                    >
+                                        <Typography
+                                            variant="body2"
+                                            color="initial"
                                         >
-                                            {copied ? (
-                                                <CopyCheckIcon
-                                                    style={{ color: "green" }}
-                                                />
-                                            ) : (
-                                                <CopyIcon />
-                                            )}
-                                        </IconButton>
-                                    </Tooltip>
+                                            {orderData.orderId || ""}
+                                        </Typography>
+                                        <Tooltip title="Copy Order ID">
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(
+                                                        orderData.orderId || ""
+                                                    );
+                                                    setCopied(true);
+                                                    setTimeout(() => {
+                                                        setCopied(false);
+                                                    }, 2000);
+                                                }}
+                                            >
+                                                {copied ? (
+                                                    <CopyCheckIcon
+                                                        style={{
+                                                            color: "green",
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <CopyIcon />
+                                                )}
+                                            </IconButton>
+                                        </Tooltip>
+                                    </Stack>
                                 </Stack>
                             </Stack>
                             <Box
@@ -144,152 +182,212 @@ const OrderCard = ({ orderData, op, openDrawer = false }) => {
                                 bgcolor: "#f7f7f7ff",
                                 borderRadius: 2,
                                 py: 2,
+
                                 p: 2,
                                 my: 1,
                             }}
                         >
-                            <Stack>
-                                <Grid container spacing={2}>
-                                    <Grid size={{ xs: 6 }}>
-                                        <Stack gap={1}>
-                                            <Typography
-                                                variant="body2"
-                                                color="secondary"
-                                                sx={{
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    gap: 1,
-                                                }}
-                                            >
-                                                <WalletIcon />
-                                                Payment:
-                                            </Typography>
-                                            <Typography
-                                                variant="body2"
-                                                color="white"
-                                                sx={{
-                                                    py: 0.3,
-                                                    bgcolor:
-                                                        "rgba(0, 0, 0, 0.5)",
-                                                    borderRadius: "999px",
-                                                }}
-                                                align="center"
-                                            >
-                                                -{" "}
-                                                {toTitleCase(
-                                                    orderData.paymentStatus
-                                                )}{" "}
-                                                -
-                                            </Typography>
-                                        </Stack>
+                            {orderData.orderStatus === "CANCELLED" ||
+                            orderData.purchaseStatus === "cancelled" ? (
+                                <Stack>
+                                    <Stack
+                                        direction={"row"}
+                                        justifyContent={"space-between"}
+                                    >
+                                        <Typography
+                                            variant="body2"
+                                            color="secondary"
+                                        >
+                                            Full Name:
+                                        </Typography>
+                                        <Typography
+                                            variant="body2"
+                                            color="gray"
+                                        >
+                                            {orderData.cancelledBy?.fullName}
+                                        </Typography>
+                                    </Stack>
+                                    <Stack
+                                        direction={"row"}
+                                        justifyContent={"space-between"}
+                                    >
+                                        <Typography
+                                            variant="body2"
+                                            color="secondary"
+                                        >
+                                            Email Address:
+                                        </Typography>
+                                        <Typography
+                                            variant="body2"
+                                            color="gray"
+                                        >
+                                            {orderData.cancelledBy?.email}
+                                        </Typography>
+                                    </Stack>
+                                    <Stack
+                                        direction={"row"}
+                                        justifyContent={"space-between"}
+                                    >
+                                        <Typography
+                                            variant="body2"
+                                            color="secondary"
+                                        >
+                                            Role:
+                                        </Typography>
+                                        <Typography
+                                            variant="body2"
+                                            color="gray"
+                                        >
+                                            {orderData.cancelledBy?.role}
+                                        </Typography>
+                                    </Stack>
+                                </Stack>
+                            ) : (
+                                <Stack>
+                                    <Grid container spacing={2}>
+                                        <Grid size={{ xs: 6 }}>
+                                            <Stack gap={1}>
+                                                <Typography
+                                                    variant="body2"
+                                                    color="secondary"
+                                                    sx={{
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        gap: 1,
+                                                    }}
+                                                >
+                                                    <WalletIcon />
+                                                    Payment:
+                                                </Typography>
+                                                <Typography
+                                                    variant="body2"
+                                                    color={"secondary"}
+                                                    sx={{
+                                                        py: 0.3,
+                                                        border:
+                                                            orderData?.paymentStatus ===
+                                                            "paid"
+                                                                ? "none"
+                                                                : "1px solid gray",
+                                                        bgcolor: "#dedee27a",
+                                                        borderRadius: "999px",
+                                                    }}
+                                                    align="center"
+                                                >
+                                                    -{" "}
+                                                    {toTitleCase(
+                                                        orderData.paymentStatus
+                                                    )}{" "}
+                                                    -
+                                                </Typography>
+                                            </Stack>
+                                        </Grid>
+                                        <Grid size={{ xs: 6 }}>
+                                            <Stack gap={1}>
+                                                <Typography
+                                                    variant="body2"
+                                                    color="secondary"
+                                                    sx={{
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        gap: 1,
+                                                    }}
+                                                >
+                                                    {orderData?.orderType ===
+                                                    "auction" ? (
+                                                        <GavelIcon />
+                                                    ) : (
+                                                        <ShoppingBasketIcon />
+                                                    )}
+                                                    Type:
+                                                </Typography>
+                                                <Typography
+                                                    variant="body2"
+                                                    color={"secondary"}
+                                                    sx={{
+                                                        py: 0.3,
+                                                        bgcolor: "#dedee27a",
+                                                        borderRadius: "999px",
+                                                    }}
+                                                    align="center"
+                                                >
+                                                    -{" "}
+                                                    {toTitleCase(
+                                                        orderData.orderType
+                                                    )}{" "}
+                                                    order -
+                                                </Typography>
+                                            </Stack>
+                                        </Grid>
+                                        <Grid size={{ xs: 6 }}>
+                                            <Stack gap={1}>
+                                                <Typography
+                                                    variant="body2"
+                                                    color="secondary"
+                                                    sx={{
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        gap: 1,
+                                                    }}
+                                                >
+                                                    <HandCoinsIcon />
+                                                    Payment method:
+                                                </Typography>
+                                                <Typography
+                                                    variant="body2"
+                                                    color="black"
+                                                    sx={{
+                                                        py: 0.3,
+                                                        borderRadius: "999px",
+                                                        bgcolor: "#dedee27a",
+                                                    }}
+                                                    align="center"
+                                                >
+                                                    -{" "}
+                                                    {orderData.paymentMethod ===
+                                                    "gcash"
+                                                        ? "GCash"
+                                                        : "Cash on Delivery"}{" "}
+                                                    -
+                                                </Typography>
+                                            </Stack>
+                                        </Grid>
+                                        <Grid size={{ xs: 6 }}>
+                                            <Stack gap={1}>
+                                                <Typography
+                                                    variant="body2"
+                                                    color="secondary"
+                                                    sx={{
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        gap: 1,
+                                                    }}
+                                                >
+                                                    <BanknoteIcon />
+                                                    Total Amount:
+                                                </Typography>
+                                                <Typography
+                                                    variant="body2"
+                                                    color="black"
+                                                    sx={{
+                                                        py: 0.3,
+                                                        bgcolor: "#dedee27a",
+                                                        borderRadius: "999px",
+                                                    }}
+                                                    align="center"
+                                                >
+                                                    - Php{" "}
+                                                    {formatNumber(
+                                                        orderData.finalPrice
+                                                    )}{" "}
+                                                    -{" "}
+                                                </Typography>
+                                            </Stack>
+                                        </Grid>
                                     </Grid>
-                                    <Grid size={{ xs: 6 }}>
-                                        <Stack gap={1}>
-                                            <Typography
-                                                variant="body2"
-                                                color="secondary"
-                                                sx={{
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    gap: 1,
-                                                }}
-                                            >
-                                                {orderData?.orderType ===
-                                                "auction" ? (
-                                                    <GavelIcon />
-                                                ) : (
-                                                    <ShoppingBasketIcon />
-                                                )}
-                                                Type:
-                                            </Typography>
-                                            <Typography
-                                                variant="body2"
-                                                color="white"
-                                                sx={{
-                                                    py: 0.3,
-                                                    bgcolor:
-                                                        "rgba(0, 0, 0, 0.5)",
-                                                    borderRadius: "999px",
-                                                }}
-                                                align="center"
-                                            >
-                                                -{" "}
-                                                {toTitleCase(
-                                                    orderData.orderType
-                                                )}{" "}
-                                                order -
-                                            </Typography>
-                                        </Stack>
-                                    </Grid>
-                                    <Grid size={{ xs: 6 }}>
-                                        <Stack gap={1}>
-                                            <Typography
-                                                variant="body2"
-                                                color="secondary"
-                                                sx={{
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    gap: 1,
-                                                }}
-                                            >
-                                                <HandCoinsIcon />
-                                                Payment method:
-                                            </Typography>
-                                            <Typography
-                                                variant="body2"
-                                                color="white"
-                                                sx={{
-                                                    py: 0.3,
-                                                    bgcolor:
-                                                        "rgba(0, 0, 0, 0.5)",
-                                                    borderRadius: "999px",
-                                                }}
-                                                align="center"
-                                            >
-                                                -{" "}
-                                                {orderData.paymentMethod ===
-                                                "gcash"
-                                                    ? "GCash"
-                                                    : "Cash on Delivery"}{" "}
-                                                -
-                                            </Typography>
-                                        </Stack>
-                                    </Grid>
-                                    <Grid size={{ xs: 6 }}>
-                                        <Stack gap={1}>
-                                            <Typography
-                                                variant="body2"
-                                                color="secondary"
-                                                sx={{
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    gap: 1,
-                                                }}
-                                            >
-                                                <BanknoteIcon />
-                                                Total Amount:
-                                            </Typography>
-                                            <Typography
-                                                variant="body2"
-                                                color="white"
-                                                sx={{
-                                                    py: 0.3,
-                                                    bgcolor:
-                                                        "rgba(0, 0, 0, 0.5)",
-                                                    borderRadius: "999px",
-                                                }}
-                                                align="center"
-                                            >
-                                                - Php{" "}
-                                                {formatNumber(
-                                                    orderData.finalPrice
-                                                )}{" "}
-                                                -{" "}
-                                            </Typography>
-                                        </Stack>
-                                    </Grid>
-                                </Grid>
-                            </Stack>
+                                </Stack>
+                            )}
+
                             <Divider />
                             <Stack gap={1}>
                                 <Stack
@@ -359,6 +457,8 @@ const OrderCard = ({ orderData, op, openDrawer = false }) => {
                                                 <img
                                                     src={
                                                         product?.productId
+                                                            ?.images[0] ||
+                                                        product?.inventoryId
                                                             ?.images[0]
                                                     }
                                                     style={{

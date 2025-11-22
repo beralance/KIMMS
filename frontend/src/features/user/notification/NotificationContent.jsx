@@ -14,7 +14,7 @@ import { useSnackbar } from "../../../contexts/SnackbarContext";
 import FullScreenLoader from "../../../components/FullScreenLoader";
 import SectionWrapper from "../../../components/SectionWrapper";
 import { claimAuctionItem } from "../../../utils/auctionApi";
-import { formatNumber } from "../../../utils/stringUtils";
+import { formatNumber, toTitleCase } from "../../../utils/stringUtils";
 import { getBidders } from "../../../utils/bidApi";
 import { fetchNotifications } from "../../../utils/notificationApi";
 import { useNavigate, useParams } from "react-router-dom";
@@ -45,7 +45,7 @@ const NotificationContent = () => {
         console.log("AUCTION AUCTION", auction?.claimDeadline > new Date());
         const interval = setInterval(() => {
             const now = new Date();
-            const deadline = new Date(auction.claimDeadline);
+            const deadline = new Date(auction?.claimDeadline);
             const diff = deadline - now;
 
             if (diff <= 0) {
@@ -121,21 +121,42 @@ const NotificationContent = () => {
         <Box
             sx={{
                 minHeight: "95vh",
-                backgroundImage: isWinner
-                    ? `url(${auction.inventoryId.images[0]})`
-                    : "none",
+                backgroundImage:
+                    isWinner && notification.showClaimButton
+                        ? `url(${auction.inventoryId.images[0]})`
+                        : "none",
                 backgroundRepeat: "no-repeat",
                 backgroundPosition: "center",
                 backgroundSize: "cover",
             }}
         >
+            {!notification.showClaimButton && (
+                <Box
+                    sx={{
+                        position: "fixed",
+                        height: "100%",
+                        top: 0,
+                        left: 0,
+                        bottom: 0,
+                        right: 0,
+                        bgcolor: "rgba(255, 255, 255, 0.3)",
+                        zIndex: 1000,
+                    }}
+                />
+            )}
             <Stack
                 gap={2}
                 sx={{
                     p: 3,
                     minHeight: "100%",
-                    bgcolor: isWinner && "rgba(0, 0, 0, 0.5)",
-                    backdropFilter: isWinner && "blur(10px)",
+                    bgcolor:
+                        isWinner &&
+                        notification.showClaimButton &&
+                        "rgba(0, 0, 0, 0.5)",
+                    backdropFilter:
+                        isWinner &&
+                        notification.showClaimButton &&
+                        "blur(10px)",
                 }}
             >
                 {/*Notification section*/}
@@ -143,14 +164,22 @@ const NotificationContent = () => {
                     <Typography
                         variant="subtitle1"
                         fontWeight={"bold"}
-                        color={isWinner ? "white" : "initial"}
+                        color={
+                            isWinner && notification?.showClaimButton
+                                ? "white"
+                                : "initial"
+                        }
                     >
                         {notification.label}
                     </Typography>
                     <Stack>
                         <Typography
                             variant="body2"
-                            color={isWinner ? "white" : "secondary"}
+                            color={
+                                isWinner && notification?.showClaimButton
+                                    ? "white"
+                                    : "secondary"
+                            }
                         >
                             {notification.message}
                         </Typography>
@@ -159,7 +188,7 @@ const NotificationContent = () => {
 
                 {/*Auction INFORMATION Section*/}
                 <SectionWrapper sx={{ gap: 2 }}>
-                    {isWinner && (
+                    {isWinner && notification.showClaimButton && (
                         <Stack>
                             <Typography
                                 variant="subtitle2"
@@ -187,14 +216,12 @@ const NotificationContent = () => {
                                     aspectRatio: "9/12",
                                 }}
                             />
-                            {isWinner && (
+                            {isWinner && notification.showClaimButton && (
                                 <Box
                                     sx={{
                                         position: "absolute",
                                         width: "100%",
                                         p: 2,
-                                        backdropFilter: "blur(10px)",
-                                        bgcolor: "rgba(255, 255, 255, 0.5)",
                                         bottom: 0,
                                         left: 0,
                                         right: 0,
@@ -215,6 +242,14 @@ const NotificationContent = () => {
                                                 direction={"row"}
                                                 alignItems={"center"}
                                                 justifyContent={"space-between"}
+                                                sx={{
+                                                    px: 2,
+                                                    py: 1,
+                                                    bgcolor: "#f0f0f0",
+                                                    boxShadow:
+                                                        "0px 0px 10px rgba(255, 255, 255, 0.5)",
+                                                    borderRadius: 1,
+                                                }}
                                             >
                                                 <Typography
                                                     variant="body2"
@@ -231,6 +266,7 @@ const NotificationContent = () => {
                                                 </Typography>
                                                 <Typography
                                                     variant="body2"
+                                                    fontWeight={"bold"}
                                                     color="warning"
                                                 >
                                                     {timeLeft}
@@ -272,7 +308,9 @@ const NotificationContent = () => {
                                             borderRadius: "999px",
                                         }}
                                     >
-                                        {auction.inventoryId?.condition}
+                                        {toTitleCase(
+                                            auction.inventoryId?.condition
+                                        )}
                                     </Typography>
                                     <Divider
                                         orientation="vertical"
@@ -397,21 +435,30 @@ const NotificationContent = () => {
                                 </Grid>
                             </Stack>
 
-                            {isWinner && !auction.winnerClaimed && (
-                                <Stack>
-                                    <Button
-                                        variant="contained"
-                                        color="secondary"
-                                        onClick={() =>
-                                            navigate(
-                                                `/auction-checkout/${auction?._id}/${auction?.winner}`
-                                            )
-                                        }
+                            {isWinner &&
+                                !auction.winnerClaimed &&
+                                notification.showClaimButton && (
+                                    <Stack
+                                        sx={{ position: "sticky", bottom: 10 }}
                                     >
-                                        Proceed to checkout
-                                    </Button>
-                                </Stack>
-                            )}
+                                        <Button
+                                            variant="contained"
+                                            color="secondary"
+                                            sx={{
+                                                boxShadow: 5,
+                                                py: 1,
+                                                borderRadius: "999px",
+                                            }}
+                                            onClick={() =>
+                                                navigate(
+                                                    `/auction-checkout/${auction?._id}/${auction?.winner}`
+                                                )
+                                            }
+                                        >
+                                            Proceed to checkout
+                                        </Button>
+                                    </Stack>
+                                )}
                         </Stack>
                     </Stack>
                 </SectionWrapper>

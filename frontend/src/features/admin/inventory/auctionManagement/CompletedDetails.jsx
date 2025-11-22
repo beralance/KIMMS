@@ -48,6 +48,9 @@ const ClosedDetails = ({ data }) => {
                             claimed at
                         </Typography>
                         <Typography variant="body1" color="initial">
+                            claimed by
+                        </Typography>
+                        <Typography variant="body1" color="initial">
                             email
                         </Typography>
                         <Typography variant="body1" color="initial">
