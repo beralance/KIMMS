@@ -325,7 +325,7 @@ export default function OrderTab({
                                                 display: "block",
                                             }}
                                         />
-                                        <Typography>
+                                        <Typography variant="body2" color="secondary">
                                             No orders with{" "}
                                             <span>
                                                 {toTitleCase(

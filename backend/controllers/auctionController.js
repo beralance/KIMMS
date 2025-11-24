@@ -72,7 +72,7 @@ export const getAuctions = async (req, res) => {
             })
             .populate({
                 path: "claimedBy",
-                select: "fullname email number address",
+                select: "fullName isLocal email number address",
             })
             .sort({ createdAt: -1 });
 

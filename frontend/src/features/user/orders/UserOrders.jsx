@@ -32,7 +32,7 @@ const UserOrders = () => {
 
     const successOrders = orders.filter(o => 
         o.isActive === true &&
-        o.orderStatus === 'SUCCESSFUL' &&
+        (o.orderStatus === 'SUCCESSFUL' || o.orderStatus === 'CANCELLED') &&
         o.userId?._id === user.userId
     );
 

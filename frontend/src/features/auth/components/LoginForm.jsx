@@ -313,7 +313,7 @@ export default function LoginForm({ onSuccess }) {
                                 borderRadius: "999px",
                             }}
                         >
-                            SIGN IN
+                            L O G I N 
                         </Button>
                     </Fade>
                     <Divider>
@@ -344,7 +344,7 @@ export default function LoginForm({ onSuccess }) {
                                 alignItems={"center"}
                                 gap={1}
                             >
-                                Sign in with
+                                Login with
                                 <img
                                     src="/google-icon.svg"
                                     alt="google-icon"

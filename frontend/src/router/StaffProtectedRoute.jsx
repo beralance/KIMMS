@@ -50,7 +50,7 @@ const StaffProtectedRoute = ({moduleName, children}) => {
     //staff access check
     if(user.role === 'staff' && moduleName && !permissions.includes(moduleName)) {
         return (
-            <Stack sx={{display: 'flex', mt: 5, justifyContent: 'center', alignItems: 'center'}}>
+            <Stack height={'40vh'} sx={{display: 'flex', mt: 5, justifyContent: 'center', alignItems: 'center'}}>
                 <Grow in={true} unmountOnExit mountOnEnter timeout={800}>
                     <Box sx={{width: 80}} >
                         <img 
@@ -66,7 +66,7 @@ const StaffProtectedRoute = ({moduleName, children}) => {
                 </Grow>
                
                 <Fade in={true} unmountOnExit mountOnEnter timeout={600}>
-                    <Stack sx={{display: 'flex', alignItems: 'center'}}>
+                    <Stack alignItems={'center'} justifyContent={'center'} >
                         <Typography variant='h6' fontWeight='bold' color='secondary'>
                             Content Hidden
                         </Typography>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ChevronRightIcon } from "lucide-react";
+import { ChevronRightIcon, XIcon } from "lucide-react";
 import {
     Box,
     Stack,
@@ -28,7 +28,13 @@ const OrderContainer = ({ order }) => {
 
     return (
         <Box>
-            <SectionWrapper sx={{ bgcolor: "#f5f5f5ff", borderRadius: 1 }}>
+            <SectionWrapper sx={{ bgcolor: "#f5f5f5ff", borderRadius: 1, position: 'relative'}}>
+                {(order.purchaseStatus === 'cancelled' && order.orderStatus === 'CANCELLED') && 
+                    <Box sx={{top: 0, left: 0, bgcolor: 'red', height: 15, width: 15, position: 'absolute', borderRadius: .5}}/>
+                }
+                {(order.purchaseStatus === 'delivered' && order.orderStatus === 'SUCCESSFUL') && 
+                    <Box sx={{top: 0, left: 0, bgcolor: 'green', height: 15, width: 15, position: 'absolute', borderRadius: .5}}/>
+                }
                 <Stack sx={{ gap: 2 }}>
                     {/*ORDER ID*/}
                     <Stack

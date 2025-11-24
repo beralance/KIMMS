@@ -40,7 +40,7 @@ export default function CategoriesList({open, onClose}) {
     }, []);
 
     return (
-        <Box sx={{p: 2, mb: 12, borderRadius: 2, maxHeight: {xs: 300}, overflowY: 'auto',}}>
+        <Box sx={{p: 2, mb: 12, borderRadius: 2, height: {xs: '60vh'}, overflowY: 'auto',}}>
             <Grid spacing={1} container>
                 {categories.map((category) => (
                     <Grid size={{xs: 6}} key={category.categoryId} sx={{position: 'relative'}}>

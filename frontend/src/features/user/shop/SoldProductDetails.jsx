@@ -9,16 +9,19 @@ import ProductCartRecommendation from "../../../components/ProductCardRecommenda
 import BottomActionBar from '../../../components/BottomActionBar';
 import ShoppingCartRoundedIcon from '@mui/icons-material/ShoppingCartRounded';
 import { useCheckout } from "../../../contexts/CheckoutContext";
+import { useAuth } from "../../../contexts/AuthContext";
 import { ScrollOnTop } from "../../../utils/ScrollOnTop";
 import { toTitleCase, formatNumber } from "../../../utils/stringUtils";
 import {Navigation, Pagination} from 'swiper/modules'
 import {Swiper, SwiperSlide} from 'swiper/react'
 import { SellRounded } from "@mui/icons-material";
 import { OrderContext } from "../../../contexts/OrderContext";
+import FullScreenLoader from "../../../components/FullScreenLoader";
 
 
 export default function SoldProductDetails() {
     const navigate = useNavigate();
+    const {user} = useAuth()
     const { id } = useParams();
     const {orders} = useContext(OrderContext)
     const [product, setProduct] = useState(null);
@@ -26,18 +29,18 @@ export default function SoldProductDetails() {
     const [imageOpen, setImageOpen] = useState(false);
     const { products } = useContext(ProductContext);
 
-    const category = product?.productId?.category
+    const category = product?.productId?.category || product?.inventoryId?.category
 
     useEffect(() => {
         const purchasedProductData = orders
+            .filter(order => order.userId?._id === user.userId)
             .flatMap(order => order.products)
-            .filter(p => p.productId?._id === id);
+            .filter(p => p.productId?._id || p.inventoryId?._id === id);
         setProduct(purchasedProductData[0])
+        console.log('Sample', purchasedProductData)
     }, [])
 
     useEffect(() => {
-        console.log('test', product)
-
         if (category) { 
             const recs = products.filter(
                 (p) => p.category?._id === category?._id && String(p._id) !== String(_id)
@@ -47,6 +50,8 @@ export default function SoldProductDetails() {
         }
     }, []);
 
+    if (!orders) return <FullScreenLoader/>
+
     return (
         <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: { xs: 0, md: 4 }}}>
             {/* Back button */}
@@ -55,7 +60,6 @@ export default function SoldProductDetails() {
                     <ArrowBackIcon sx={{ fontSize: 25 }} />
                 </Button>
             </Box>
-
             {/* Product Image */}
             <Box
                 onClick={() => setImageOpen(true)}
@@ -82,13 +86,12 @@ export default function SoldProductDetails() {
                             "--swiper-pagination-bullet-size": "8px",
                         }}
                     >
-                        {Array.isArray(product?.productId?.images) && product?.productId?.images.length > 0 && (
-                            product?.productId?.images.map((img, idx) => (
+                        {Array.isArray(product?.productId?.images ?? product?.inventoryId?.images ?? []) && product?.productId?.images.length > 0 || product?.inventoryId?.images.length > 0 && (
+                            (product?.productId?.images ?? product?.inventoryId?.images ?? []).map((img, idx) => (
                                 <SwiperSlide key={idx} style={{height: '70vh'}}>
                                     <Box sx={{justifySelf: 'center', height: '100%', width: '100%'}}>
                                         <img
                                             src={`${img}`}
-                                            alt={`${product?.productId?.productName}`}
                                             style={{ 
                                                 display: 'block',
                                                 width: "100%",
@@ -134,32 +137,37 @@ export default function SoldProductDetails() {
                         <Stack gap={2}>
                             <Stack sx={{gap: 4}}>
                                 <Stack gap={1}>
+                                    
                                     <Stack direction={'row'}>
                                         <Box sx={{bgcolor: 'black', opacity: .8, borderRadius: 1, width: 5, mr: 2}}/>
-                                        <Typography variant="h6" color="gray" fontWeight={'bold'} maxWidth={'80%'} sx={{textDecoration: 'line-through'}}>{product?.productId?.productName}</Typography>
+                                        <Typography variant="h6" color="gray" fontWeight={'bold'} maxWidth={'80%'} sx={{textDecoration: 'line-through'}}>{product?.productId?.productName || product?.inventoryId?.productName}</Typography>
                                     </Stack>
                                     <Stack direction={'row'} alignItems={'center'}>
                                         <SellRounded color="error" sx={{mr: 1}}/>
-                                        <Typography variant="body1" color="gray" sx={{textDecoration: 'line-through'}}>Php {formatNumber(product?.productId?.price)}</Typography>
+                                        <Typography variant="body1" color="gray" sx={{textDecoration: 'line-through'}}>Php {formatNumber(product?.productId?.price || product?.inventoryId?.price)}</Typography>
                                     </Stack>
                                 </Stack>
                                 <Stack direction={'row'} alignItems={'center'}>
-                                    <Typography variant="subtitle1" color="secondary" sx={{border: 1, px: 2, borderRadius: '999px'}}>
-                                        {product?.productId?.category?.name}
+                                    <Typography variant="body2" color="secondary" sx={{border: 1, px: 2, borderRadius: '999px'}}>
+                                        {product?.productId?.category?.name || product?.inventoryId?.category?.name}
                                     </Typography>
                                     <Divider orientation="vertical" sx={{ height: 20, color: '#37353E', mx: 1}}/>
-                                    <Typography variant="subtitle1" color="secondary"  sx={{border: 1, px: 2, borderRadius: '999px'}}>
-                                        {toTitleCase(product?.productId?.condition)}
+                                    <Typography variant="body2" color="secondary"  sx={{border: 1, px: 2, borderRadius: '999px'}}>
+                                        {toTitleCase(product?.productId?.condition || product?.inventoryId?.condition)}
+                                    </Typography>
+                                    <Divider orientation="vertical" sx={{ height: 20, color: '#37353E', mx: 1}}/>
+                                    <Typography variant="body2" color="secondary"  sx={{border: 1, px: 2, borderRadius: '999px'}}>
+                                        {product?.productId?.isLocal || product?.inventoryId?.isLocal ? "Large" : 'Small'} item
                                     </Typography>
                                 </Stack>
                                 <Stack>
-                                    <Typography variant="subtitle1" color="initial">Description: </Typography>
-                                    <Typography variant="body1" color="secondary" paragraph>{product?.productId?.description}</Typography>
+                                    <Typography variant="body1" color="secondary">Description: </Typography>
+                                    <Typography variant="body2" color="gray" paragraph>{product?.productId?.description || product?.inventoryId?.description}</Typography>
                                 </Stack>
                                 <Stack>
-                                    <Typography variant="subtitle1" color="initial">Details:</Typography>
-                                    <Typography variant="body1" color="secondary" paragraph>
-                                        {product?.productId?.details}
+                                    <Typography variant="body1" color="secondary">Details:</Typography>
+                                    <Typography variant="body2" color="gray" paragraph>
+                                        {product?.productId?.details || product?.inventoryId?.details}
                                     </Typography>
                                 </Stack>
                             </Stack>
@@ -208,13 +216,12 @@ export default function SoldProductDetails() {
                                 "--swiper-pagination-bullet-size": "8px",
                             }}
                         >
-                            {Array.isArray(product?.productId?.images) && product?.productId?.images.length > 0 && (
-                                product?.productId?.images.map((img, idx) => (
+                            {Array.isArray(product?.productId?.images ?? product?.inventoryId?.images ?? []) && product?.productId?.images.length > 0 || product?.inventoryId?.images.length > 0 && (
+                                (product?.productId?.images ?? product?.inventoryId?.images ?? []).map((img, idx) => (
                                     <SwiperSlide key={idx} style={{alignSelf: 'center', position: 'relative'}}>
                                         <Box sx={{height: '100%', width: '100%'}}>
                                             <img
                                                 src={`${img}`}
-                                                alt={`${product?.productId?.productName}`}
                                                 style={{ 
                                                     display: 'block',
                                                     maxWidth: '100%',
@@ -230,7 +237,7 @@ export default function SoldProductDetails() {
                                         </IconButton>
                                         <Box sx={{position: 'absolute', bottom: 10, backdropFilter: 'blur(10px)', zIndex:  100, WebkitBackdropFilter: "blur(10px)", borderRadius: .5, px: 2, py: .5}}> 
                                             <Typography variant="body1" color="initial">
-                                                {product.productId?.productName}
+                                                {product.productId?.productName || product.inventoryId?.productName}
                                             </Typography>
                                         </Box>
                                     </SwiperSlide>

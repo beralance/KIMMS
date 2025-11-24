@@ -30,11 +30,10 @@ const RecentPurchase = ({userOrders}) => {
                 <Stack direction="row" gap={2} sx={{overflowY: 'auto', width: '100%'}}>
                     {recentProducts.length > 0 ? (
                         recentProducts.slice(0, 5).map((product) => (
-                            <Stack key={product.productId?._id} alignItems="center" gap={2}>
-                                <Box onClick={() => navigate(`/product/sold/${product.productId?._id}`)} sx={{ cursor: 'pointer', width: 150, overflow: 'hidden', borderRadius: 1 }}>
+                            <Stack key={product.productId?._id || product.inventoryId?._id} alignItems="center" width={150} gap={2}>
+                                <Box onClick={() => navigate(`/product/sold/${product.productId?._id || product.inventoryId?._id}`)} sx={{ cursor: 'pointer', width: 150, overflow: 'hidden', borderRadius: 1 }}>
                                     <img
-                                        src={product.productId?.images?.[0]}
-                                        alt={product.productId?.productName}
+                                        src={product.productId?.images?.[0] || product.inventoryId?.images?.[0]}
                                         style={{
                                         display: 'block',
                                         aspectRatio: '9/10',
@@ -45,7 +44,7 @@ const RecentPurchase = ({userOrders}) => {
                                     />
                                 </Box>
                                 <Stack>
-                                    <Typography variant="body2" textAlign={'center'} gutterBottom>{product.productId?.productName}</Typography>
+                                    <Typography variant="body2" textAlign={'center'} gutterBottom>{product.productId?.productName || product.inventoryId?.productName}</Typography>
                                 </Stack>
                             </Stack>
                         ))

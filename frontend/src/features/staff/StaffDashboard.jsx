@@ -88,14 +88,14 @@ const StaffDashboard = () => {
         });
     };
 
-    const categoryData = Object.entries(categoryBreakdown).map(
+    const categoryData = Object.entries(categoryBreakdown || {}).map(
         ([name, value]) => ({
             name,
             value,
         })
     );
 
-    const conditionData = Object.entries(conditionBreakdown).map(
+    const conditionData = Object.entries(conditionBreakdown || {}).map(
         ([name, value]) => ({
             name,
             value,

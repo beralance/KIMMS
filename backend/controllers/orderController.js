@@ -2,6 +2,7 @@
 import Order from "../models/Order.js";
 import User from "../models/User.js";
 import Inventory from "../models/Inventory.js";
+import Auction from "../models/Auction.js";
 import Product from "../models/Product.js";
 import { sendEmail } from "../utils/sendEmail.js";
 
@@ -204,11 +205,26 @@ export const updateOrderStatus = async (req, res) => {
         if (!order) return res.status(404).json({ message: "Order not found" });
 
         if (
+            order.orderStatus === 'SUCCESSFUL' &&
             order.paymentMethod === "cashOnDelivery" &&
             order.purchaseStatus === "out_for_delivery" &&
             paymentStatus !== "paid"
         ) {
             order.paymentStatus = "paid";
+        }
+
+        if (
+            order.auctionId &&
+            order.orderStatus === 'SUCCESSFUL' &&
+            order.orderType === 'auction' &&
+            order.purchaseStatus === "out_for_delivery"
+        ) {
+            const auction = await Auction.findById(order.auctionId)
+            auction.status = 'CLOSED'
+            auction.cooldownUntil = null
+            auction.claimDeadline = null
+            order.paymentStatus = "paid";
+            auction.save()
         }
 
         if (purchaseStatus) order.purchaseStatus = purchaseStatus;
@@ -319,12 +335,20 @@ export const cancelOrder = async (req, res) => {
             await Promise.all(
                 order.products
                     .filter((item) => item.inventoryId)
-                    .map((item) =>
-                        Inventory.findByIdAndUpdate(item.inventoryId, {
+                    .map( async (item) => {
+                        await Inventory.findByIdAndUpdate(item.inventoryId, {
                             status: "available",
                         })
-                    )
+                    })
             );
+            if (order.auctionId) {
+                await Auction.findByIdAndUpdate(order.auctionId, {
+                    status: 'CANCELLED',
+                    winner: null,
+                    claimDeadline: null,
+                    finalized: false,
+                })
+            }
             console.log(
                 `Cancelled -AUCTION- order: ORDER "${order._id}" update successful`
             );

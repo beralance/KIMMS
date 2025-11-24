@@ -9,12 +9,6 @@ export const saveLocation = async (req, res) => {
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ message: "User not found" });
 
-        if (user.role === "admin") {
-            return res
-                .status(403)
-                .json({ message: "Admin account, location not tracked" });
-        }
-
         const locationData = await reverseGeocode(latitude, longitude);
 
         const location = await Location.findOneAndUpdate(

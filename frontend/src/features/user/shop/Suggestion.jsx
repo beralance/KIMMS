@@ -34,8 +34,8 @@ const Suggestion = ({label, subLabel, products, icon}) => {
                                 />
                             </Box>
                             <Stack>
-                                <Typography variant="subtitle1" color="initial" noWrap>{product?.productName}</Typography>
-                                <Typography variant="body1" color="secondary">PHP {formatNumber(product?.price)}</Typography>
+                                <Typography variant="body1" color="initial" align='center' noWrap>{product?.productName}</Typography>
+                                <Typography variant="body2" color="secondary" align='center'>PHP {formatNumber(product?.price)}</Typography>
                             </Stack>
                         </Stack>
                     )}

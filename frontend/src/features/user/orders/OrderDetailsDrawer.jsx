@@ -197,12 +197,23 @@ const OrderDetailsDrawer = ({ order, open, onClose }) => {
                                 </Stack>
                             </SectionWrapper>
                             <SectionWrapper>
-                                <Typography variant="body1" color="initial">
-                                    Purchase Status:
-                                </Typography>
-                                <OrderStatusStepper
-                                    orderStatus={order.purchaseStatus}
-                                />
+                                {(order.purchaseStatus === 'cancelled' || order.orderStatus === 'CANCELLED') ?
+                                    <Stack>
+                                        <Stack>
+                                            <Typography variant="body1" color="secondary">Order cancelled</Typography>
+                                            <Typography variant="body2" color="gray" >Your order has been cancelled by <span style={{fontWeight: 'bold', textDecoration: 'underline'}}>{user.userId === order.cancelledBy?._id ? "You" : order.cancelledBy?.fullName}</span></Typography>
+                                        </Stack>
+                                    </Stack>
+                                :
+                                    <Stack>
+                                        <Typography variant="body1" color="initial">
+                                            Purchase Status:
+                                        </Typography>
+                                        <OrderStatusStepper
+                                            orderStatus={order.purchaseStatus}
+                                        />
+                                    </Stack>
+                                }
                             </SectionWrapper>
                             <SectionWrapper>
                                 <Typography

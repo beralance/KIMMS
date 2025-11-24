@@ -155,7 +155,7 @@ const OrderTab = ({ orders = [] }) => {
                                             </Box>
                                             <Stack>
                                                 <Typography
-                                                    variant="subtitle1"
+                                                    variant="body2"
                                                     color="secondary"
                                                     align="center"
                                                 >

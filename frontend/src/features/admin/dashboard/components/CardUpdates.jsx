@@ -10,7 +10,11 @@ import {
 } from "@mui/material";
 import { formatNumber } from "../../../../utils/stringUtils";
 import dayjs from "dayjs";
+import FullScreenLoader from "../../../../components/FullScreenLoader";
+
+
 const CardUpdates = ({ data }) => {
+    if (!data) return <Typography variant="body2">Loading Dashboard...</Typography>
     return (
         <>
             <Stack
@@ -24,7 +28,7 @@ const CardUpdates = ({ data }) => {
                     bgcolor: "#f0f0f0",
                 }}
             >
-                {data?.map((product) => (
+                {Array.isArray(data) && data.map((product) => (
                     <Stack
                         key={product._id}
                         gap={1}

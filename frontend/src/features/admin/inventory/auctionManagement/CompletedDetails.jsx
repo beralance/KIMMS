@@ -12,56 +12,84 @@ import {
 } from "@mui/material";
 import { AlignStartHorizontalIcon, Ellipsis } from "lucide-react";
 import SectionWrapper from "../../../../components/SectionWrapper";
+import {useAuth} from "../../../../contexts/AuthContext";
 import AuctionDetailsDisplay from "./AuctionDetailsDisplay";
 import { OrderContext } from "../../../../contexts/OrderContext";
 import { formatNumber } from "../../../../utils/stringUtils";
+import { getBidders } from "../../../../utils/bidApi";
+import dayjs from "dayjs";
 
 const ClosedDetails = ({ data }) => {
     console.log("TOP", data);
+    const { user } = useAuth();
     const { orders } = useContext(OrderContext);
     const [winnerOrder, setWinnerOrder] = useState(null);
+    const [userBid, setUserBid] = useState(null);
 
     console.log("orders", orders);
 
     useEffect(() => {
         const order = orders.filter((o) => o.auctionId === data._id);
-        console.log("order", order);
+        const fetchBidders = async () => {
+            const bid = await getBidders( data._id, user.token)
+            setUserBid(bid)
+            console.log('bid', bid)
+        }
+        fetchBidders()
     }, [data, orders]);
+
+
     return (
         <Stack gap={3}>
             <AuctionDetailsDisplay data={data} />
-            <Stack sx={{ border: "1px solid gray", borderRadius: 2, p: 2 }}>
-                <Typography
-                    variant="subtitle2"
-                    color="secondary"
-                    sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                >
-                    <AlignStartHorizontalIcon />
-                    Top Bidders
-                </Typography>
-                <Typography variant="body2" color="gray">
-                    Summary of leading bidders and their offers
-                </Typography>
+            <Stack gap={2} sx={{ border: "1px solid gray", borderRadius: 2, p: 2 }}>
+                <Stack>
+                    <Typography
+                        variant="subtitle2"
+                        color="secondary"
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                    >
+                        <AlignStartHorizontalIcon />
+                        Auction Winner
+                    </Typography>
+                    <Typography variant="body2" color="gray">
+                        Confirmed auction winner who has finalized payment for the item”
+                    </Typography>
+                </Stack>
                 <Stack>
                     <Stack>
-                        <Typography variant="body1" color="initial">
-                            claimed at
-                        </Typography>
-                        <Typography variant="body1" color="initial">
-                            claimed by
-                        </Typography>
-                        <Typography variant="body1" color="initial">
-                            email
-                        </Typography>
-                        <Typography variant="body1" color="initial">
-                            amount
-                        </Typography>
-                        <Typography variant="body1" color="initial">
-                            winner
-                        </Typography>
-                        <Typography variant="body1" color="initial">
-                            winner notified
-                        </Typography>
+                        <Stack direction={'row'} justifyContent={'space-between'}>
+                            <Typography variant="body2" color="secondary">
+                                Full name:
+                            </Typography>
+                            <Typography variant="body2" color="gray">
+                                {data.claimedBy?.fullName}
+                            </Typography>
+                        </Stack>
+                        <Stack direction={'row'} justifyContent={'space-between'}>
+                            <Typography variant="body2" color="secondary">
+                                Bid:
+                            </Typography>
+                            <Typography variant="body2" color="gray">
+                                Php {formatNumber(userBid[0].amount)}
+                            </Typography>
+                        </Stack>
+                        <Stack direction={'row'} justifyContent={'space-between'}>
+                            <Typography variant="body2" color="secondary">
+                                Email Address:
+                            </Typography>
+                            <Typography variant="body2" color="gray">
+                                {data.claimedBy?.email}
+                            </Typography>
+                        </Stack>
+                        <Stack direction={'row'} justifyContent={'space-between'}>
+                            <Typography variant="body2" color="secondary">
+                                Claimed At:
+                            </Typography>
+                            <Typography variant="body2" color="gray">
+                                 {dayjs(data.claimAt).format('MMMM DD, YYYY | HH:m A')}
+                            </Typography>
+                        </Stack>
                     </Stack>
                     <Stack>
                         <Typography

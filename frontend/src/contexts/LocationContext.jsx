@@ -12,7 +12,6 @@ export const LocationProvider = ({ children }) => {
 
     const updateLocation = async (latitude, longitude, isManual = false) => {
         if (!user?.userId) return;
-        if (user.role !== "admin") return;
 
         setLocation({ latitude, longitude });
         setStatus(isManual ? "manual" : "granted");
@@ -28,7 +27,6 @@ export const LocationProvider = ({ children }) => {
     const checkPermissionAndUpdate = () => {
         if (!user?.userId || !navigator.geolocation || !navigator.permissions)
             return;
-        if (user.role !== "admin") return;
 
         navigator.permissions
             .query({ name: "geolocation" })
