@@ -10,6 +10,7 @@ import {
     decrementProductCount,
 } from "./categoryController.js";
 import { io } from "../server.js";
+import { json } from "express";
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -66,7 +67,7 @@ export const createInventoryItem = async (req, res) => {
             tags,
             itemWeight,
         } = req.body;
-
+        const subCat = JSON.parse(req.body.subCategories || "[]");
         if (isLocal === "false" || isLocal === false) {
             if (!itemWeight)
                 return res
@@ -91,6 +92,7 @@ export const createInventoryItem = async (req, res) => {
             condition,
             price,
             category,
+            subCategories: subCat,
             isLocal,
             tags,
             weight:

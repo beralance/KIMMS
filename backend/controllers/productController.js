@@ -43,6 +43,7 @@ export const postProduct = async (req, res) => {
             details: inventoryItem.details,
             price: inventoryItem.price,
             category: inventoryItem.category._id,
+            subCategories: inventoryItem.subCategories,
             condition: inventoryItem.condition,
             images: inventoryItem.images,
             tags: inventoryItem.tags,

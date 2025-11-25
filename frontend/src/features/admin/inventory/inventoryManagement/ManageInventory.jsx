@@ -18,28 +18,41 @@ import {
     FormControlLabel,
     Switch,
     Divider,
+    List,
+    ListItemIcon,
+    Checkbox,
+    ListItemButton,
 } from "@mui/material";
+import SectionWrapper from "../../../../components/SectionWrapper";
 import { InventoryContext } from "../../../../contexts/InventoryContext";
 import PhysicalCodeDisplayer from "../components/PhysicalCodeDisplayer";
 import { useSnackbar } from "../../../../contexts/SnackbarContext";
 import ConfirmDialog from "../../../../components/ConfirmDialog";
 import FullScreenLoader from "../../../../components/FullScreenLoader";
 import {
+    AddRounded,
+    BackspaceRounded,
     CheckBox,
     CheckRounded,
     CloseRounded,
     CompareSharp,
     DeleteForeverRounded,
+    DeleteRounded,
     EditOffRounded,
     EditRounded,
     FrontHand,
+    PlusOneRounded,
 } from "@mui/icons-material";
 import {
     deleteCategory,
     addCategory,
     fetchCategories,
+    fetchSubCategories,
+    addSubCategory,
+    deleteSubCategory,
 } from "../../../../utils/categoryApi";
 import { toTitleCase } from "../../../../utils/stringUtils";
+import { CheckIcon, DeleteIcon, PlusIcon } from "lucide-react";
 
 export default function ProductForm({ productId, onClose }) {
     // <-- accept callback
@@ -49,6 +62,8 @@ export default function ProductForm({ productId, onClose }) {
     const [details, setDetails] = useState("");
     const [price, setPrice] = useState("");
     const [category, setCategory] = useState("");
+    const [subCategories, setSubCategories] = useState([]);
+    const [newSub, setNewSub] = useState("");
     const [condition, setCondition] = useState("");
     const [categories, setCategories] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]);
@@ -58,6 +73,8 @@ export default function ProductForm({ productId, onClose }) {
     const [isLocal, setIsLocal] = useState(true);
     const [existingImages, setExistingImages] = useState([]);
     const [itemWeight, setItemWeight] = useState(0);
+    const [openSubCat, setOpenSubCat] = useState(false);
+    const [subCategoriesSelected, setSubCategoriesSelected] = useState([]);
 
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -93,6 +110,7 @@ export default function ProductForm({ productId, onClose }) {
                 setIsLocal(item.isLocal ?? true);
                 setExistingImages(item.images || []);
                 setItemWeight(item.weight || 0);
+                setSubCategoriesSelected(item.subCategories || []);
 
                 console.log("Loaded item:", item);
             } catch (err) {
@@ -122,6 +140,13 @@ export default function ProductForm({ productId, onClose }) {
             }
         })();
     }, [categories]);
+
+    useEffect(() => {
+        if (!category) return;
+        if (subCategories.length === 0) {
+            setOpenSubCat(true);
+        }
+    }, [category]);
 
     const formatNumber = (value) => {
         if (!value) return "";
@@ -201,15 +226,81 @@ export default function ProductForm({ productId, onClose }) {
         }
     };
 
+    useEffect(() => {
+        if (!category) return;
+        loadSubCategories();
+    }, [category]);
+
+    const loadSubCategories = async () => {
+        try {
+            setLoading(true);
+            const res = await fetchSubCategories(category);
+            setSubCategories(res.subCategories || []);
+        } catch (err) {
+            console.error("Failed to load subcategories", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleAdd = async () => {
+        if (!newSub.trim())
+            return showSnackbar("Please add a sub label", "warning");
+        try {
+            await addSubCategory(category, newSub);
+            setNewSub("");
+            loadSubCategories();
+        } catch (err) {
+            console.error("Failed to add subcategory", err);
+        }
+    };
+
+    const handleToggleSubCategory = (sub) => {
+        const exists = subCategoriesSelected.includes(sub);
+
+        if (exists) {
+            // Remove
+            setSubCategoriesSelected((prev) =>
+                prev.filter((item) => item !== sub)
+            );
+        } else {
+            // Add
+            setSubCategoriesSelected((prev) => [...prev, sub]);
+        }
+    };
+
+    const handleDelete = async (name) => {
+        try {
+            const res = await deleteSubCategory(category, name);
+
+            if (res.ok || res.message === "Subcategory deleted") {
+                loadSubCategories();
+                showSnackbar("Subcategory deleted", "success");
+            }
+        } catch (err) {
+            console.error("Failed to delete subcategory", err);
+
+            const errorMessage =
+                err?.response?.data?.message ||
+                "Something went wrong while deleting subcategory";
+
+            if (err?.response?.data?.productCount) {
+                showSnackbar(
+                    `${errorMessage} (${err.response.data.productCount} product(s) using it)`,
+                    "warning"
+                );
+            } else {
+                showSnackbar(errorMessage, "warning");
+            }
+        }
+    };
+
     const handleImageUpload = (e) => {
         if (e.target.files && e.target.files.length > 0) {
             const filesArray = Array.from(e.target.files).filter(
                 (file) => file instanceof File
             );
-            console.log("prev", images);
-            console.log("filesarray:", filesArray);
             setImages((prev) => [...prev, ...filesArray]);
-
             e.target.value = null;
         }
     };
@@ -231,6 +322,7 @@ export default function ProductForm({ productId, onClose }) {
         setExistingImages([]);
         setNewCategory("");
         setItemWeight(0);
+        setSubCategoriesSelected([]);
     };
 
     const handleSubmit = async () => {
@@ -248,6 +340,11 @@ export default function ProductForm({ productId, onClose }) {
             !condition
         ) {
             showSnackbar("Please fill in all fields.", "warning");
+            return;
+        }
+
+        if (subCategoriesSelected.filter(Boolean).length === 0) {
+            showSnackbar("Please add 1 or more sub category.", "warning");
             return;
         }
 
@@ -279,6 +376,7 @@ export default function ProductForm({ productId, onClose }) {
         formData.append("details", details);
         formData.append("price", numericPrice);
         formData.append("category", toTitleCase(category));
+        formData.append("subCategories", JSON.stringify(subCategoriesSelected));
         formData.append("condition", condition);
         formData.append("tags", toTitleCase(tags));
         formData.append("isLocal", isLocal);
@@ -287,8 +385,6 @@ export default function ProductForm({ productId, onClose }) {
         images
             .filter(Boolean)
             .forEach((file) => formData.append("images", file));
-
-        console.log("Weight", formData);
 
         try {
             setLoading(true);
@@ -486,7 +582,7 @@ export default function ProductForm({ productId, onClose }) {
                         </Stack>
                     )}
                 </Box>
-                <Typography variant="subtitle2" color="grey">
+                <Typography variant="body2" color="grey">
                     * You can upload multiple images to improve product
                     presentation
                 </Typography>
@@ -501,7 +597,7 @@ export default function ProductForm({ productId, onClose }) {
                         onChange={handleImageUpload}
                     />
                 </Button>
-                <Typography variant="subtitle2" color="grey">
+                <Typography variant="body2" color="grey">
                     * Make sure very field is entered before submission
                 </Typography>
                 {/* Product name TEXT FIELD*/}
@@ -527,7 +623,7 @@ export default function ProductForm({ productId, onClose }) {
                 />
 
                 {/* Details TEXT FIELD*/}
-                <Typography variant="subtitle2" color="grey">
+                <Typography variant="body2" color="grey">
                     * Enter product details below such as width, height, depth,
                     and other specifications to provide users with a better
                     understanding of your product.
@@ -553,156 +649,297 @@ export default function ProductForm({ productId, onClose }) {
                     required
                     InputLabelProps={{ sx: { color: "#37353E" } }}
                 />
-
-                {/* Category SELECT FIELD*/}
-                <Typography variant="subtitle2" color="grey">
-                    * Add or edit categories by clicking the edit icon.
-                </Typography>
-                <Box sx={{ display: "flex", width: "100%", gap: 1 }}>
-                    <FormControl fullWidth>
-                        <InputLabel>Category</InputLabel>
-                        <Select
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value)}
-                            label="Category"
-                            required
-                        >
-                            {categories.map((cat) => (
-                                <MenuItem key={cat._id} value={cat._id}>
-                                    {cat.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-
-                    {/* Add Category BUTTON*/}
-                    <Button
-                        variant="text"
-                        color="secondary"
-                        onClick={() => setOpenAddCategory(!openAddCategory)}
-                    >
-                        {openAddCategory ? <EditOffRounded /> : <EditRounded />}
-                    </Button>
-                </Box>
-
-                {/* Add Category COLLAPSE*/}
-                <Collapse in={openAddCategory}>
-                    <Stack
-                        spacing={2}
-                        sx={{ bgcolor: "#f8f8f8", p: 2, borderRadius: 2 }}
-                    >
-                        <Box sx={{ display: "flex", gap: 2 }}>
-                            <TextField
-                                fullWidth
-                                variant="standard"
-                                label="New Category"
-                                value={newCategory}
-                                inputProps={{ maxLength: 15 }}
-                                onChange={(e) => setNewCategory(e.target.value)}
-                                size="small"
-                            />
-                            <IconButton
-                                variant="text"
-                                color="success"
-                                onClick={handleAddCategory}
+                <Stack gap={1}>
+                    {/* Category SELECT FIELD*/}
+                    <Typography variant="body2" color="grey">
+                        * Add or edit categories by clicking the edit icon.
+                    </Typography>
+                    <Box sx={{ display: "flex", width: "100%", gap: 1 }}>
+                        <FormControl fullWidth>
+                            <InputLabel>Category</InputLabel>
+                            <Select
+                                value={category}
+                                onChange={(e) => setCategory(e.target.value)}
+                                label="Category"
+                                required
                             >
-                                <CheckRounded />
-                            </IconButton>
-                        </Box>
-                        <Box sx={{ display: "flex", gap: 2 }}>
-                            <FormControl fullWidth variant="standard">
-                                <InputLabel id="select-categories-label">
-                                    {categories.length === 0
-                                        ? "Nothing to delete"
-                                        : "Remove Categories"}
-                                </InputLabel>
-                                <Select
-                                    labelId="select-categories-label"
-                                    multiple
-                                    disabled={categories.length === 0}
-                                    value={selectedCategories.map(
-                                        (cat) => cat._id
-                                    )}
-                                    onChange={(e) => {
-                                        const selectedIds = e.target.value;
-                                        const selectedObjs = categories.filter(
-                                            (cat) =>
-                                                selectedIds.includes(cat._id)
-                                        );
-                                        setSelectedCategories(selectedObjs);
-                                    }}
-                                    renderValue={(selectedIds) =>
-                                        categories
-                                            .filter((cat) =>
-                                                selectedIds.includes(cat._id)
-                                            )
-                                            .map((cat) => cat.name)
-                                            .join(", ")
+                                {categories.map((cat) => (
+                                    <MenuItem key={cat._id} value={cat._id}>
+                                        {cat.name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
+                        {/* Add Category BUTTON*/}
+                        <Button
+                            variant="text"
+                            color="secondary"
+                            onClick={() => setOpenAddCategory(!openAddCategory)}
+                        >
+                            {openAddCategory ? (
+                                <EditOffRounded />
+                            ) : (
+                                <EditRounded />
+                            )}
+                        </Button>
+                    </Box>
+
+                    {/* Add Category COLLAPSE*/}
+                    <Collapse in={openAddCategory}>
+                        <Stack
+                            spacing={2}
+                            sx={{ bgcolor: "#f8f8f8", p: 2, borderRadius: 2 }}
+                        >
+                            <Box sx={{ display: "flex", gap: 2 }}>
+                                <TextField
+                                    fullWidth
+                                    variant="standard"
+                                    label="New Category"
+                                    value={newCategory}
+                                    inputProps={{ maxLength: 15 }}
+                                    onChange={(e) =>
+                                        setNewCategory(e.target.value)
                                     }
+                                    size="small"
+                                />
+                                <IconButton
+                                    variant="text"
+                                    color="success"
+                                    onClick={handleAddCategory}
                                 >
-                                    <Typography
-                                        variant="body2"
-                                        color="grey"
-                                        sx={{
-                                            maxWidth: 300,
-                                            p: 1,
-                                            mb: 0.5,
-                                            textWrap: "wrap",
+                                    <CheckRounded />
+                                </IconButton>
+                            </Box>
+                            <Box sx={{ display: "flex", gap: 2 }}>
+                                <FormControl fullWidth variant="standard">
+                                    <InputLabel id="select-categories-label">
+                                        {categories.length === 0
+                                            ? "Nothing to delete"
+                                            : "Remove Categories"}
+                                    </InputLabel>
+                                    <Select
+                                        labelId="select-categories-label"
+                                        multiple
+                                        disabled={categories.length === 0}
+                                        value={selectedCategories.map(
+                                            (cat) => cat._id
+                                        )}
+                                        onChange={(e) => {
+                                            const selectedIds = e.target.value;
+                                            const selectedObjs =
+                                                categories.filter((cat) =>
+                                                    selectedIds.includes(
+                                                        cat._id
+                                                    )
+                                                );
+                                            setSelectedCategories(selectedObjs);
                                         }}
-                                    >
-                                        <b>Note:</b> Grey categories are not
-                                        used by any products and can be safely
-                                        deleted
-                                    </Typography>
-                                    <Divider />
-                                    {categories.map((cat) => (
-                                        <MenuItem
-                                            key={cat._id}
-                                            value={cat._id}
-                                            sx={{
-                                                color: selectedCategories.some(
-                                                    (sel) =>
-                                                        sel._id >= cat._id ||
-                                                        null
+                                        renderValue={(selectedIds) =>
+                                            categories
+                                                .filter((cat) =>
+                                                    selectedIds.includes(
+                                                        cat._id
+                                                    )
                                                 )
-                                                    ? "secondary"
-                                                    : "grey",
+                                                .map((cat) => cat.name)
+                                                .join(", ")
+                                        }
+                                    >
+                                        <Typography
+                                            variant="body2"
+                                            color="grey"
+                                            sx={{
+                                                maxWidth: 300,
+                                                p: 1,
+                                                mb: 0.5,
+                                                textWrap: "wrap",
                                             }}
                                         >
-                                            <Box
-                                                sx={{ display: "flex", gap: 1 }}
+                                            <b>Note:</b> Grey categories are not
+                                            used by any products and can be
+                                            safely deleted
+                                        </Typography>
+                                        <Divider />
+                                        {categories.map((cat) => (
+                                            <MenuItem
+                                                key={cat._id}
+                                                value={cat._id}
+                                                sx={{
+                                                    color: selectedCategories.some(
+                                                        (sel) =>
+                                                            sel._id >=
+                                                                cat._id || null
+                                                    )
+                                                        ? "secondary"
+                                                        : "grey",
+                                                }}
                                             >
-                                                {selectedCategories.some(
-                                                    (sel) => sel._id === cat._id
-                                                ) && (
-                                                    <CheckRounded fontSize="small" />
-                                                )}
-                                                <ListItemText
-                                                    primary={cat.name}
-                                                    primaryTypographyProps={{
-                                                        color:
-                                                            cat.productCount ===
-                                                            0
-                                                                ? "grey"
-                                                                : "black",
+                                                <Box
+                                                    sx={{
+                                                        display: "flex",
+                                                        gap: 1,
                                                     }}
-                                                />
-                                            </Box>
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                            <IconButton
-                                variant="text"
-                                color="error"
-                                onClick={handleRemoveCategory}
-                            >
-                                <DeleteForeverRounded />
-                            </IconButton>
-                        </Box>
-                    </Stack>
-                </Collapse>
+                                                >
+                                                    {selectedCategories.some(
+                                                        (sel) =>
+                                                            sel._id === cat._id
+                                                    ) && (
+                                                        <CheckRounded fontSize="small" />
+                                                    )}
+                                                    <ListItemText
+                                                        primary={cat.name}
+                                                        primaryTypographyProps={{
+                                                            color:
+                                                                cat.productCount ===
+                                                                0
+                                                                    ? "grey"
+                                                                    : "black",
+                                                        }}
+                                                    />
+                                                </Box>
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                                <IconButton
+                                    variant="text"
+                                    color="error"
+                                    onClick={handleRemoveCategory}
+                                >
+                                    <DeleteForeverRounded />
+                                </IconButton>
+                            </Box>
+                        </Stack>
+                    </Collapse>
+                    {category && (
+                        <SectionWrapper sx={{ bgcolor: "#f4f4f4" }}>
+                            <Stack>
+                                {loading ? (
+                                    <Typography>Loading...</Typography>
+                                ) : (
+                                    <Stack gap={2}>
+                                        <Typography
+                                            variant="body2"
+                                            color="gray"
+                                        >
+                                            Select a sub label for{" "}
+                                            <b>
+                                                {categories.find(
+                                                    (c) =>
+                                                        c._id.toString() ===
+                                                        category
+                                                )?.name || "test"}
+                                            </b>
+                                        </Typography>
+                                        <List
+                                            sx={{
+                                                maxHeight: 250,
+                                                overflowY: "auto",
+                                            }}
+                                        >
+                                            {subCategories.map((sub) => (
+                                                <ListItem
+                                                    key={sub._id || sub.name}
+                                                    disablePadding
+                                                >
+                                                    <ListItemButton
+                                                        onClick={() =>
+                                                            handleToggleSubCategory(
+                                                                sub.name
+                                                            )
+                                                        }
+                                                    >
+                                                        <ListItemIcon>
+                                                            <Checkbox
+                                                                color="secondary"
+                                                                edge="start"
+                                                                checked={subCategoriesSelected.includes(
+                                                                    sub.name
+                                                                )}
+                                                                tabIndex={-1}
+                                                                disableRipple
+                                                            />
+                                                        </ListItemIcon>
+                                                        <ListItemText
+                                                            primary={sub.name}
+                                                        />
+                                                        <IconButton
+                                                            color="error"
+                                                            onClick={() =>
+                                                                handleDelete(
+                                                                    sub.name
+                                                                )
+                                                            }
+                                                        >
+                                                            <DeleteForeverRounded fontSize="small" />
+                                                        </IconButton>
+                                                    </ListItemButton>
+                                                </ListItem>
+                                            ))}
+                                        </List>
+                                        {subCategories.length === 0 && (
+                                            <Stack>
+                                                <Typography
+                                                    color="warning"
+                                                    variant="body2"
+                                                >
+                                                    * No sub-category found for{" "}
+                                                    <span
+                                                        style={{
+                                                            fontWeight: "bold",
+                                                        }}
+                                                    >
+                                                        {categories.find(
+                                                            (c) =>
+                                                                c._id.toString() ===
+                                                                category
+                                                        )?.name || "test"}
+                                                    </span>
+                                                </Typography>
+                                            </Stack>
+                                        )}
+                                        <Divider>
+                                            <Typography
+                                                variant="body2"
+                                                color="gray"
+                                            >
+                                                Add sub category
+                                            </Typography>
+                                        </Divider>
 
+                                        <Stack direction={"row"} gap={1}>
+                                            <TextField
+                                                fullWidth
+                                                label="Subcategory"
+                                                variant="outlined"
+                                                value={newSub}
+                                                onChange={(e) =>
+                                                    setNewSub(
+                                                        toTitleCase(
+                                                            e.target.value
+                                                        )
+                                                    )
+                                                }
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter")
+                                                        handleAdd();
+                                                }}
+                                            />
+                                            <Button
+                                                variant="outlined"
+                                                color="success"
+                                                onClick={handleAdd}
+                                            >
+                                                <CheckRounded />
+                                            </Button>
+                                        </Stack>
+                                    </Stack>
+                                )}
+                            </Stack>
+                        </SectionWrapper>
+                    )}
+                </Stack>
                 {/* Add Condition SELECT*/}
                 <FormControl>
                     <InputLabel>Condition</InputLabel>
@@ -737,7 +974,15 @@ export default function ProductForm({ productId, onClose }) {
                                 >
                                     Available for:
                                 </Typography>
-                                <Typography variant="body1" color="secondary">
+                                <Typography
+                                    variant="body1"
+                                    color="secondary"
+                                    sx={{
+                                        px: 1,
+                                        border: "1px solid gray",
+                                        borderRadius: 1,
+                                    }}
+                                >
                                     {isLocal ? "Local" : "International"}{" "}
                                     customers
                                 </Typography>

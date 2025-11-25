@@ -38,7 +38,6 @@ const InventoryChart = () => {
         return Object.values(acc);
     }, [filteredItems]);
 
-    console.log("CHART DATA", chartData);
     const tableData = useMemo(() => {
         if (selectedCategory === "all") return filteredItems;
         return filteredItems.filter((item) =>
@@ -54,14 +53,15 @@ const InventoryChart = () => {
         };
 
         allInventoryItems.forEach((item) => {
-            if (item.status === "available" && item.status === 'available') totals.available += 1;
+            if (item.status === "available" && item.status === "available")
+                totals.available += 1;
         });
 
         return totals;
     }, [allInventoryItems]);
     return (
         <Stack gap={2}>
-            <Box sx={{ bgcolor: "#f8f8f8", borderRadius: 3, p: 2 }}>
+            <Box sx={{ bgcolor: "white", borderRadius: 3, p: 2 }}>
                 <Chart
                     onClick={(data) => setSelectedCategory(data.category)}
                     data={Array.isArray(chartData) ? chartData : []}

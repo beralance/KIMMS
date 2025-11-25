@@ -25,6 +25,8 @@ function ProductManagement() {
     const [highlight, setHighlight] = useState("all");
     const { searchTerm, setSearchTerm } = useOutletContext();
     const [loading, setLoading] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState("");
+    const [selectedSubCategory, setSelectedSubCategory] = useState("");
 
     useEffect(() => {
         const loadProducts = async () => {
@@ -54,12 +56,22 @@ function ProductManagement() {
                     if (
                         !p.productName?.toLowerCase().includes(s) &&
                         !p.category?.name?.toLowerCase().includes(s) &&
+                        !p.category?.subCategories?.toLowerCase().includes(s) &&
                         !p._id?.toLowerCase().includes(s)
                     )
                         return false;
                 }
 
-                if (category !== "all" && p.category?.name !== category)
+                if (
+                    selectedCategory &&
+                    selectedCategory !== "all" &&
+                    p.category?.name !== selectedCategory
+                )
+                    return false;
+                if (
+                    selectedSubCategory &&
+                    !p.subCategories?.includes(selectedSubCategory)
+                )
                     return false;
                 if (highlight !== "all") {
                     if (highlight === "featured" && p.highlight !== "featured")
@@ -70,8 +82,26 @@ function ProductManagement() {
 
                 return true;
             });
-    }, [products, searchTerm, category, highlight]);
+    }, [
+        products,
+        searchTerm,
+        category,
+        highlight,
+        selectedCategory,
+        selectedSubCategory,
+    ]);
 
+    const subCategories = useMemo(() => {
+        if (!selectedCategory) return [];
+        const filtered = products.filter(
+            (p) => p.category?.name === selectedCategory
+        );
+        return [...new Set(filtered.flatMap((p) => p.subCategories || []))];
+    }, [products, selectedCategory]);
+
+    useEffect(() => {
+        setSelectedSubCategory("");
+    }, [selectedCategory]);
     return (
         <Stack gap={3}>
             <Box>
@@ -93,11 +123,9 @@ function ProductManagement() {
 
             {/* Filters */}
             <Stack>
-                <SectionWrapper
-                    sx={{ boxShadow: 2, bgcolor: "#f0f0f0", gap: 4 }}
-                >
-                    <Stack sx={{ mb: 3 }}>
-                        {products.length > 0 && (
+                <Stack sx={{ mb: 3 }}>
+                    {products.length > 0 && (
+                        <Stack gap={2}>
                             <Stack
                                 direction={"row"}
                                 sx={{ gap: 2, mt: 2, width: "100%" }}
@@ -105,11 +133,10 @@ function ProductManagement() {
                                 <FormControl sx={{ width: { xs: "100%" } }}>
                                     <InputLabel>Category</InputLabel>
                                     <Select
-                                        variant="filled"
-                                        value={category}
+                                        value={selectedCategory}
                                         label="Category"
                                         onChange={(e) =>
-                                            setCategory(e.target.value)
+                                            setSelectedCategory(e.target.value)
                                         }
                                         sx={{
                                             maxHeight: 50,
@@ -124,7 +151,6 @@ function ProductManagement() {
                                         ))}
                                     </Select>
                                 </FormControl>
-
                                 <FormControl
                                     sx={{
                                         width: {
@@ -136,7 +162,6 @@ function ProductManagement() {
                                     <InputLabel>Highlight</InputLabel>
                                     <Select
                                         value={highlight}
-                                        variant="filled"
                                         label="Highlight"
                                         onChange={(e) =>
                                             setHighlight(e.target.value)
@@ -154,9 +179,37 @@ function ProductManagement() {
                                     </Select>
                                 </FormControl>
                             </Stack>
-                        )}
-                    </Stack>
-                    {/* Products Grid */}
+                            {selectedCategory && selectedCategory !== "all" && (
+                                <FormControl
+                                    fullWidth
+                                    disabled={!selectedCategory}
+                                >
+                                    <InputLabel>Subcategory</InputLabel>
+                                    <Select
+                                        value={selectedSubCategory}
+                                        label="Subcategory"
+                                        onChange={(e) =>
+                                            setSelectedSubCategory(
+                                                e.target.value
+                                            )
+                                        }
+                                    >
+                                        <MenuItem value="">
+                                            All Subcategories
+                                        </MenuItem>
+                                        {subCategories.map((sub, index) => (
+                                            <MenuItem key={index} value={sub}>
+                                                {sub}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            )}
+                        </Stack>
+                    )}
+                </Stack>
+                {/* Products Grid */}
+                <SectionWrapper sx={{ bgcolor: "#f0f0f0", gap: 4 }}>
                     <Grid
                         container
                         spacing={{ xs: 2, md: 2, lg: 3, xl: 2 }}

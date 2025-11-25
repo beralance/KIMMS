@@ -15,6 +15,10 @@ import {
     Button,
     Stack,
     Divider,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
 } from "@mui/material";
 import {
     AdjustRounded,
@@ -36,6 +40,12 @@ import UpdateDialog from "./UpdateDialog";
 import UpdateDrawer from "./UpdateDrawer";
 import ConfirmDialog from "../../../../components/ConfirmDialog";
 import RefreshButton from "../RefreshButton";
+import { formatNumber } from "../../../../utils/stringUtils";
+import {
+    fetchCategories,
+    fetchSubCategories,
+} from "../../../../utils/categoryApi";
+import FullScreenLoader from "../../../../components/FullScreenLoader";
 
 // Each row = 1 product
 function Row({ product, open, onToggle, deleteItem }) {
@@ -69,7 +79,6 @@ function Row({ product, open, onToggle, deleteItem }) {
         <React.Fragment>
             <TableRow
                 sx={{
-                    "& > *": { borderBottom: "unset" },
                     boxShadow: 0,
                     borderBottom: open && "1px solid #cfcfcfff",
                     m: 0,
@@ -97,7 +106,6 @@ function Row({ product, open, onToggle, deleteItem }) {
                             <Button sx={{ p: 0 }}>
                                 <Typography
                                     color="secondary"
-                                    fontWeight={"bold"}
                                     variant="body2"
                                     noWrap
                                     sx={{ minWidth: 80, maxWidth: 100 }}
@@ -114,13 +122,9 @@ function Row({ product, open, onToggle, deleteItem }) {
                     {product.physicalCode}
                 </TableCell>
                 <TableCell>{product.category?.name}</TableCell>
-                <TableCell>PHP {product.price}</TableCell>
+                <TableCell>PHP {formatNumber(product.price)}</TableCell>
                 <TableCell>
-                    <Typography
-                        variant="body2"
-                        fontWeight={"bold"}
-                        color="secondary"
-                    >
+                    <Typography variant="body2" color="secondary">
                         {dayjs(product.createdAt).format("MMMM D, YYYY")}
                     </Typography>
                     <Typography variant="body2" color="grey">
@@ -144,7 +148,7 @@ function Row({ product, open, onToggle, deleteItem }) {
             </TableRow>
 
             {/* Expandable details */}
-            <TableRow sx={{ bgcolor: "#f8f8f8" }}>
+            <TableRow sx={{ bgcolor: "#fafafa" }}>
                 <TableCell
                     style={{ paddingBottom: 0, paddingTop: 0 }}
                     colSpan={12}
@@ -153,6 +157,7 @@ function Row({ product, open, onToggle, deleteItem }) {
                         in={open}
                         timeout="auto"
                         unmountOnExit
+                        mountOnEnter
                         sx={{ pb: 2 }}
                     >
                         <Box>
@@ -304,10 +309,11 @@ function Row({ product, open, onToggle, deleteItem }) {
                                             <Grid size={{ xs: 6 }}>
                                                 <Stack gap={1}>
                                                     <Typography
-                                                        variant="subtitle2"
-                                                        color="white"
+                                                        variant="body2"
+                                                        color="secondary"
                                                         sx={{
-                                                            bgcolor: "#37353E",
+                                                            bgcolor:
+                                                                "#e0e0e0ff",
                                                             py: 0.5,
                                                             px: 2,
                                                             borderRadius: 1,
@@ -317,42 +323,87 @@ function Row({ product, open, onToggle, deleteItem }) {
                                                     </Typography>
                                                     <Stack
                                                         direction={"row"}
-                                                        sx={{ px: 1 }}
+                                                        sx={{
+                                                            px: 1,
+                                                            pb: 1,
+                                                            overflowX: "auto",
+                                                            width: "100%",
+                                                        }}
+                                                        gap={1}
                                                     >
                                                         <Typography
-                                                            variant="body1"
+                                                            variant="body2"
                                                             color="secondary"
+                                                            fontWeight={"bold"}
                                                             sx={{
                                                                 px: 2,
+                                                                textWrap:
+                                                                    "nowrap",
                                                                 borderRadius:
                                                                     "999px",
                                                                 border: 1,
                                                             }}
                                                         >
-                                                            {product.condition}
+                                                            <small>
+                                                                {" "}
+                                                                {
+                                                                    product.condition
+                                                                }
+                                                            </small>
                                                         </Typography>
-                                                        <Divider
-                                                            orientation="vertical"
-                                                            sx={{
-                                                                height: 20,
-                                                                mx: 1,
-                                                            }}
-                                                        />
                                                         <Typography
-                                                            variant="body1"
+                                                            variant="body2"
                                                             color="secondary"
+                                                            fontWeight={"bold"}
                                                             sx={{
                                                                 px: 2,
                                                                 borderRadius:
                                                                     "999px",
                                                                 border: 1,
+                                                                textWrap:
+                                                                    "nowrap",
                                                             }}
                                                         >
-                                                            {product.isLocal
-                                                                ? "Large"
-                                                                : "Small"}{" "}
-                                                            item
+                                                            <small>
+                                                                {product.isLocal
+                                                                    ? "Large"
+                                                                    : "Small"}{" "}
+                                                                item
+                                                            </small>
                                                         </Typography>
+                                                        {product.subCategories.map(
+                                                            (sub, index) => (
+                                                                <Stack
+                                                                    direction={
+                                                                        "row"
+                                                                    }
+                                                                    key={index}
+                                                                >
+                                                                    <Typography
+                                                                        variant="body2"
+                                                                        color="secondary"
+                                                                        noWrap
+                                                                        fontWeight={
+                                                                            "bold"
+                                                                        }
+                                                                        sx={{
+                                                                            px: 2,
+                                                                            borderRadius:
+                                                                                "999px",
+                                                                            border: 1,
+                                                                            textWrap:
+                                                                                "nowrap",
+                                                                        }}
+                                                                    >
+                                                                        <small>
+                                                                            {
+                                                                                sub
+                                                                            }
+                                                                        </small>
+                                                                    </Typography>
+                                                                </Stack>
+                                                            )
+                                                        )}
                                                     </Stack>
                                                 </Stack>
                                             </Grid>
@@ -360,10 +411,11 @@ function Row({ product, open, onToggle, deleteItem }) {
                                                 {/*Last Update*/}
                                                 <Stack gap={1}>
                                                     <Typography
-                                                        variant="subtitle2"
-                                                        color="white"
+                                                        variant="body2"
+                                                        color="secondary"
                                                         sx={{
-                                                            bgcolor: "#37353E",
+                                                            bgcolor:
+                                                                "#e0e0e0ff",
                                                             py: 0.5,
                                                             px: 2,
                                                             borderRadius: 1,
@@ -373,7 +425,7 @@ function Row({ product, open, onToggle, deleteItem }) {
                                                     </Typography>
                                                     <Stack sx={{ px: 1 }}>
                                                         <Typography
-                                                            variant="body1"
+                                                            variant="body2"
                                                             color="initial"
                                                         >
                                                             {product.updatedAt
@@ -410,11 +462,11 @@ function Row({ product, open, onToggle, deleteItem }) {
                                         >
                                             <Grid size={{ xs: 6 }}>
                                                 <Typography
-                                                    variant="subtitle2"
+                                                    variant="body2"
                                                     gutterBottom
-                                                    color="white"
+                                                    color="secondary"
                                                     sx={{
-                                                        bgcolor: "#37353E",
+                                                        bgcolor: "#e0e0e0ff",
                                                         px: 1,
                                                         py: 0.5,
                                                         borderRadius: 1,
@@ -435,11 +487,11 @@ function Row({ product, open, onToggle, deleteItem }) {
                                             </Grid>
                                             <Grid size={{ xs: 6 }}>
                                                 <Typography
-                                                    variant="subtitle2"
+                                                    variant="body2"
                                                     gutterBottom
-                                                    color="white"
+                                                    color="secondary"
                                                     sx={{
-                                                        bgcolor: "#37353E",
+                                                        bgcolor: "#e0e0e0ff",
                                                         px: 1,
                                                         py: 0.5,
                                                         borderRadius: 1,
@@ -497,6 +549,10 @@ function Row({ product, open, onToggle, deleteItem }) {
 export default function InventoryTable({ searchTerm }) {
     const { inventoryItems, deleteInventoryItem, fetchInventoryItems } =
         useContext(InventoryContext);
+    const [categories, setCategories] = useState("");
+    const [subCategories, setSubCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState("");
+    const [selectedSubCategory, setSelectedSubCategory] = useState("");
     const [sortConfig, setSortConfig] = React.useState({
         key: null,
         direction: "asc",
@@ -504,26 +560,31 @@ export default function InventoryTable({ searchTerm }) {
     const [open, setOpen] = React.useState(null);
     const [loading, setLoading] = React.useState(false);
 
-    console.log("fetch", inventoryItems);
-    // filter here before rendering
-    const filteredItems = inventoryItems.filter((product) => {
-        if (!searchTerm) return true; // no search, return all
-        const search = searchTerm.toLowerCase();
-        const query = search.toLowerCase().replace(/-/g, "");
+    useEffect(() => {
+        const getCategories = async () => {
+            try {
+                const cats = await fetchCategories();
+                setCategories(cats);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        getCategories();
+        fetchInventoryItems();
+    }, []);
 
-        return (
-            product.productName?.toLowerCase().includes(query) ||
-            product.category?.name?.toLowerCase().includes(query) ||
-            product.physicalCode
-                ?.toLowerCase()
-                .replace(/-/g, "")
-                .includes(query) ||
-            product._id?.toLowerCase().includes(query)
-        );
-    });
+    useEffect(() => {
+        if (!selectedCategory) {
+            setSubCategories([]);
+            setSelectedCategory("");
+            return;
+        }
+        const category = categories.find((cat) => cat._id === selectedCategory);
+        setSubCategories(category?.subCategories.map((sub) => sub.name) || []);
+        setSelectedSubCategory("");
+    }, [selectedCategory, categories]);
 
     const handleSort = (key) => {
-        setOpen(null);
         setSortConfig((prev) => {
             if (prev.key === key) {
                 return {
@@ -531,10 +592,47 @@ export default function InventoryTable({ searchTerm }) {
                     direction: prev.direction === "asc" ? "desc" : "asc",
                 };
             }
-            return { key, direction: "asc" }; // new column, default
+            return { key, direction: "asc" };
         });
     };
 
+    const filteredItems = inventoryItems.filter((product) => {
+        // Search filter
+        if (searchTerm) {
+            const query = searchTerm.toLowerCase().replace(/-/g, "");
+            if (
+                !(
+                    product.productName?.toLowerCase().includes(query) ||
+                    product.category?.name?.toLowerCase().includes(query) ||
+                    product.category?.subCategories
+                        ?.toLowerCase()
+                        .includes(query) ||
+                    product.subCategories?.some((sub) =>
+                        sub.toLowerCase().includes(query)
+                    ) ||
+                    product.physicalCode
+                        ?.toLowerCase()
+                        .replace(/-/g, "")
+                        .includes(query) ||
+                    product._id?.toLowerCase().includes(query)
+                )
+            )
+                return false;
+        }
+        // Category filter
+        if (selectedCategory && product.category?._id !== selectedCategory)
+            return false;
+
+        // Subcategory filter
+        if (
+            selectedSubCategory &&
+            !product.subCategories?.includes(selectedSubCategory)
+        )
+            return false;
+        return true;
+    });
+
+    // Sort items
     const sortedItems = [...filteredItems].sort((a, b) => {
         if (!sortConfig.key) return 0;
 
@@ -551,26 +649,18 @@ export default function InventoryTable({ searchTerm }) {
             bValue = b[sortConfig.key] ?? "";
         }
 
-        // Date sort
-        if (
-            aValue instanceof Date &&
-            bValue instanceof Date &&
-            !isNaN(aValue) &&
-            !isNaN(bValue)
-        ) {
+        if (aValue instanceof Date && bValue instanceof Date) {
             return sortConfig.direction === "asc"
                 ? aValue - bValue
                 : bValue - aValue;
         }
 
-        // String sort
         if (typeof aValue === "string" && typeof bValue === "string") {
             return sortConfig.direction === "asc"
                 ? aValue.localeCompare(bValue)
                 : bValue.localeCompare(aValue);
         }
 
-        // Number sort
         if (typeof aValue === "number" && typeof bValue === "number") {
             return sortConfig.direction === "asc"
                 ? aValue - bValue
@@ -593,14 +683,58 @@ export default function InventoryTable({ searchTerm }) {
         }
     };
 
+    if (!categories) return <FullScreenLoader open={!categories} />;
     return (
-        <>
+        <Stack gap={2}>
+            <Stack direction={"row"} gap={1}>
+                <FormControl fullWidth>
+                    <InputLabel>Category</InputLabel>
+                    <Select
+                        value={selectedCategory}
+                        label="Category"
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                    >
+                        <MenuItem value="">All Categories</MenuItem>
+                        {categories?.map((cat) => (
+                            <MenuItem key={cat._id} value={cat._id}>
+                                {cat.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+
+                {selectedCategory && (
+                    <FormControl fullWidth disabled={!selectedCategory}>
+                        <InputLabel>Subcategory</InputLabel>
+                        <Select
+                            value={selectedSubCategory}
+                            label="Subcategory"
+                            onChange={(e) =>
+                                setSelectedSubCategory(e.target.value)
+                            }
+                        >
+                            <MenuItem value="">All Subcategories</MenuItem>
+                            {subCategories.map((sub, index) => (
+                                <MenuItem key={index} value={sub}>
+                                    {sub}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                )}
+            </Stack>
+            <Stack alignSelf={"flex-end"}>
+                <Typography variant="body1" color="secondary">
+                    {filteredItems.length} items found
+                </Typography>
+            </Stack>
+
             <TableContainer
                 component={Paper}
                 sx={{
-                    borderRadius: 2,
+                    borderRadius: "1px",
                     minHeight: "40vh",
-                    maxHeight: "80vh",
+                    maxHeight: "100vh",
                     overflowY: "auto",
                 }}
             >
@@ -610,10 +744,9 @@ export default function InventoryTable({ searchTerm }) {
                             position: "sticky",
                             top: 0,
                             zIndex: 500,
-                            boxShadow: 5,
                         }}
                     >
-                        <TableRow sx={{ bgcolor: "#37353E" }}>
+                        <TableRow sx={{ bgcolor: "#e9e9e9ff" }}>
                             <TableCell />
                             <TableCell
                                 sx={{ cursor: "pointer" }}
@@ -622,11 +755,11 @@ export default function InventoryTable({ searchTerm }) {
                                 <Typography
                                     fontWeight="bold"
                                     variant="body2"
-                                    color="white"
+                                    color="secondary"
                                     noWrap
                                     width={120}
                                 >
-                                    Product{" "}
+                                    PRODUCT{" "}
                                     {sortConfig.key === "productName" &&
                                         (sortConfig.direction === "asc"
                                             ? "▲"
@@ -640,11 +773,11 @@ export default function InventoryTable({ searchTerm }) {
                                 <Typography
                                     fontWeight="bold"
                                     variant="body2"
-                                    color="white"
+                                    color="secondary"
                                     noWrap
                                     width={120}
                                 >
-                                    Physical Code{" "}
+                                    PHYSICAL CODE{" "}
                                     {sortConfig.key === "physicalCode" &&
                                         (sortConfig.direction === "asc"
                                             ? "▲"
@@ -658,11 +791,11 @@ export default function InventoryTable({ searchTerm }) {
                                 <Typography
                                     fontWeight="bold"
                                     variant="body2"
-                                    color="white"
+                                    color="secondary"
                                     noWrap
                                     width={120}
                                 >
-                                    Category{" "}
+                                    CATEGORY{" "}
                                     {sortConfig.key === "category" &&
                                         (sortConfig.direction === "asc"
                                             ? "▲"
@@ -676,11 +809,11 @@ export default function InventoryTable({ searchTerm }) {
                                 <Typography
                                     fontWeight="bold"
                                     variant="body2"
-                                    color="white"
+                                    color="secondary"
                                     noWrap
                                     width={120}
                                 >
-                                    Price{" "}
+                                    PRICE{" "}
                                     {sortConfig.key === "price" &&
                                         (sortConfig.direction === "asc"
                                             ? "▲"
@@ -694,11 +827,11 @@ export default function InventoryTable({ searchTerm }) {
                                 <Typography
                                     fontWeight="bold"
                                     variant="body2"
-                                    color="white"
+                                    color="secondary"
                                     noWrap
                                     width={120}
                                 >
-                                    Date Created{" "}
+                                    DATE CREATED{" "}
                                     {sortConfig.key === "createdAt" &&
                                         (sortConfig.direction === "asc"
                                             ? "▲"
@@ -708,7 +841,7 @@ export default function InventoryTable({ searchTerm }) {
                             <TableCell align="center">
                                 {/*refresh button*/}
                                 <RefreshButton
-                                    sx={{ color: "white" }}
+                                    sx={{ color: "secondary" }}
                                     onRefresh={handleRefresh}
                                     tooltip="Refresh inventory"
                                 />
@@ -755,6 +888,6 @@ export default function InventoryTable({ searchTerm }) {
                     </TableBody>
                 </Table>
             </TableContainer>
-        </>
+        </Stack>
     );
 }

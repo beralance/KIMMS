@@ -13,6 +13,11 @@ const inventorySchema = new mongoose.Schema(
             ref: "Category",
             required: true,
         },
+        subCategories: {
+            type: [String],
+            default: [],
+            required: true,
+        },
         status: {
             type: String,
             enum: ["available", "sold", "reserved"],

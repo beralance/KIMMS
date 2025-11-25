@@ -3,48 +3,88 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export async function fetchCategories() {
     const res = await fetch(`${API_URL}/api/categories`);
-    if (!res.ok) throw new Error('Failed to fetch categories')
-    return res.json()
+    if (!res.ok) throw new Error("Failed to fetch categories");
+    return res.json();
 }
 
 export async function fetchPostedCategories() {
     const res = await fetch(`${API_URL}/api/categories/posted`);
-    if (!res.ok) throw new Error('Failed to fetch posted categories.')
-    return res.json()
+    if (!res.ok) throw new Error("Failed to fetch posted categories.");
+    return res.json();
 }
 
 export async function addCategory(name) {
     const res = await fetch(`${API_URL}/api/categories`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json'},
-        body: JSON.stringify({name}),
-    })
-    if (!res.ok) throw new Error('Failed to add category')
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+    });
+    if (!res.ok) throw new Error("Failed to add category");
     return res.json();
 }
 
 export async function deleteCategory(id) {
     try {
-        const res = await fetch(`${API_URL}/api/categories/${id}`, {method: 'DELETE'});
-        const data = await res.json()
-        
-        return {ok: res.ok, data};
-    }
-    catch (err) {
-        console.error('Error deleting category', err)
-        return {ok: false, data: {message: `This category cannot be removed because it is still assigned to existing products.`}}
+        const res = await fetch(`${API_URL}/api/categories/${id}`, {
+            method: "DELETE",
+        });
+        const data = await res.json();
+
+        return { ok: res.ok, data };
+    } catch (err) {
+        console.error("Error deleting category", err);
+        return {
+            ok: false,
+            data: {
+                message: `This category cannot be removed because it is still assigned to existing products.`,
+            },
+        };
     }
 }
 
 // ✅ New: fetch categories used in products
 export async function fetchCategoriesFromProducts() {
-    const user = JSON.parse(localStorage.getItem('user') || '{}')
-    const token = user.token?.trim()
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const token = user.token?.trim();
     const res = await fetch(`${API_URL}/api/categories/from-products`, {
         headers: {
-            'Authorization': `Bearer ${token}`
-        }
+            Authorization: `Bearer ${token}`,
+        },
     });
-    if (!res.ok) throw new Error('Failed to fetch categories from products.');
+    if (!res.ok) throw new Error("Failed to fetch categories from products.");
+    return res.json();
+}
+
+export async function addSubCategory(categoryId, subCategoryName) {
+    const res = await fetch(
+        `${API_URL}/api/categories/${categoryId}/subcategories`,
+        {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ subCategoryName }),
+        }
+    );
+    if (!res.ok) throw new Error("Failed to add subcategory");
+    return res.json();
+}
+
+export async function fetchSubCategories(categoryId) {
+    const res = await fetch(
+        `${API_URL}/api/categories/${categoryId}/subcategories`
+    );
+    if (!res.ok) throw new Error("Failed to fetch subcategories");
+    return res.json();
+}
+
+export async function deleteSubCategory(categoryId, subCategoryName) {
+    const res = await fetch(
+        `${API_URL}/api/categories/${categoryId}/subcategories`,
+        {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ subCategoryName }),
+        }
+    );
+    if (!res.ok) throw new Error("Failed to delete subcategory");
     return res.json();
 }
