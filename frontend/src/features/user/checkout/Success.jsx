@@ -1,10 +1,25 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Typography, Button, Box, Stack, IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeftIcon } from 'lucide-react';
+import { ChevronLeftIcon } from 'lucide-react'
+import {getPaymentStatus} from '../../../utils/paymentApi'
 
 export default function Success() {
+    const [payment, setPayment] = useState(null)
     const navigate = useNavigate();
+    const orderId = new URLSearchParams(window.location.search).get("orderId");
+
+    console.log('Testing', orderId)
+
+
+    useEffect(() => {
+        const fetchPayment = async () => {
+            const paym = await getPaymentStatus(orderId)
+            console.log('Payment', paym)
+            setPayment(paym)
+        }
+        fetchPayment()
+    }, [orderId])
 
     return (
         <Container>

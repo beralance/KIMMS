@@ -23,8 +23,8 @@ export const createCheckoutSession = async (req, res) => {
                 attributes: {
                     line_items: [{ name: "Purchase", amount, currency: "PHP", quantity: 1 }],
                     payment_method_types: ["gcash"],
-                    success_url: `${FRONTEND_URL}/success`,
-                    cancel_url: `${FRONTEND_URL}/cancel`,
+                    success_url: `${FRONTEND_URL}/success?orderId=${orderId}`,
+                    cancel_url: `${FRONTEND_URL}/cancel?orderId=${orderId}`,
                     metadata: {
                         checkoutSessionId: "cs_" + new mongoose.Types.ObjectId(),
                         orderId, // <-- store orderId in metadata if needed
@@ -110,3 +110,28 @@ export const cancelPayment = async (req, res) => {
     }
 };
 
+export const getPaymentStatus = async (req, res) => {
+    try {
+    const {orderId} = req.params
+    if (!orderId) return res.status(400).json({error: 'Order ID is required'})
+
+    const payment = await Payment.findOne({orderId})
+    if (!payment) return res.status(404).json({error: 'Payment not found'})
+
+
+    res.status(200).json({
+        orderId: payment.orderId,
+        checkoutSessionId: payment.checkoutSessionId,
+        paymongoId: payment.paymongoId,
+        amount: payment.amount,
+        currency: payment.currency,
+        status: payment.status,
+        productIds: payment.productIds,
+        paidAt: payment.createdAt || null,
+    })
+    }
+    catch (err) {
+        console.error(err) 
+        res.status(500).json({error: 'Failed to fetch payment status.'})
+    }
+}
