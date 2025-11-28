@@ -115,7 +115,7 @@ export const getPaymentStatus = async (req, res) => {
     const {orderId} = req.params
     if (!orderId) return res.status(400).json({error: 'Order ID is required'})
 
-    const payment = await Payment.findOne({orderId})
+    const payment = await Payment.findOne({orderId}).populate('orderId', 'orderId transactionReference').populate('productIds', 'productName isLocal amount images condition')
     if (!payment) return res.status(404).json({error: 'Payment not found'})
 
 
