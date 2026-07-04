@@ -14,9 +14,9 @@ const supabase = createClient(
 );
 
 const DEFAULT_AVATARS = {
-    male: "https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/Kimms%20Bucket/account-avatar-profile-male-01.svg",
-    female: "https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/Kimms%20Bucket/account-avatar-profile-female-01.svg",
-    other: "https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/Kimms%20Bucket/account-avatar-profile-male-07.svg",
+    male: "https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/Kimms%20Bucket/assets/account-avatar-profile-male-01.svg",
+    female: "https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/Kimms%20Bucket/assets/account-avatar-profile-female-01.svg",
+    other: "https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/Kimms%20Bucket/assets/account-avatar-profile-male-02.svg",
 };
 
 // SIGN UP (user)
@@ -641,32 +641,32 @@ export const verifyNewEmail = async (req, res) => {
 
 export const updateUserAvatar = async (req, res) => {
     try {
-            const userId = req.user.id;
+        const userId = req.user.id;
 
-            if (!req.file)
-                return res.status(400).json({ error: "No file uploaded" });
+        if (!req.file)
+            return res.status(400).json({ error: "No file uploaded" });
 
-            const user = await User.findById(userId);
-            if (!user) return res.status(404).json({ error: "User not found" });
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ error: "User not found" });
 
-            const sanitizedOriginal = req.file.originalname.replace(/[\s()]/g, "_");
-            const fileName = `avatars/${Date.now()}-${uuidv4()}-${sanitizedOriginal}`;
+        const sanitizedOriginal = req.file.originalname.replace(/[\s()]/g, "_");
+        const fileName = `avatars/${Date.now()}-${uuidv4()}-${sanitizedOriginal}`;
 
-            const { data, error } = await supabase.storage
-                .from("Kimms Bucket")
-                .upload(fileName, req.file.buffer, {
-                    cacheControl: "3600",
-                    upsert: false,
-                    contentType: req.file.mimetype,
-                });
+        const { data, error } = await supabase.storage
+            .from("User-Assets")
+            .upload(fileName, req.file.buffer, {
+                cacheControl: "3600",
+                upsert: false,
+                contentType: req.file.mimetype,
+            });
 
-            if (error) {
-                console.error("Supabase upload error:", error);
-                return res.status(500).json({ error: "Failed to upload avatar" });
-            }
+        if (error) {
+            console.error("Supabase upload error:", error);
+            return res.status(500).json({ error: "Failed to upload avatar" });
+        }
 
         const publicUrl = supabase.storage
-            .from("Kimms Bucket")
+            .from("User-Assets")
             .getPublicUrl(fileName).data?.publicUrl;
 
         if (!publicUrl)
@@ -674,12 +674,12 @@ export const updateUserAvatar = async (req, res) => {
                 .status(500)
                 .json({ error: "Failed to generate public URL" });
 
-        if (user.avatar && user.avatar.includes("/Kimms Bucket/")) {
+        if (user.avatar && user.avatar.includes("/User-Assets/")) {
             try {
-                const oldPath = user.avatar.split("/Kimms Bucket/")[1];
+                const oldPath = user.avatar.split("/User-Assets/")[1];
                 if (oldPath) {
                     await supabase.storage
-                        .from("Kimms Bucket")
+                        .from("User-Assets")
                         .remove([oldPath]);
                 }
             } catch (delErr) {

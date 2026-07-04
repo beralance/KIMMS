@@ -11,7 +11,7 @@ const AuctionHero = ({children}) => {
                 }}
             >
                 <video autoPlay muted loop style={{height: '100vh', width: '100%', objectFit: 'cover',}}>
-                    <source src="https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/Kimms%20Bucket/Auction-Backgrouond.mp4" type="video/mp4"/>
+                    <source src="https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/Kimms%20Bucket/assets/background-video.mp4" type="video/mp4"/>
                     Your Browser does not support this video tag.
                 </video>
                 <Box
