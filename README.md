@@ -2,7 +2,7 @@
 
 A full-stack MERN capstone project developed in collaboration with Kimm's Furniture & Merchandise. The platform modernizes surplus retail by combining traditional e-commerce with a first-price sealed-bid auction system, providing a tailored solution for inventory, sales, and auction management.
 
-Deployed Sample: *[[https://kimms]()](https://kimms-6drf.vercel.app/)*
+Deployed Sample: *[[https://kimms](https://kimms-6drf.vercel.app/)]*
 
 **Admin Dummy Account**
 - username: *admin.sample@2025*
