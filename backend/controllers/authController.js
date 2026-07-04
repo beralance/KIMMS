@@ -653,7 +653,7 @@ export const updateUserAvatar = async (req, res) => {
             const fileName = `avatars/${Date.now()}-${uuidv4()}-${sanitizedOriginal}`;
 
             const { data, error } = await supabase.storage
-                .from("Kimms-Bucket")
+                .from("Kimms Bucket")
                 .upload(fileName, req.file.buffer, {
                     cacheControl: "3600",
                     upsert: false,
