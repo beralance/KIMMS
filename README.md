@@ -4,9 +4,9 @@ A full-stack MERN capstone project developed in collaboration with Kimm's Furnit
 
 Deployed Sample: *https://link*
 
-**Admin Dummy Account:**
--username: *admin.kimms@2025*
--password: *Sample.admin.2502*
+**Admin Dummy Account**
+- username: *admin.kimms@2025*
+- password: *Sample.admin.2502*
 
 ---
 
