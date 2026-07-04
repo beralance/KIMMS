@@ -9,7 +9,7 @@ Deployed Sample: *[https://link](https://kimms-py92r2rnb-self-studys-projects.ve
 - password: *Sample.admin.2502*
 
 **Note**
-- If Google Login does not work, sign-up instead
+- If manual sign-up/login does not work, use google instead
 - This project is optimized for mobile view and may experience UI problems on desktop.
 If using desktop, view using inpect for better experience.
 
