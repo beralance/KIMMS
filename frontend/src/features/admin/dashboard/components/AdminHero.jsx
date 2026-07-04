@@ -3,7 +3,6 @@ import { Box, Stack, Typography } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
 
-// import swiper styles
 import "swiper/css";
 import "swiper/css/pagination";
 import SectionWrapper from "../../../../components/SectionWrapper";
@@ -25,7 +24,7 @@ export default function AdminHero() {
                 <Swiper
                     style={{
                         width: "100%",
-                        position: 'relative', // follows parent container width
+                        position: 'relative',
                         "--swiper-pagination-color": "white",
                         "--swiper-pagination-bullet-size": ".5rem",
                     }}
@@ -44,7 +43,7 @@ export default function AdminHero() {
                             <Box
                                 sx={{
                                     width: "100%",
-                                    aspectRatio: "16/9", // keeps responsive ratio
+                                    aspectRatio: "16/9",
                                     overflow: "hidden",
                                     backdropFilter: 'blur(10px)',
                                 }}

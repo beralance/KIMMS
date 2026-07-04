@@ -11,18 +11,16 @@ const CartHeader = () => {
     return (
         <AppBar position="fixed" color="secondary" sx={{height: '60px'}}>
             <Toolbar sx={{display: 'flex', justifyContent: 'space-between'}}>
-                {/* Back button */}
                 <IconButton
                     edge="start"
                     color="inherit"
                     aria-label="back"
-                    onClick={() => navigate('/auction/listing')} // go to previous page
+                    onClick={() => navigate('/auction/listing')}
                     sx={{ mr: 2 }}
                 >
                     <ArrowBackIcon/>
                 </IconButton>
 
-                {/* Title */}
                 <Box>
                     <Typography variant="body1" component="div">
                         A U C T I O N

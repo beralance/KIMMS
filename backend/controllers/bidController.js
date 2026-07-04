@@ -79,7 +79,6 @@ export const placeBid = async (req, res) => {
             });
         }
 
-        // ✅ Validate auction exists
         const auction = await Auction.findById(auctionId);
         if (!auction)
             return res.status(404).json({ message: "Auction not found" });
@@ -88,7 +87,6 @@ export const placeBid = async (req, res) => {
             return res.status(400).json({ message: "Auction is not active" });
         }
 
-        // ✅ Ensure bid meets reserve/start price
         const minAllowed = auction.reservePrice || auction.startPrice;
         if (amount < minAllowed) {
             return res
@@ -124,7 +122,6 @@ export const placeBid = async (req, res) => {
 
         res.status(201).json({ message: "Bid placed successfully" });
     } catch (err) {
-        // Handle duplicate bid if using unique index
         if (err.code === 11000) {
             return res.status(400).json({
                 message: "You have already placed a bid for this auction",
@@ -135,13 +132,12 @@ export const placeBid = async (req, res) => {
     }
 };
 
-// Optional: Only admin can view all bids (for audit/finalization)
 export const getBidsByAuction = async (req, res) => {
     try {
         console.log("auction id", req.params.auctionId);
         const bids = await Bid.find({ auctionId: req.params.auctionId })
-            .populate("userId", "fullName isLocal email") // admin sees user info
-            .sort({ amount: -1, createdAt: 1 }); // highest bid first, earliest if tie
+            .populate("userId", "fullName isLocal email")
+            .sort({ amount: -1, createdAt: 1 });
 
         res.json(bids);
     } catch (err) {

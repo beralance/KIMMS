@@ -31,7 +31,7 @@ export const claimAuctionItem = async (auctionId, token) => {
     try {
         const res = await axios.post(
             `${API_URL}/api/auctions/${auctionId}/claim`,
-            {}, // empty body (you can add data here if needed)
+            {},
             {
                 headers: {
                     Authorization: `Bearer ${token}`,

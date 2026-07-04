@@ -1,4 +1,3 @@
-// src/context/InventoryContext.jsx
 import { createContext, useState, useEffect } from "react";
 import {useAuth} from '../contexts/AuthContext'
 
@@ -11,14 +10,12 @@ export function InventoryProvider({ children }) {
     const [error, setError] = useState(null)
     const {token} = useAuth()
 
-    // Fetch all inventory items (filter out reserved/inactive items)
     const fetchInventoryItems = async () => {
         try {
             const res = await fetch(`${API_URL}/api/inventory`, {
                 headers: {'Authorization' : `Bearer ${token}`}
             })
             const data = await res.json();
-            // Only keep items that are available
             const availableItems = data.filter(item => item.status === "available");
             setInventoryItems(availableItems);
             setAllInventoryItems(data)
@@ -32,7 +29,7 @@ export function InventoryProvider({ children }) {
             const res = await fetch(`${API_URL}/api/inventory`, {
                 method: "POST",
                 headers: {'Authorization' : `Bearer ${token}`,},
-                body: itemData, // FormData with image
+                body: itemData,
             });
 
             const data = await res.json()
@@ -56,7 +53,7 @@ export function InventoryProvider({ children }) {
             const res = await fetch(`${API_URL}/api/inventory/${id}`, {
                 method: "PUT",
                 headers: {'Authorization' : `Bearer ${token}`,},
-                body: updatedData, // FormData if updating image
+                body: updatedData,
             });
             const updatedItem = await res.json();
             setInventoryItems((prevItems) => 

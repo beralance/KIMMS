@@ -1,4 +1,3 @@
-// context/CheckoutContext.jsx
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useCart } from "./CartContext";
 import { useAuth } from "./AuthContext";
@@ -21,7 +20,6 @@ export const CheckoutProvider = ({ children }) => {
     const navigate = useNavigate()
     const API_URL = import.meta.env.VITE_API_URL;
 
-    // Update checkout items and total whenever cart changes
     useEffect(() => {
         const total = checkoutItems.reduce(
             (sum, item) => sum + (item.productId?.price || 0),
@@ -30,7 +28,6 @@ export const CheckoutProvider = ({ children }) => {
         setTotalAmount(total);
     }, [checkoutItems]);
 
-    // online checkout
     const checkout = async () => {
         console.log('NO AUCTION CHECKOUT')
         if (!checkoutItems.length && !auctionCheckout) return;
@@ -87,7 +84,7 @@ export const CheckoutProvider = ({ children }) => {
 
             if (checkoutUrl) {
                 localStorage.setItem("pendingPurchase", JSON.stringify(order));
-                localStorage.setItem('checkoutSessionId', JSON.stringify(sessionId)) //add session id to local storage
+                localStorage.setItem('checkoutSessionId', JSON.stringify(sessionId))
                 window.location.href = checkoutUrl;
             } else {
                 console.error("No checkout_url returned:", paymentResp.data);

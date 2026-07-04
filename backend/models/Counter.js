@@ -1,9 +1,8 @@
-// Counter.js
 import mongoose from "mongoose";
 
 const counterSchema = new mongoose.Schema({
     category: String,
-    date: String, // YYYYMMDD
+    date: String,
     seq: { type: Number, default: 0 }
 });
 

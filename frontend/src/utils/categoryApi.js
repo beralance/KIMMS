@@ -1,4 +1,3 @@
-//const API_URL = 'http://localhost:5000/api/categories'
 const API_URL = import.meta.env.VITE_API_URL;
 
 export async function fetchCategories() {
@@ -42,7 +41,6 @@ export async function deleteCategory(id) {
     }
 }
 
-// ✅ New: fetch categories used in products
 export async function fetchCategoriesFromProducts() {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const token = user.token?.trim();

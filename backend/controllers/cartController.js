@@ -19,7 +19,6 @@ export const getCart = async (req, res) => {
                 }
             }).lean();
 
-        // If cart doesn't exist, create an empty one
         if (!cart) {
             cart = await Cart.create({ userId, items: [] });
             cart = await cart.populate({
@@ -33,7 +32,6 @@ export const getCart = async (req, res) => {
             });
         }
 
-        // remove item where productId didn't match (null after populate)
         cart.items = cart.items.filter(item => item.productId != null)
 
         res.json(cart);
@@ -49,11 +47,9 @@ export const addToCart = async (req, res) => {
         const userId = req.user.id;
         const { productId } = req.body;
 
-        // find product
         const product = await Product.findById(productId);
         if (!product) return res.status(404).json({error: 'Product not found'})
 
-        // backend restriction, block local only items for non local user
         if (product.isLocal && !req.user.isLocal) {
             console.log('RESULT', product.isLocal && !req.user.isLocal)
 
@@ -75,7 +71,6 @@ export const addToCart = async (req, res) => {
             })
         };
 
-        // Check if product is already in cart
         const exists = cart.items.some((i) => i.productId.toString() === productId);
         if (!exists) {
             cart.items.push({ productId });
@@ -103,7 +98,6 @@ export const removeFromCart = async (req, res) => {
         const userId = req.user.id;
         const { productId } = req.params;
 
-        // Find one using this userId inside CART collection
         const cart = await Cart.findOne({ userId });
         if (!cart) return res.status(404).json({ error: "Cart not found" });
 
@@ -139,19 +133,15 @@ export const clearCart = async (req, res) => {
 export const removePurchased = async (req, res) => {
     try {
         const userId = req.user.id;
-        const { removeIds } = req.body; // ✅ this matches what frontend sends
-
-        console.log("🟡 removePurchased called for user:", userId);
-        console.log("🟡 removeIds:", removeIds);
+        const { removeIds } = req.body;
 
         if (!removeIds || !removeIds.length) {
             return res.status(400).json({ message: "No productIds provided" });
         }
 
-        // Filter out purchased products from the cart
         const cart = await Cart.findOneAndUpdate(
             { userId },
-            { $pull: { items: { productId: { $in: removeIds } } } }, // ✅ MongoDB pull
+            { $pull: { items: { productId: { $in: removeIds } } } },
             { new: true }
         ).populate("items.productId", "productName weight category isLocal images price description");
 
@@ -159,7 +149,6 @@ export const removePurchased = async (req, res) => {
             return res.status(404).json({ message: "Cart not found" });
         }
 
-        console.log("✅ Updated cart after removePurchased:", cart);
         res.json(cart);
     } catch (err) {
         console.error("❌ Error in removePurchased:", err);

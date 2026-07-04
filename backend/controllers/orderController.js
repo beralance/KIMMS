@@ -86,10 +86,6 @@ export const createOrder = async (req, res) => {
                 )
             );
         }
-        console.log(
-            `New ${orderType.toUpperCase()} order created: ${savedOrder._id}`
-        );
-
         res.status(201).json(savedOrder);
     } catch (err) {
         console.error("❌ Error creating order:", err);
@@ -97,7 +93,6 @@ export const createOrder = async (req, res) => {
     }
 };
 
-// ✅ Get all orders (admin) or by user
 export const getOrders = async (req, res) => {
     try {
         const { userId } = req.query;
@@ -137,7 +132,6 @@ export const getOrders = async (req, res) => {
     }
 };
 
-// ✅ Search Order
 export const searchOrder = async (req, res) => {
     try {
         const { orderId } = req.query;
@@ -196,7 +190,6 @@ export const getOrder = async (req, res) => {
     }
 };
 
-// ✅ Update order status (admin or system automation)
 export const updateOrderStatus = async (req, res) => {
     try {
         const { purchaseStatus, paymentStatus, adminNote } = req.body;
@@ -236,11 +229,6 @@ export const updateOrderStatus = async (req, res) => {
         await updatedOrder.populate("userId");
         await updatedOrder.populate("products");
 
-        console.log(
-            `Order ${order._id} updated: purchaseStatus=${order.purchaseStatus}, paymentStatus=${order.paymentStatus}`
-        );
-
-        //send email to user based on status
         if (updatedOrder.userId && updatedOrder.userId.email) {
             await sendEmail({
                 to: updatedOrder.userId.email,
@@ -275,7 +263,6 @@ export const updateOrderStatus = async (req, res) => {
     }
 };
 
-// Cancel an order (Admin or system fallback)
 export const cancelOrder = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id);

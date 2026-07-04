@@ -351,7 +351,7 @@ const PrivacyPolicy = () => {
                                                     gap: 1,
                                                 }}
                                             >
-                                                0995 937 2422
+                                                0912-345-6789
                                             </Typography>
                                         </li>
                                         <li>
@@ -364,13 +364,13 @@ const PrivacyPolicy = () => {
                                                     gap: 1,
                                                 }}
                                             >
-                                                kimmsfurnituresinquiry@gmail.com
+                                                sample-email-address@sample.com
                                             </Typography>
                                         </li>
                                         <li>
                                             <Link
                                                 to={
-                                                    "https://www.facebook.com/kimmsjapansurplus"
+                                                    "https://"
                                                 }
                                                 target="_blank"
                                                 style={{
@@ -399,15 +399,14 @@ const PrivacyPolicy = () => {
                                                     gap: "10px",
                                                 }}
                                                 to={
-                                                    "https://maps.app.goo.gl/9aedRrBdvqxC33fK7"
+                                                    "https://"
                                                 }
                                             >
                                                 <Typography
                                                     variant="body2"
                                                     color="gray"
                                                 >
-                                                    Berces St. Zone 1
-                                                    Baranghawon , Tabaco,
+                                                    Sample Location,
                                                     Philippines
                                                 </Typography>
                                             </Link>

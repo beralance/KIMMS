@@ -73,7 +73,6 @@ const productSchema = new mongoose.Schema(
         },
         views: { type: Number, default: 0 },
 
-        // Optional: track the user who bought it
         purchasedBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",

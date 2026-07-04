@@ -8,8 +8,6 @@ import Cart from "../models/Cart.js";
 import { createNotification } from "../controllers/auctionNotificationController.js";
 import mongoose from "mongoose";
 
-// modified
-
 const mapEventTypeToStatus = (type) => {
     switch (type) {
         case "payment.paid":
@@ -28,51 +26,34 @@ const mapEventTypeToStatus = (type) => {
 export const handleWebhook = async (req, res) => {
     try {
         const event = req.body;
-        //console.log("Parsed event:", JSON.stringify(event, null, 2));
         const eventId = event.data?.id;
         const type = event.data?.attributes?.type;
         const paymentData = event.data?.attributes?.data || {};
-        //console.log('✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅')
-        //console.log('✅✅✅✅✅✅PAYMENT DATA✅✅✅✅✅✅✅', paymentData)
         const paymongoId = paymentData.id;
-
-        // Payment Attribute
         const paymentAttr = paymentData.attributes || {};
-        //console.log('✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅')
-        //console.log('✅✅✅✅✅✅PAYMENT ATTRIBUTES✅✅✅✅✅✅✅', paymentAttr)
         const checkoutSessionId = paymentAttr.metadata?.checkoutSessionId;
         const checkoutOrderId = paymentAttr.metadata?.orderId;
         const paymentMethod = paymentAttr.source?.type;
-
-        // Payment Intent
         const lineItems = paymentAttr?.line_items;
         const amount = lineItems?.[0]?.amount || 0;
         const currency = lineItems?.[0]?.currency || "PHP";
-        //console.log(lineItems)
-        //console.log('AMOUNT', amount)
-        //console.log('THIS IS THE AMOUNT FROM LINE ITEMS', lineItems?.[0].amount)
-        //console.log('THIS IS THE CURRENCY FROM LINE ITEMS', lineItems?.[0].currency)
 
         if (!paymongoId) {
             console.log("❌ No paymongoId found");
             return res.status(400).send("invalid webhook");
         }
 
-        // Try to find by paymongoId first
         let payment = await Payment.findOne({ paymongoId }).populate(
             "orderId",
             "userId auctionId orderType paymentMethod isActive finalPrice paymentStatus purchaseStatus orderId"
         );
-        //console.log("✅✅✅ paymongo Id is: ", paymongoId);
-
-        // Fallback: use checkoutSessionId from metadata
         if (!payment && checkoutSessionId) {
             payment = await Payment.findOne({ checkoutSessionId }).populate(
                 "orderId",
                 "userId auctionId orderType paymentMethod isActive finalPrice paymentStatus purchaseStatus orderId"
             );
             if (payment) {
-                payment.paymongoId = paymongoId; // link PayMongo ID
+                payment.paymongoId = paymongoId;
                 await payment.save();
             }
         }
@@ -120,7 +101,6 @@ export const handleWebhook = async (req, res) => {
 
         // Update products if payment is paid
         if (payment.status === "paid" && (checkoutOrderId || payment.orderId)) {
-            // replaced: payment.status === "paid" && Array.isArray(payment.productIds) && payment.productIds.length
             console.log("Updating products:", payment.productIds);
 
             // Update ORDER Collection
@@ -130,7 +110,7 @@ export const handleWebhook = async (req, res) => {
                 order.purchaseStatus = "confirmed";
                 order.checkoutSessionId = checkoutSessionId;
                 order.paymentId = payment._id;
-                order.paymentMethod = paymentMethod; //|| 'gcash'
+                order.paymentMethod = paymentMethod;
                 order.transactionReference = paymongoId;
                 (order.orderStatus = "SUCCESSFUL"), (order.isActive = true);
                 await order.save();
@@ -139,7 +119,6 @@ export const handleWebhook = async (req, res) => {
                 console.log("Order not found for order ID:", orderId);
             }
 
-            // Check if auction ID is available: if not proceed to normal payment, SKIP if no auction
             if (
                 payment?.orderId?.auctionId ||
                 payment?.orderId?.orderType === "auction"

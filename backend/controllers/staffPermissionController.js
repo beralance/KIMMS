@@ -2,19 +2,16 @@
 import StaffPermission from "../models/StaffPermission.js";
 import User from "../models/User.js";
 
-// ✅ Admin assigns or updates staff permissions
 export const setStaffPermissions = async (req, res) => {
     try {
         const { staffId, allowedModules } = req.body;
-        const adminId = req.user.id; // from auth middleware (must be admin)
+        const adminId = req.user.id;
 
-        // make sure staff exists and is a staff
         const staffUser = await User.findById(staffId);
         if (!staffUser || staffUser.role !== "staff") {
             return res.status(400).json({ error: "Invalid staff account" });
         }
 
-        // upsert permissions
         const staffPermission = await StaffPermission.findOneAndUpdate(
             { staffId },
             { staffId, adminId, allowedModules },
@@ -29,7 +26,6 @@ export const setStaffPermissions = async (req, res) => {
     }
 };
 
-// ✅ Get staff permissions (admin)
 export const getStaffPermissions = async (req, res) => {
     try {
         const staffId = req.params.staffId;
@@ -47,12 +43,11 @@ export const getStaffPermissions = async (req, res) => {
     }
 };
 
-// controllers/staffPermissionController.js
 export const getAllStaffPermissions = async (req, res) => {
     try {
         const allStaffs = await StaffPermission.find()
             .populate("staffId", "fullName email role");
-        res.json(allStaffs); // returns an array
+        res.json(allStaffs);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

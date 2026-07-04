@@ -1,6 +1,4 @@
-// src/utils/api.js
 const API_URL = import.meta.env.VITE_API_URL;
-// Generic helper for POST requests
 const postRequest = async (url, payload) => {
     const res = await fetch(url, {
         method: "POST",
@@ -10,10 +8,10 @@ const postRequest = async (url, payload) => {
 
     let resData;
     try {
-        resData = await res.json(); // parse once
+        resData = await res.json();
     } catch (e) {
         console.error("Failed to parse JSON response:", e);
-        resData = null; // fallback
+        resData = null;
     }
 
     if (!res.ok) {
@@ -69,7 +67,7 @@ export const updateUserProfile = async (userId, payload, token) => {
         method: "PATCH",
         headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json", // needed for JSON
+            "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
     });

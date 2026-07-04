@@ -30,7 +30,7 @@ export default function NavDrawer({
                             <ListItemButton
                                 component={NavLink}
                                 to={to}
-                                onClick={onClose} // closes drawer after navigation
+                                onClick={onClose}
                                 style={({ isActive }) => ({
                                     backgroundColor: isActive ? "#f0f0f0" : "transparent",
                                     fontWeight: isActive ? "bold" : "normal",

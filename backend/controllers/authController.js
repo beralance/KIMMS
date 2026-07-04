@@ -55,7 +55,7 @@ export const signup = async (req, res) => {
         }
         const orCondition = [{ email }];
         if (googleId) orCondition.push({ googleId });
-        // check if user already exists
+
         const existingUser = await User.findOne({
             $or: orCondition,
         });
@@ -64,7 +64,6 @@ export const signup = async (req, res) => {
             return res.status(400).json({ error: "User already exists" });
         }
 
-        // if local or google signup
         const isGoogle = !!googleId;
         let code, expiry;
         if (!isGoogle) {
@@ -81,7 +80,7 @@ export const signup = async (req, res) => {
             address,
             role: "user",
             isVerified: isGoogle,
-            isLocal: !isGoogle && address?.region === "05", // if navigate google sign up to address, only google sign up
+            isLocal: !isGoogle && address?.region === "05",
             verificationCode: code,
             verificationExpiry: expiry,
             googleId: googleId || undefined,
@@ -96,7 +95,6 @@ export const signup = async (req, res) => {
         await newUser.save();
 
         if (!isGoogle) {
-            // send email
             await sendEmail({
                 to: email,
                 subject: "Verify Your Account",
@@ -148,8 +146,8 @@ export const signup = async (req, res) => {
 
 export const updateAddress = async (req, res) => {
     const { userId } = req.params;
-    const { address: wrapper } = req.body; // unwrap the frontend object
-    const address = wrapper?.address || wrapper; // in case it's double-wrapped
+    const { address: wrapper } = req.body;
+    const address = wrapper?.address || wrapper;
 
     if (!address) {
         return res.status(400).json({ error: "Address is required" });
@@ -219,7 +217,6 @@ export const verifyEmail = async (req, res) => {
         user.verificationExpiry = null;
         await user.save();
 
-        // generate token after verification
         const token = jwt.sign(
             { id: user._id, role: user.role },
 
@@ -287,7 +284,6 @@ export const login = async (req, res) => {
             isLocal = user.address?.region === "05";
         }
 
-        // ensure verified
         if (!user.isVerified) {
             return res.status(400).json({
                 error: "Please verify your email before logging in",
@@ -295,7 +291,6 @@ export const login = async (req, res) => {
             });
         }
 
-        // compare password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch)
             return res.status(400).json({ error: "Invalid credentials" });
@@ -347,21 +342,6 @@ export const googleLogin = async (req, res) => {
         }
 
         let user = await User.findOne({ $or: [{ email }, { googleId }] });
-        /*
-        if (!user) {
-            user = new User({
-                email,
-                fullName,
-                googleId,
-                avatar: avatar || DEFAULT_AVATARS,
-                role: "user",
-                isVerified: "true",
-                isLocal: false,
-                termsAccepted: false,
-            });
-            await user.save();
-        }
-        */
 
         if (!user) {
             return res.status(401).json({
@@ -423,7 +403,7 @@ export const updateUserProfile = async (req, res) => {
         const userId = req.user.id;
         const { fullName, gender, phoneNumber, address } = req.body;
         console.log("USER", phoneNumber);
-        // Ensure at least one field is provided
+
         if (!fullName && !gender && !phoneNumber && !address) {
             return res.status(400).json({ error: "No field to update" });
         }
@@ -431,7 +411,6 @@ export const updateUserProfile = async (req, res) => {
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ error: "User not found" });
 
-        // Update fields if provided
         if (fullName) user.fullName = fullName.trim();
         if (gender) user.gender = gender;
         if (phoneNumber && !/^09\d{9}$/.test(phoneNumber)) {
@@ -441,7 +420,7 @@ export const updateUserProfile = async (req, res) => {
         }
         user.phoneNumber = phoneNumber;
         if (address && typeof address !== "object") {
-            return res.status(400).json({ error: "Invlid address format" });
+            return res.status(400).json({ error: "Invalid address format" });
         }
 
         if (address && typeof address === "object") {
@@ -549,8 +528,6 @@ export const updatePassword = async (req, res) => {
         const userId = req.user.id;
         const { currentPassword, newPassword } = req.body;
 
-        console.log("BODY", req.body);
-        console.log("User", userId);
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -559,12 +536,7 @@ export const updatePassword = async (req, res) => {
                 .status(400)
                 .json({ error: "Google user cannot change password" });
         }
-        console.log("_____________________________");
-        console.log("DEBUG - currentPassword:", currentPassword);
-        console.log("DEBUG - currentPassword:", newPassword);
-        console.log("DEBUG - user.password:", user.password);
         const isMatch = await bcrypt.compare(currentPassword, user.password);
-        console.log("MATCH ", isMatch);
         if (!isMatch)
             return res
                 .status(400)
@@ -591,14 +563,12 @@ export const updateEmail = async (req, res) => {
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ error: "User not found" });
 
-        // Restrict Google users
         if (user.googleId) {
             return res
                 .status(400)
                 .json({ error: "Google user cannot change email here" });
         }
 
-        // Verify current password for security
         const isMatch = await bcrypt.compare(currentPassword, user.password);
         if (!isMatch) {
             return res
@@ -606,23 +576,19 @@ export const updateEmail = async (req, res) => {
                 .json({ error: "Current password is incorrect" });
         }
 
-        // Check if new email already exists
         const existingUser = await User.findOne({ email: newEmail });
         if (existingUser) {
             return res.status(400).json({ error: "Email already in use" });
         }
 
-        // Generate verification code & expiry (same as signup)
         const code = generateCode(6);
         const expiry = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
 
-        // Store temporary verification data
         user.pendingEmail = newEmail;
         user.verificationCode = code;
         user.verificationExpiry = expiry;
         await user.save();
 
-        // Send verification email
         await sendEmail({
             to: newEmail,
             subject: "Verify Your New Email Address",
@@ -648,20 +614,17 @@ export const verifyNewEmail = async (req, res) => {
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ error: "User not found" });
 
-        // Check if there's a pending email
         if (!user.pendingEmail)
             return res
                 .status(400)
                 .json({ error: "No pending email to verify" });
 
-        // Verify code and expiry
         if (user.verificationCode !== code)
             return res.status(400).json({ error: "Invalid verification code" });
 
         if (Date.now() > user.verificationExpiry)
             return res.status(400).json({ error: "Verification code expired" });
 
-        // ✅ Update actual email and clear temp fields
         user.email = user.pendingEmail;
         user.pendingEmail = undefined;
         user.verificationCode = undefined;
@@ -689,7 +652,6 @@ export const updateUserAvatar = async (req, res) => {
         const sanitizedOriginal = req.file.originalname.replace(/[\s()]/g, "_");
         const fileName = `avatars/${Date.now()}-${uuidv4()}-${sanitizedOriginal}`;
 
-        // Upload file to Supabase
         const { data, error } = await supabase.storage
             .from("User-Assets")
             .upload(fileName, req.file.buffer, {
@@ -703,7 +665,6 @@ export const updateUserAvatar = async (req, res) => {
             return res.status(500).json({ error: "Failed to upload avatar" });
         }
 
-        // Generate public URL
         const publicUrl = supabase.storage
             .from("User-Assets")
             .getPublicUrl(fileName).data?.publicUrl;
@@ -713,7 +674,6 @@ export const updateUserAvatar = async (req, res) => {
                 .status(500)
                 .json({ error: "Failed to generate public URL" });
 
-        // Delete old avatar if exists
         if (user.avatar && user.avatar.includes("/User-Assets/")) {
             try {
                 const oldPath = user.avatar.split("/User-Assets/")[1];
@@ -727,7 +687,6 @@ export const updateUserAvatar = async (req, res) => {
             }
         }
 
-        // Update user's avatar
         user.avatar = publicUrl;
         await user.save();
 

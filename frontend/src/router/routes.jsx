@@ -105,11 +105,6 @@ export default function AppRoutes() {
                 <Route path="/forgot-password" element={<ForgotPassword />} />
             </Route>
 
-            {/*
-            <Route path='/auth/login' element={<Auth/>}/>
-            <Route path='/auth/signup' element={<Auth/>}/>
-            <Route path="/auth/signup/verify" element={<VerifyForm/>}/>
-            */}
             <Route element={<GlobalLayout />}>
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/terms-and-conditions" element={<TnC />} />

@@ -16,7 +16,7 @@ function CopyButton({ text }) {
         try {
             await navigator.clipboard.writeText(text);
             setCopied(true);
-            setTimeout(() => setCopied(false), 1500); // reset after 1.5s
+            setTimeout(() => setCopied(false), 1500); 
         } catch (err) {
             console.error("Failed to copy!", err);
         }

@@ -1,6 +1,5 @@
 import rateLimit from 'express-rate-limit'
 
-
 // Limit requests to prevent brute force attacks
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes

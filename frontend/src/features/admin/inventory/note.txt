@@ -1,2 +1,0 @@
-add an edit for products posted on products tab,
-add an edit dialog or drawer so user can edit the price etc 

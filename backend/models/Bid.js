@@ -23,8 +23,6 @@ const bidSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-// Ensure on bid per user per auction
-
 bidSchema.index({ auctionId: 1, userId: 1}, {unique: true})
 
 const Bid = mongoose.model("Bid", bidSchema);

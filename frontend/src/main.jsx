@@ -36,7 +36,7 @@ createRoot(document.getElementById('root')).render(
                                             <CheckoutProvider> 
                                                 <OrderProvider>
                                                     <ThemeProvider theme={theme}>
-                                                        <CssBaseline/> {/* Reset and normalize css */}
+                                                        <CssBaseline/>
                                                         <App/>
                                                     </ThemeProvider>
                                                 </OrderProvider>

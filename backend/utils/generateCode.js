@@ -1,12 +1,5 @@
-// utils/generateCode.js
 import crypto from 'crypto';
 
-/**
- * Generate a random verification code
- * @param {number} length - Length of the code (default 6)
- * @param {string} type - 'numeric' or 'alphanumeric'
- * @returns {string} Generated code
- */
 export const generateCode = (length = 6, type = 'numeric') => {
     const chars =
         type === 'numeric'

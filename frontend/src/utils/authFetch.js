@@ -10,5 +10,3 @@ export const authFetch = async (url, options = {}, token) => {
     if (!res.ok) throw new Error(data.error || 'Request failed');
     return data
 }
-
-//askjdflkjsdaf

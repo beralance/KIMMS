@@ -1,10 +1,8 @@
-// utils/stringUtils.js
 export const toUpper = (text) => {
     if (!text) return '';
     return text.toString().toUpperCase();
 };
 
-// utils/stringUtils.js
 export const toTitleCase = (text) => {
   if (!text) return '';
   return text

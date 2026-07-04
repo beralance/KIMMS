@@ -3,7 +3,6 @@ import { Box } from "@mui/material";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
 
-// import swiper styles
 import "swiper/css";
 import "swiper/css/pagination";
 
@@ -18,7 +17,7 @@ export default function AdminAutoSlideCarousel() {
     <Box sx={{ width: "100%" }}>
       <Swiper
         style={{
-          width: "100%", // follows parent container width
+          width: "100%",
           "--swiper-pagination-color": "#222",
           "--swiper-pagination-bullet-size": ".5rem",
         }}
@@ -36,7 +35,7 @@ export default function AdminAutoSlideCarousel() {
             <Box
               sx={{
                 width: "100%",
-                aspectRatio: "16/9", // keeps responsive ratio
+                aspectRatio: "16/9",
                 overflow: "hidden",
                 borderRadius: 2,
               }}

@@ -102,18 +102,12 @@ const AboutUs = () => {
                                 sx={{ overflowY: "auto", height: 250 }}
                             >
                                 <Typography variant="body2" color="gray">
-                                    To provide the people with quality
-                                    Japan-made surplus products and household
-                                    items that are durable, functional, and
-                                    affordable. Kimm’s Furniture & Merchandise
-                                    is dedicated to maintaining customer trust
-                                    by offering dependable products that add
-                                    comfort and value to every home.
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
                                 </Typography>
                             </Grid>
                             <Grid size={{ xs: 6 }} height={250}>
                                 <img
-                                    src="/kimmsAssets/figurine.jpg"
+                                    src="/background01.jpg"
                                     style={{
                                         width: "100%",
                                         borderRadius: "10px",
@@ -131,7 +125,7 @@ const AboutUs = () => {
                         <Grid container spacing={1} height={250}>
                             <Grid size={{ xs: 6 }} height={250}>
                                 <img
-                                    src="/kimmsAssets/truck.jpg"
+                                    src="/background01.jpg"
                                     style={{
                                         width: "100%",
                                         borderRadius: "10px",
@@ -145,14 +139,7 @@ const AboutUs = () => {
                                 sx={{ overflowY: "auto", height: 250 }}
                             >
                                 <Typography variant="body2" color="gray">
-                                    To continuously improve and expand Kimm’s
-                                    Furniture & Merchandise, reaching more
-                                    customers while maintaining the same
-                                    standard of quality and service. The
-                                    business aims to grow steadily beyond Tabaco
-                                    City, offering a wider variety of Japan
-                                    surplus goods to meet the needs of more
-                                    households in the future.
+                                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
                                 </Typography>
                             </Grid>
                         </Grid>
@@ -165,20 +152,18 @@ const AboutUs = () => {
                                 Business Overview
                             </Typography>
                             <ImageComponent
-                                img={"/kimmsAssets/KIMMS-Sign.jpg"}
+                                img={"/background01.jpg"}
                                 alt={"kimms-shop-sign"}
                                 width={"100%"}
                             />
                             <Typography variant="body2" color="gray">
-                                Kimm’s Furniture & Merchandise is a trusted
-                                surplus furniture store located in Tabaco City,
-                                Albay, proudly owned and managed by Ms. Bella
-                                Jane Celestial. Since its establishment in
-                                August 2017, the business has been dedicated to
-                                providing customers with quality surplus goods
-                                and affordable household items, earning a strong
-                                reputation for reliability and customer
-                                satisfaction.
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
+                                sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+                                Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi 
+                                ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit 
+                                in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+                                Excepteur sint occaecat cupidatat non proident, sunt in culpa qui 
+                                officia deserunt mollit anim id est laborum.
                             </Typography>
                         </Stack>
                         <Stack gap={1}>
@@ -186,15 +171,13 @@ const AboutUs = () => {
                                 Products and Services
                             </Typography>
                             <Typography variant="body2" color="gray">
-                                The store offers a wide range of products across
-                                various categories, including furniture,
-                                appliances, kitchenware, storage solutions,
-                                decorations, rattan products, electronics,
-                                lighting fixtures, office equipment, cleaning
-                                tools, outdoor and garden items, and other
-                                essential household goods. Every item is
-                                carefully sourced and inspected to ensure
-                                quality, durability, and functionality.
+                                Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium,
+                                totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae 
+                                vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur 
+                                aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.
+                                Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, 
+                                adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam 
+                                aliquam quaerat voluptatem.
                             </Typography>
                             <Stack gap={2} p={1}>
                                 <Stack gap={1}>
@@ -434,16 +417,11 @@ const AboutUs = () => {
                                 Location and Product Sourcing
                             </Typography>
                             <Typography variant="body2" color="gray">
-                                Located at Berces St., Zone 1, Baranghawon,
-                                Tabaco City, Kimm’s Furniture & Merchandise
-                                takes pride in its diverse selection of Japan
-                                surplus products, offering customers unique and
-                                high-quality items suitable for every home. Each
-                                shipment is thoroughly curated to guarantee
-                                authenticity and excellent condition, with the
-                                store continually updating its product lineup to
-                                provide fresh, dependable, and well-crafted
-                                goods that meet customer needs and preferences.
+                                Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis 
+                                suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? 
+                                Quis autem vel eum iure reprehenderit qui in ea voluptate velit 
+                                esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo 
+                                voluptas nulla pariatur?
                             </Typography>
                         </Stack>
                         <Stack gap={2}>
@@ -457,8 +435,7 @@ const AboutUs = () => {
                                 <Typography variant="body2" color="gray">
                                     Have questions or want to visit our store?
                                     We’re here to help! Contact us via phone or
-                                    email, or drop by Kimm’s Furniture &
-                                    Merchandise in Tabaco City. Click the map
+                                    email, or drop by. Click the map
                                     link below to get directions straight to our
                                     location
                                 </Typography>
@@ -474,7 +451,7 @@ const AboutUs = () => {
                                     }}
                                 >
                                     <PhoneRounded />
-                                    0995 937 2422
+                                    091 234 5678
                                 </Typography>
                                 <Typography
                                     variant="body2"
@@ -486,11 +463,11 @@ const AboutUs = () => {
                                     }}
                                 >
                                     <EmailRounded />
-                                    kimmsfurnituresinquiry@gmail.com
+                                    sample-email-address@sample.com
                                 </Typography>
                                 <Link
                                     to={
-                                        "https://www.facebook.com/kimmsjapansurplus"
+                                        "https://"
                                     }
                                     style={{
                                         display: "flex",
@@ -513,23 +490,17 @@ const AboutUs = () => {
                                         gap: "10px",
                                     }}
                                     to={
-                                        "https://maps.app.goo.gl/9aedRrBdvqxC33fK7"
+                                        "https://"
                                     }
                                 >
                                     <LocationOnRounded
                                         style={{ color: "gray" }}
                                     />
                                     <Typography variant="body2" color="gray">
-                                        Berces St. Zone 1 Baranghawon , Tabaco,
-                                        Philippines
+                                        Sample Location, Philippines
                                     </Typography>
                                 </Link>
                                 <Stack gap={1} position={"relative"}>
-                                    <ImageComponent
-                                        img={
-                                            "/kimmsAssets/Kimms-Shop-Location-Map.png"
-                                        }
-                                    />
                                     <Link
                                         target="_blank"
                                         style={{
@@ -545,17 +516,13 @@ const AboutUs = () => {
                                             left: 5,
                                             alignSelf: "center",
                                         }}
-                                        to={
-                                            "https://maps.app.goo.gl/9aedRrBdvqxC33fK7"
-                                        }
                                     >
                                         <MapPinIcon style={{ color: "gray" }} />
                                         <Typography
                                             variant="body2"
                                             color="gray"
                                         >
-                                            Berces St. Zone 1 Baranghawon ,
-                                            Tabaco, Philippines
+                                            Sample Location, Philippines
                                         </Typography>
                                     </Link>
                                 </Stack>
@@ -567,50 +534,6 @@ const AboutUs = () => {
                                 >
                                     Proof of Authenticity
                                 </Typography>
-                                <Typography variant="body2" color="gray">
-                                    The following public posts and updates serve
-                                    as proof of authenticity for Kimm’s
-                                    Furniture & Merchandise. They verify the
-                                    store’s legitimacy and highlight real
-                                    interactions with our customers.
-                                </Typography>
-                                <Grid container spacing={1}>
-                                    {reviews.map((r, index) => (
-                                        <Grid
-                                            size={{ xs: 6 }}
-                                            key={index}
-                                            sx={{
-                                                boxShadow: 2,
-                                                borderRadius: 2,
-                                            }}
-                                        >
-                                            <ImageComponent img={r.image} />
-                                        </Grid>
-                                    ))}
-                                </Grid>
-
-                                <Stack>
-                                    <Link
-                                        target="_blank"
-                                        style={{
-                                            color: "gray",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            gap: "10px",
-                                            alignSelf: "flex-end",
-                                        }}
-                                        to={
-                                            "https://www.facebook.com/media/set/?set=a.1024655752998304&type=3"
-                                        }
-                                    >
-                                        <Typography
-                                            variant="body2"
-                                            color="gray"
-                                        >
-                                            View all reviews on Facebook
-                                        </Typography>
-                                    </Link>
-                                </Stack>
                             </Stack>
                         </Stack>
                     </Stack>

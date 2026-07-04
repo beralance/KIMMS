@@ -22,6 +22,5 @@ export const generateOrderSlip = (order) => {
 
     commands.newline().newline().cut();
 
-    // Returns Uint8Array of ESC/POS commands
     return commands.encode();
 };

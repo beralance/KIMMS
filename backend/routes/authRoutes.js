@@ -31,7 +31,7 @@ router.post("/signup", signup);
 router.post("/login", rateLimit, login);
 router.post("/google-login", rateLimit, googleLogin);
 router.post("/verify", verifyEmail);
-router.post("/resent-code", rateLimit, resendCode); //add rate limiting
+router.post("/resent-code", rateLimit, resendCode);
 
 // forgot password routes
 router.post("/forgot-password", rateLimit, forgotPassword);

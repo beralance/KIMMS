@@ -1,10 +1,8 @@
-// src/context/SocketContext.js
 import { createContext, useContext } from "react";
 import { io } from "socket.io-client";
 
 const SocketContext = createContext();
 
-// Create socket once
 const socket = io(import.meta.env.VITE_API_URL);
 
 export const SocketProvider = ({ children }) => (

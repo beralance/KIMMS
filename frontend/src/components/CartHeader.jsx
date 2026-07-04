@@ -19,7 +19,7 @@ const CartHeader = () => {
                     edge="start"
                     color="inherit"
                     aria-label="back"
-                    onClick={() => navigate(previousPage)} // go to previous page
+                    onClick={() => navigate(previousPage)}
                     sx={{ mr: 2 }}
                 >
                     <ArrowBackIcon/>

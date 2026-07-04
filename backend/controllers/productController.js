@@ -11,13 +11,11 @@ export const getProductsForPolling = async (req, res) => {
     }
 };
 
-// POST Inventory item to Products collection (publish to shop)
 export const postProduct = async (req, res) => {
     try {
         const { inventoryId } = req.body;
         const addedBy = req.user?.id;
 
-        // Find the inventory item
         const inventoryItem = await Inventory.findById(inventoryId);
         if (!inventoryItem)
             return res
@@ -34,7 +32,6 @@ export const postProduct = async (req, res) => {
             ? inventoryItem.weight
             : undefined;
 
-        // Create new Product from Inventory data
         const product = new Product({
             inventoryId: inventoryItem._id,
             productId: inventoryItem.productId,
@@ -52,12 +49,10 @@ export const postProduct = async (req, res) => {
             visibility: "active",
             addedBy: addedBy,
             weight: weight || undefined,
-            // add physical code here
         });
 
         await product.save();
 
-        // Update inventory status to prevent double posting
         inventoryItem.status = "reserved";
         await inventoryItem.save();
 
@@ -67,7 +62,6 @@ export const postProduct = async (req, res) => {
     }
 };
 
-// GET all active posted products
 export const getProducts = async (req, res) => {
     try {
         const user = req.user;
@@ -90,7 +84,6 @@ export const getProducts = async (req, res) => {
     }
 };
 
-// GET new products
 export const getNewestProducts = async (req, res) => {
     try {
         const user = req.user;
@@ -98,7 +91,6 @@ export const getNewestProducts = async (req, res) => {
 
         if (user) {
             if (user.role === "admin" || user.role === "staff") {
-                // see all products
             } else {
                 query.isLocal = user.isLocal;
             }
@@ -114,7 +106,6 @@ export const getNewestProducts = async (req, res) => {
     }
 };
 
-// GET single product (for product detail page)
 export const getProductById = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id)
@@ -123,7 +114,6 @@ export const getProductById = async (req, res) => {
         if (!product)
             return res.status(404).json({ message: "Product not found" });
 
-        // Optional: increment views automatically
         await Product.findByIdAndUpdate(req.params.id, { $inc: { views: 1 } });
 
         res.json(product);
@@ -132,7 +122,6 @@ export const getProductById = async (req, res) => {
     }
 };
 
-// UPDATE posted product (admin can change price, description, etc.)
 export const updateProduct = async (req, res) => {
     try {
         const updates = req.body;
@@ -145,7 +134,6 @@ export const updateProduct = async (req, res) => {
         if (!product)
             return res.status(404).json({ message: "Product not found" });
 
-        // Sync critical fields back to inventory
         const syncFields = {};
 
         if (updates.price !== undefined) syncFields.price = updates.price;
@@ -162,7 +150,6 @@ export const updateProduct = async (req, res) => {
     }
 };
 
-// SOFT DELETE posted product
 export const deleteProduct = async (req, res) => {
     try {
         const product = await Product.findByIdAndUpdate(
@@ -174,7 +161,6 @@ export const deleteProduct = async (req, res) => {
         if (!product)
             return res.status(404).json({ message: "Product not found" });
 
-        // Reset Inventory item status back to "available"
         await Inventory.findByIdAndUpdate(product.inventoryId, {
             status: "available",
         });
@@ -188,7 +174,6 @@ export const deleteProduct = async (req, res) => {
     }
 };
 
-// SEARCH Products
 export const searchProducts = async (req, res) => {
     try {
         const { q } = req.query;
@@ -214,7 +199,6 @@ export const searchProducts = async (req, res) => {
     }
 };
 
-// GET products by highlight (featured, mostViewed, none)
 export const getProductsByHighlight = async (req, res) => {
     try {
         const { type } = req.params;
@@ -251,7 +235,6 @@ export const getProductsByHighlight = async (req, res) => {
     }
 };
 
-// PATCH product highlight with limit enforcement
 export const updateProductHighlight = async (req, res) => {
     try {
         const { highlight } = req.body;
@@ -261,7 +244,6 @@ export const updateProductHighlight = async (req, res) => {
             return res.status(400).json({ message: "Invalid highlight value" });
         }
 
-        // Enforce limit only for featured or mostViewed
         if (highlight === "featured" || highlight === "mostViewed") {
             const count = await Product.countDocuments({ highlight });
             if (count >= 10) {
@@ -287,7 +269,6 @@ export const updateProductHighlight = async (req, res) => {
     }
 };
 
-// Increment views manually (optional if not using auto increment)
 export const incrementProductViews = async (req, res) => {
     try {
         const product = await Product.findByIdAndUpdate(

@@ -1,18 +1,13 @@
 import cron from "node-cron";
 import Auction from "../models/Auction.js";
 
-/**
- * Cron job to automatically update auction statuses
- * PENDING → LIVE → ENDED (store cooldown)
- */
-
 export const auctionLifecycleCron = () => {
   // Runs every minute
     cron.schedule("* * * * *", async () => {
         try {
             const now = new Date();
 
-            // 1️⃣ Start auctions that should be LIVE
+            // Start auctions that should be LIVE
             const pendingAuctions = await Auction.find({
                 status: "PENDING",
                 startTime: { $lte: now },
@@ -24,7 +19,7 @@ export const auctionLifecycleCron = () => {
                 console.log(`Auction ${auction._id} is now LIVE`);
             }
 
-            // 2️⃣ End auctions that should be ENDED
+            // End auctions that should be ENDED
             const liveAuctions = await Auction.find({
                 status: "LIVE",
                 endTime: { $lte: now },

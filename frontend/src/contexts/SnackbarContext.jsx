@@ -12,7 +12,6 @@ export function SnackbarProvider({ children }) {
     const showSnackbar = useCallback((message, severity = "info") => {
         setQueue(prevQueue => {
             const newQueue = [...prevQueue, { message, severity }];
-            // If no current snackbar, show first immediately
             if (!current) setCurrent(newQueue[0]);
             return newQueue;
         });
@@ -21,7 +20,7 @@ export function SnackbarProvider({ children }) {
     const handleClose = () => {
         setCurrent(null);
         setQueue(prevQueue => {
-            const [, ...rest] = prevQueue; // remove the one just closed
+            const [, ...rest] = prevQueue; 
             if (rest.length > 0) {
                 setCurrent(rest[0]);
             }

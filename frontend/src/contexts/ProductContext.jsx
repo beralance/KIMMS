@@ -1,4 +1,3 @@
-// src/context/ProductContext.jsx
 import { createContext, useState, useEffect, use } from "react";
 import {useAuth} from '../contexts/AuthContext'
 import {useSocket} from '../contexts/SocketContext'
@@ -20,11 +19,9 @@ export function ProductProvider({ children }) {
             console.log('Server says:', msg)
         })
         socket.on('postedProductDelete', (data) => {
-            console.log('📢 Posted product ID removed', data.id)
             setProducts((prev) => prev.filter((p) => p._id !== data.id))
         })
         socket.on('productSold', (data) => {
-            console.log('📢📢📢📢Data from server webhook', data)
             const productsToRemove = Array.isArray(data) ? data.map(d => d._id) : [];
             setProducts(prev => prev.filter(p => !productsToRemove.includes(p._id)));
         })
@@ -41,7 +38,6 @@ export function ProductProvider({ children }) {
     }, [])
 
 
-    // Fetch all products
     const fetchProducts = async () => {
         try {
             const res = await fetch(`${API_URL}/api/products`)
@@ -52,13 +48,6 @@ export function ProductProvider({ children }) {
                     ? data
                     : data.filter((product) => !product.isLocal || user.isLocal)
                 : data;
-
-            //console.log('VISIBLE PRODUCTS', visibleProducts)
-            if (user) {
-                console.log('IS USER LOCAL', user.isLocal);
-            } else {
-                console.log('Guest mode (no user)');
-            }
             
             setProducts(visibleProducts);
 
@@ -67,7 +56,6 @@ export function ProductProvider({ children }) {
         }
     };
 
-    // Fetch available inventory (for posting)
     const fetchInventory = async () => {
         try {
             const res = await fetch(`${INVENTORY_URL}?status=available`,);

@@ -1,4 +1,3 @@
-// controllers/paymentController.js
 import Payment from "../models/Payment.js";
 import Order from '../models/Order.js'
 import axios from "axios";
@@ -27,7 +26,7 @@ export const createCheckoutSession = async (req, res) => {
                     cancel_url: `${FRONTEND_URL}/cancel?orderId=${orderId}`,
                     metadata: {
                         checkoutSessionId: "cs_" + new mongoose.Types.ObjectId(),
-                        orderId, // <-- store orderId in metadata if needed
+                        orderId, 
                     },
                 },
             },
@@ -49,7 +48,7 @@ export const createCheckoutSession = async (req, res) => {
             currency: "PHP",
             status: "pending",
             productIds,
-            orderId, // <-- link payment to the order
+            orderId,
             rawPayload: session,
         });
         res.status(200).json({
@@ -74,14 +73,12 @@ export const cancelPayment = async (req, res) => {
 
 
     try {
-        // updates PAYMENT status to cancelled
         const payment = await Payment.findOne({ checkoutSessionId: cleanedId }).populate('order');
         console.log('***** This is the checkoutSessionId found *****: \n',  payment)
 
         payment.status = "cancelled";
         await payment.save();
 
-        // updates ORDER status to cancelled
         console.log('@ This is the order id:', payment.orderId)
         if (payment.orderId) {
             const order = await Order.findById(payment.orderId)

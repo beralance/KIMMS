@@ -1,4 +1,3 @@
-// SearchDrawer.jsx
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
@@ -6,11 +5,11 @@ import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
 import { Stack, List, ListItem, ListItemButton, Divider, Container, Grow, Fade } from "@mui/material";
-import { ProductContext } from "../contexts/ProductContext"; // adjust path
+import { ProductContext } from "../contexts/ProductContext";
 import { useContext, useState } from "react";
 import { useNavigate } from 'react-router-dom'
 import SearchCategories from './SearchCategories'
-import SearchBar from "./SearchBar"; // adjust path if needed
+import SearchBar from "./SearchBar";
 
 
 export default function SearchDrawer({ open, onClose, anchor = "top" }) {
@@ -27,7 +26,7 @@ export default function SearchDrawer({ open, onClose, anchor = "top" }) {
             setResults([]);
             return;
         }
-        const data = await searchProducts(value); // fetch from context
+        const data = await searchProducts(value);
         setResults(data || []);
     };
 
@@ -40,7 +39,7 @@ export default function SearchDrawer({ open, onClose, anchor = "top" }) {
                 sx: {
                     height: { xs: "100%" },
                     p: 2,
-                    borderRadius: { xs: 0, sm: "0 0 16px 16px" }, // rounded bottom for top drawer
+                    borderRadius: { xs: 0, sm: "0 0 16px 16px" },
                 },
             }}
         >

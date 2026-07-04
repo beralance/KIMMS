@@ -36,7 +36,7 @@ export default function ProfilePicker({ open, handleClose, avatar, userId, token
         }
         else {
             setSelectedAvatar(avatar);
-            setUploadPreview(null); // clear file preview if default avatar is selected
+            setUploadPreview(null);
         }
     };
 
@@ -45,7 +45,7 @@ export default function ProfilePicker({ open, handleClose, avatar, userId, token
         if (file) {
             const url = URL.createObjectURL(file);
             setUploadPreview(url);
-            setSelectedAvatar(null); // clear default selection
+            setSelectedAvatar(null);
         }
     };
 
@@ -60,7 +60,6 @@ export default function ProfilePicker({ open, handleClose, avatar, userId, token
                 fileOrAvatar = fileInputRef.current.files[0];
             } 
             else if (selectedAvatar) {
-                // fetch the default avatar as Blob
                 const response = await fetch(selectedAvatar);
                 const blob = await response.blob();
                 fileOrAvatar = new File([blob], selectedAvatar.split('/').pop(), { type: blob.type });
@@ -68,7 +67,6 @@ export default function ProfilePicker({ open, handleClose, avatar, userId, token
 
             const updatedUser = await uploadUserAvatar(userId, fileOrAvatar, token);
 
-            // Use backend returned public URL, not blob URL
             const newAvatar = updatedUser?.avatar || "/account-avatar-profile-other.svg";
             onAvatarUpdate(newAvatar);
 

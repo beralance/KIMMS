@@ -47,7 +47,6 @@ const StaffProtectedRoute = ({moduleName, children}) => {
 
     if (user.role === 'admin') return children || <Outlet/>
 
-    //staff access check
     if(user.role === 'staff' && moduleName && !permissions.includes(moduleName)) {
         return (
             <Stack height={'40vh'} sx={{display: 'flex', mt: 5, justifyContent: 'center', alignItems: 'center'}}>

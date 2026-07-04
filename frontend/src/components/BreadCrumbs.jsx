@@ -10,7 +10,6 @@ import HomeIcon from "@mui/icons-material/Home";
 export default function BreadCrumbs() {
     const location = useLocation();
 
-    // Split path into segments
     const pathnames = location.pathname.split("/").filter((x) => x);
 
     return (
@@ -20,12 +19,10 @@ export default function BreadCrumbs() {
                 aria-label="breadcrumb"
             >
 
-                {/* Other path segments */}
                 {pathnames.map((name, index) => {
                     const routeTo = "/" + pathnames.slice(0, index + 1).join("/");
                     const isLast = index === pathnames.length - 1;
 
-                    // Format name: capitalize first letter
                     const displayName = name.charAt(0).toUpperCase() + name.slice(1);
 
                     return isLast ? (

@@ -5,7 +5,6 @@ const CustomSnackbar = ({ open, onClose, message, severity = 'success' }) => {
     const [queue, setQueue] = useState([])
     const lastMessageRef = useRef('')
 
-    // Push new messages to queue only if message actually changed
     useEffect(() => {
         if (open && message && message !== lastMessageRef.current) {
             lastMessageRef.current = message
@@ -30,7 +29,7 @@ const CustomSnackbar = ({ open, onClose, message, severity = 'success' }) => {
                     open
                     autoHideDuration={3000}
                     onClose={() => handleClose(item.id)}
-                    sx={{ mb: queue.indexOf(item) * 7 }} // stack vertically
+                    sx={{ mb: queue.indexOf(item) * 7 }}
                 >
                     <Alert
                         onClose={() => handleClose(item.id)}

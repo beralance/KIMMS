@@ -2,15 +2,6 @@ import React from "react";
 import { IconButton, Tooltip, CircularProgress } from "@mui/material";
 import { RefreshRounded } from "@mui/icons-material";
 
-/**
- * Reusable refresh button component.
- * 
- * Props:
- * - onRefresh: function to call when clicked (required)
- * - loading: boolean to show loading spinner (optional)
- * - size: 'small' | 'medium' | 'large' (optional)
- * - tooltip: string to show on hover (optional)
- */
 export default function RefreshButton({ 
     onRefresh, 
     loading = false, 

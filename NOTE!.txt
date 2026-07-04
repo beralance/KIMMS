@@ -1,7 +1,0 @@
-change featured product visit button to >
-
-
-REMOVE SOON:
-
-snackbar wrapper = component
-custom snackbar = component

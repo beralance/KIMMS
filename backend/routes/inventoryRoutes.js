@@ -1,7 +1,6 @@
-// backend/routes/productRoutes.js
 import express from "express";
 import upload from "../middleware/upload.js";
-import Inventory from "../models/Inventory.js"; // <-- add this
+import Inventory from "../models/Inventory.js";
 import { 
     createInventoryItem, 
     getInventoryItems, 
@@ -14,10 +13,9 @@ import multer from "multer";
 
 const router = express.Router();
 
-// PATCH /api/inventory/:id/status
 router.patch("/:id/status", async (req, res) => {
     try {
-        const { status } = req.body; // e.g., "sold" or "available"
+        const { status } = req.body;
         const inventory = await Inventory.findByIdAndUpdate(
             req.params.id,
             { status },

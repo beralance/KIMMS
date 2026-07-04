@@ -25,7 +25,7 @@ const staffPermissionSchema = new mongoose.Schema(
                     "report",
                 ],
             },
-        ], // modules list
+        ],
     },
     { timestamps: true }
 );

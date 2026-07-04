@@ -18,8 +18,8 @@ const AdminLayout = () => {
     useEffect(() => {
         let timeout;
         let interval;
-        const duration = 15 * 60 * 1000; // 15 minutes
-        const warningTime = 1 * 60 * 1000 // 1 minute before logout
+        const duration = 15 * 60 * 1000;
+        const warningTime = 1 * 60 * 1000
         const startTime = Date.now();
 
         let warned = false
@@ -50,7 +50,6 @@ const AdminLayout = () => {
 
             timeout = setTimeout(handleLogout, duration);
 
-            // display countdown every 10s
             interval = setInterval(() => {
                 const elapsed = Date.now() - resetTime;
                 const remaining = Math.max(duration - elapsed, 0);
@@ -63,10 +62,8 @@ const AdminLayout = () => {
             }, 10000);
         }
 
-        // first start
         resetTimer();
 
-        // track user activity
         const activityEvents = ['mousemove', 'keypress', 'click', 'scroll'];
         activityEvents.forEach(event => window.addEventListener(event, resetTimer));
 

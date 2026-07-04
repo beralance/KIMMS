@@ -217,7 +217,6 @@ export const updateInventoryItem = async (req, res) => {
             physicalCode,
         };
 
-        // ✅ Update and populate category
         const item = await Inventory.findByIdAndUpdate(req.params.id, updates, {
             new: true,
         }).populate("category", "name");
@@ -234,14 +233,12 @@ export const updateInventoryItem = async (req, res) => {
 // DELETE Inventory Item
 export const deleteInventoryItem = async (req, res) => {
     try {
-        // 1️⃣ Find the item first (so we can get its images)
         const item = await Inventory.findById(req.params.id);
         if (!item) return res.status(404).json({ message: "Item not found" });
 
-        // 2️⃣ Remove associated images from Supabase (if any)
         if (item.images && item.images.length > 0) {
             const paths = item.images
-                .map((url) => url.split("/Product-Uploads/")[1]) // ✅ correct split
+                .map((url) => url.split("/Product-Uploads/")[1])
                 .filter((path) => path);
 
             if (paths.length > 0) {
@@ -270,16 +267,6 @@ export const deleteInventoryItem = async (req, res) => {
     }
 };
 
-/**
- * Get inventory stats for reports
- * @param {Object} options - optional filters
- *   options.period: 'week' | 'month' | 'year' | {from: Date, to: Date}
- *   options.category: categoryId
- *   options.status: 'available' | 'sold' | 'reserved'
- *   options.condition: 'new' | 'like new' | 'used' | 'refurbished'
- */
-
-// GET Inventory Overview
 export const getInventoryReportStats = async (options = {}) => {
     const { period, category, status, condition } = options;
 
@@ -289,7 +276,6 @@ export const getInventoryReportStats = async (options = {}) => {
     if (status) filter.status = status;
     if (condition) filter.condition = condition;
 
-    // Compute date range for period
     if (period) {
         const now = new Date();
         let fromDate;
@@ -335,6 +321,6 @@ export const getInventoryReportStats = async (options = {}) => {
         inventoryItems,
         soldItems,
         newAddedItem,
-        filteredCount: allItems.length, // useful for frontend display
+        filteredCount: allItems.length,
     };
 };

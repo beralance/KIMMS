@@ -5,13 +5,11 @@ import { createTheme } from '@mui/material/styles'
 // Component BG '#F0F0F0'
 // Dark White D3DAD9
 // Main White BG f0f0f0ff
-// gray shade 414141ff
+
 const theme = createTheme({
-    // palette: colors system
     palette: { 
         secondary: {main: '#37353E'},
     },
-    // typography: global font styles
     typography: {
         fontFamily: ['Poppins', 'Helvetica Neue', 'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'].join(','),
         h1: {
@@ -136,7 +134,6 @@ const theme = createTheme({
             letterSpacing: '0.02em',
         },
     },
-    // components: overrides and default props for MUI components
     components: {
         MuiButton: {
             styleOverrides: {
@@ -154,7 +151,6 @@ const theme = createTheme({
             }
         }
     }
-    // mode: light/dark theme switching
 })
 
 export default theme

@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema(
         lastLogin: { type: Date },
 
         // contact
-        phoneNumber: { type: String, required: false }, // optional, can be used on checkout
+        phoneNumber: { type: String, required: false }, 
 
         // address
         address: {

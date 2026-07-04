@@ -174,10 +174,10 @@ export default function UserFooter() {
                                 }}
                             >
                                 <PhoneRounded />
-                                0995 937 2422
+                                0912-345-6789
                             </Typography>
                             <Link
-                                href="https://www.facebook.com/kimmsjapansurplus"
+                                href="https://"
                                 target="_blank"
                                 underline="none"
                                 sx={{
@@ -203,13 +203,23 @@ export default function UserFooter() {
                 <Divider sx={{ my: 4 }} />
 
                 {/* Bottom */}
-                <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    textAlign="center"
-                >
-                    © 2017 Kimm’s Furniture & Merchandise. All rights reserved.
-                </Typography>
+                <Stack>
+                    <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        textAlign="center"
+                    >
+                        © 2017 Kimm’s Furniture & Merchandise.
+                    </Typography>
+                    <Typography
+                        variant="body2"
+                        color="textDisabled"
+                        textAlign="center"
+                        sx={{fontSize: 12}}
+                    >
+                        This application was developed as an academic capstone project and is presented for portfolio purposes. It is not an official production system.
+                    </Typography>
+                </Stack>
             </Container>
         </Box>
     );

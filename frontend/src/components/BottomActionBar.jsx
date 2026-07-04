@@ -20,11 +20,11 @@ const BottomActionBar = ({ children, backgroundColor }) => {
             <Box
                 sx={{
                     display: 'flex',
-                    flexDirection: 'column', // allows multiple rows
+                    flexDirection: 'column',
                     gap: 1,
                 }}
             >
-                {children} {/* Inject any content you want */}
+                {children} 
             </Box>
         </Paper>
     );

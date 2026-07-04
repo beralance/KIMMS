@@ -62,8 +62,5 @@ const PaymentSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-// remove comment if error occurs on payment
-//PaymentSchema.index({ paymongoId: 1 });
-
 const Payment = mongoose.model("Payment", PaymentSchema);
 export default Payment;

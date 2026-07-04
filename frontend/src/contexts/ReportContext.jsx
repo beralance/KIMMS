@@ -64,7 +64,6 @@ export const ReportProvider = ({ children }) => {
             const data = await getCombinedReport();
             if (!data) return console.log("No data from report context");
 
-            console.log("dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", data);
             // --- Auctions ---
             setAlerts((prev) =>
                 JSON.stringify(prev) !== JSON.stringify(data.auctions.alerts)
@@ -245,7 +244,6 @@ export const ReportProvider = ({ children }) => {
                     : prev
             );
 
-            console.log("🔄 Reports fetched and states updated if changed");
         } catch (err) {
             console.error("Error fetching reports:", err);
             setError(err.response?.data?.error || err.message);

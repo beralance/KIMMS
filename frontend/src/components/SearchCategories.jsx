@@ -17,23 +17,19 @@ export default function CategoriesList({open, onClose}) {
     const navigate = useNavigate()
 
     const handleCategoryClick = (categoryId) => {
-        // Close the drawer first
         if (open) onClose();
 
-        // Then navigate
         navigate(`/shop?category=${categoryId}`);
     };
 
     useEffect(() => {
-        fetchCategoriesFromProducts()   // your existing API call
+        fetchCategoriesFromProducts() 
             .then(data => {
                 console.log("Fetched categories:", data);
                 setCategories(data);
 
-                // sort descending by count
                 const sorted = [...data].sort((a, b) => b.count - a.count);
 
-                // get highest and second highest
                 setTopCategories(sorted.slice(0, 2));
             })
     .catch(err => console.error(err));

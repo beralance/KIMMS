@@ -56,7 +56,6 @@ export const LocationProvider = ({ children }) => {
             .catch((err) => console.error("Permissions API error:", err));
     };
     useEffect(() => {
-        console.log("😭😭😭 Status updated:", status);
     }, [status]);
 
     useEffect(() => {

@@ -28,8 +28,6 @@ export const CartProvider = ({ children }) => {
         if (!socket) return
 
         socket.on('removeCartItem', (data) => {
-            console.log('📢 Cart items ID removed', data.productIds)
-            console.log('IDS inside cart', cartItems)
             setCartItems((prev) => prev.filter((p) => !data.productIds.includes(p.productId._id)))
         })
 
@@ -43,7 +41,6 @@ export const CartProvider = ({ children }) => {
         }
     }, [socket])
 
-    /** 🔹 Fetch Cart */
     const fetchCart = async () => {
         if (!token) {
             setCartItems([]);
@@ -70,7 +67,6 @@ export const CartProvider = ({ children }) => {
         fetchCart();
     }, [token]);
 
-    /** 🔹 Add to Cart */
     const addToCart = async (product) => {
         if (!token) {
             showSnackbar("You must log in to add items", "error");
@@ -118,7 +114,6 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    /** 🔹 Remove from Cart */
     const removeFromCart = async (productId) => {
         if (!token) return;
 
@@ -137,7 +132,6 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    /** 🔹 Clear Cart */
     const clearCart = async () => {
         if (!token) return;
 

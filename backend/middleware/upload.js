@@ -1,8 +1,6 @@
-// backend/middlewares/upload.js
 import multer from "multer";
 import path from "path";
 
-// ✅ File filter to allow only certain image formats
 const fileFilter = (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|webp|svg/;
     const ext = path.extname(file.originalname).toLowerCase();
@@ -15,7 +13,6 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-// Use memory storage instead of diskStorage
 const storage = multer.memoryStorage();
 
 const upload = multer({

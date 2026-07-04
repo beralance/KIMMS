@@ -24,7 +24,6 @@ export default function ProductCard({ images, category, isLocal, name = 'Unknown
             }}
         >
 
-            {/* Clickable area for navigation */}
             <Box sx={{ cursor: 'pointer'}}>
                 {/* Product Image */}
                 <Box sx={{position: 'relative'}}>

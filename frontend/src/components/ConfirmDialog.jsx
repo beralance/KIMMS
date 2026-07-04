@@ -1,4 +1,3 @@
-// src/components/common/ConfirmDialog.jsx
 import {
     Dialog,
     DialogTitle,

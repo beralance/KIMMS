@@ -97,9 +97,7 @@ export const handleCodCheckout = async (req, res) => {
             orderStatus: "SUCCESSFUL",
         });
 
-        console.log("PRODUCTS", products);
         const productIds = products.map((item) => item.productId);
-        console.log("PRODUCT IDS ARRAY", productIds);
 
         await Product.updateMany(
             { _id: { $in: productIds } },

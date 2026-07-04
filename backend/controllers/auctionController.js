@@ -1,11 +1,9 @@
-// controllers/auctionController.js
 import Auction from "../models/Auction.js";
-import Inventory from "../models/Inventory.js"; // ✅ Auction uses Inventory as source
+import Inventory from "../models/Inventory.js";
 import Bid from "../models/Bid.js";
 import { createNotification } from "../controllers/auctionNotificationController.js";
-/**
- * Create a new auction
- */
+
+//Create a new auction
 export const createAuction = async (req, res) => {
     try {
         const {
@@ -17,7 +15,6 @@ export const createAuction = async (req, res) => {
             description,
         } = req.body;
 
-        // ✅ Validate inventory exists
         const inventoryItem = await Inventory.findById(inventoryId);
         if (!inventoryItem) {
             return res
@@ -25,14 +22,12 @@ export const createAuction = async (req, res) => {
                 .json({ message: "Inventory item not found" });
         }
 
-        // ✅ Prevent double posting
         if (inventoryItem.status !== "available") {
             return res.status(400).json({
                 message: "This inventory item is not available for auction",
             });
         }
 
-        // Create auction
         const auction = new Auction({
             inventoryId,
             startPrice,
@@ -46,7 +41,6 @@ export const createAuction = async (req, res) => {
 
         await auction.save();
 
-        // ✅ Mark inventory as reserved
         inventoryItem.status = "reserved";
         await inventoryItem.save();
 
@@ -56,9 +50,7 @@ export const createAuction = async (req, res) => {
     }
 };
 
-/**
- * Get all auctions
- */
+// Get all auctions
 export const getAuctions = async (req, res) => {
     try {
         const auctions = await Auction.find()
@@ -76,7 +68,6 @@ export const getAuctions = async (req, res) => {
             })
             .sort({ createdAt: -1 });
 
-        // attach top 3 bids for each auction
         const auctionsWithBids = await Promise.all(
             auctions.map(async (auction) => {
                 const topBids = await Bid.find({ auctionId: auction._id })
@@ -99,15 +90,13 @@ export const getAuctions = async (req, res) => {
             })
         );
 
-        res.json(auctionsWithBids); // ✅ return auctions with topBidders
+        res.json(auctionsWithBids);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 };
 
-/**
- * Get single auction by ID
- */
+// Get single auction by ID
 export const getAuctionById = async (req, res) => {
     try {
         const auction = await Auction.findById(req.params.id).populate({
@@ -159,9 +148,7 @@ export const deletePendingAuction = async (req, res) => {
     }
 };
 
-/**
- * Finalize auction (mark as closed & sold if winner exists)
- */
+// Finalize auction (mark as closed & sold if winner exists)
 export const finalizeAuction = async (req, res) => {
     try {
         const { id } = req.params;
@@ -177,12 +164,10 @@ export const finalizeAuction = async (req, res) => {
                 .json({ message: "Auction already finalized" });
         }
 
-        // Mark auction as closed
         auction.status = "CLOSED";
         auction.finalized = true;
         await auction.save();
 
-        // Update inventory if there is a winner
         if (auction.winner) {
             const inventoryItem = await Inventory.findById(auction.inventoryId);
             if (inventoryItem) {
@@ -210,7 +195,7 @@ export const getPastAuctions = async (req, res) => {
                 },
             })
             .sort({ endTime: -1 })
-            .lean(); // convert to plain JS object
+            .lean();
 
         for (let auction of auctions) {
             const bids = await Bid.find({ auctionId: auction._id })
@@ -312,14 +297,6 @@ export const auctionCloseCron = async () => {
     }
 };
 
-/**
- * Get auction stats for reports
- * @param {Object} options - optional filters
- *   options.period: 'week' | 'month' | 'year' | {from: Date, to: Date}
- *   options.category: categoryId (requires inventory population)
- *   options.inventoryId: specific inventory item
- *   options.alertThresholds: { pendingHours: Number, liveHours: Number }
- */
 export const getAuctionReportStats = async (options = {}) => {
     const { period, category, inventoryId, alertThresholds } = options;
     const pendingHours = alertThresholds?.pendingHours || 24;
@@ -328,7 +305,6 @@ export const getAuctionReportStats = async (options = {}) => {
     const now = new Date();
     let filter = {};
 
-    // Period filter
     if (period) {
         let fromDate;
         if (period === "week") {
@@ -352,23 +328,19 @@ export const getAuctionReportStats = async (options = {}) => {
         }
     }
 
-    // Inventory filter
     if (inventoryId) filter.inventoryId = inventoryId;
 
-    // Fetch auctions and populate inventory
     const auctions = await Auction.find(filter).populate(
         "inventoryId",
         "productName category"
     );
 
-    // Category filter (after populate)
     const filteredAuctions = category
         ? auctions.filter(
               (a) => a.inventoryId?.category?.toString() === category.toString()
           )
         : auctions;
 
-    // Counts
     const totalAuctions = filteredAuctions.length;
     const liveAuctions = filteredAuctions.filter(
         (a) => a.status === "LIVE"
@@ -383,10 +355,8 @@ export const getAuctionReportStats = async (options = {}) => {
         (a) => a.status === "CLOSED"
     ).length;
 
-    // Alerts
     const alerts = [];
 
-    // Pending auctions starting soon
     filteredAuctions
         .filter((a) => a.status === "PENDING")
         .forEach((a) => {
@@ -403,7 +373,6 @@ export const getAuctionReportStats = async (options = {}) => {
             }
         });
 
-    // Live auctions ending soon
     filteredAuctions
         .filter((a) => a.status === "LIVE")
         .forEach((a) => {

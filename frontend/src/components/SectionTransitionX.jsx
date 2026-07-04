@@ -7,10 +7,10 @@ export function ScrollSectionRight({ children, sx }) {
 
     useEffect(() => {
         const observer = new IntersectionObserver(
-            ([entry]) => setVisible(entry.intersectionRatio > 0.2), // use ratio instead of exact isIntersecting
+            ([entry]) => setVisible(entry.intersectionRatio > 0.2),
             {
-            threshold: [0, 0.2, 0.5, 1], // more granular
-            rootMargin: "0px 0px -5% 0px", // adds buffer at bottom
+            threshold: [0, 0.2, 0.5, 1], 
+            rootMargin: "0px 0px -5% 0px",
             }
         );
         if (ref.current) observer.observe(ref.current);
@@ -27,7 +27,7 @@ export function ScrollSectionRight({ children, sx }) {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                ...sx, // allow custom styles
+                ...sx,
             }}
         >
             {children}
@@ -41,10 +41,10 @@ export function ScrollSectionLeft({ children, sx }) {
 
     useEffect(() => {
         const observer = new IntersectionObserver(
-            ([entry]) => setVisible(entry.intersectionRatio > 0.2), // use ratio instead of exact isIntersecting
+            ([entry]) => setVisible(entry.intersectionRatio > 0.2),
             {
-            threshold: [0, 0.2, 0.5, 1], // more granular
-            rootMargin: "0px 0px -5% 0px", // adds buffer at bottom
+            threshold: [0, 0.2, 0.5, 1], 
+            rootMargin: "0px 0px -5% 0px",
             }
         );
         if (ref.current) observer.observe(ref.current);
@@ -61,7 +61,7 @@ export function ScrollSectionLeft({ children, sx }) {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                ...sx, // allow custom styles
+                ...sx,
             }}
         >
             {children}

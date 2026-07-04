@@ -5,8 +5,8 @@ const inventorySchema = new mongoose.Schema(
         productId: { type: String, required: true, unique: true },
         physicalCode: { type: String, required: true },
         productName: { type: String, required: true },
-        description: { type: String, required: true }, // short description
-        details: { type: String, required: true }, // long specification text
+        description: { type: String, required: true }, 
+        details: { type: String, required: true }, 
         price: { type: Number, required: true },
         category: {
             type: mongoose.Schema.Types.ObjectId,

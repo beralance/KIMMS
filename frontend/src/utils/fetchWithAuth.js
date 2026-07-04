@@ -10,7 +10,7 @@ export const fetchWithAuth = async (url, { method = "GET", body, token }, logout
     });
 
     if (res.status === 401) {
-        if (logout) logout(); // clears user + token in context
+        if (logout) logout();
         throw new Error("Session expired. Please login again.");
     }
 

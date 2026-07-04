@@ -2,7 +2,6 @@ import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 
 export function ButtonBasic ({ variant, content, ...props}) {
-    // variant = text, contained, outlined
     return <Button variant={variant}>{content}</Button>
 }
 

@@ -9,7 +9,7 @@ export const verifyToken = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded; // contains payload from login
+        req.user = decoded;
         next();
     } catch (err) {
         console.error("JWT Verify Error:", err.message);
@@ -23,7 +23,7 @@ export const verifyToken = (req, res, next) => {
 export const optionalAuth = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     if (!authHeader) {
-        req.user = null; // no token = guest
+        req.user = null;
         console.log("No auth header → guest");
         return next();
     }
@@ -37,10 +37,10 @@ export const optionalAuth = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded; // contains role, isLocal, id
+        req.user = decoded;
     } catch (err) {
         console.warn("JWT Verify Error (optional):", err.message);
-        req.user = null; // invalid token treated as guest
+        req.user = null;
     }
     console.log('')
     next();

@@ -10,7 +10,7 @@ import { Box, Typography } from "@mui/material";
 export default function FeaturedProductCarousel() {
     const navigate = useNavigate();
     const { addToCart } = useCart();
-    const { products } = useContext(ProductContext); // get products from context
+    const { products } = useContext(ProductContext);
 
     const handleAddToCart = (product) => {
         addToCart(product); 

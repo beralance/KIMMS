@@ -55,8 +55,6 @@ export const getPostedCategories = async (req, res) => {
     }
 };
 
-// controllers/categoryController.js
-
 export const getAllCategoriesFromProducts = async (req, res) => {
     try {
         const user = req.user;
@@ -70,7 +68,6 @@ export const getAllCategoriesFromProducts = async (req, res) => {
         }
         const categories = await Product.aggregate([
             { $match: matchStage },
-
             {
                 $group: {
                     _id: "$category",
@@ -89,7 +86,6 @@ export const getAllCategoriesFromProducts = async (req, res) => {
             },
             { $unwind: "$category" },
 
-            // Shape the output
             {
                 $project: {
                     _id: 0,
@@ -118,7 +114,6 @@ export const updateCategoryCounts = async () => {
             await category.save();
         }
 
-        console.log("✅ Category counts updated successfully");
     } catch (error) {
         console.error("❌ Error updating category counts:", error);
     }

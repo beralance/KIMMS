@@ -28,10 +28,9 @@ import useScrollTrigger from "@mui/material/useScrollTrigger";
 import { useCart } from "../contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { ProductContext } from "../contexts/ProductContext"; // adjust path
+import { ProductContext } from "../contexts/ProductContext";
 import { hasUnreadNotifications } from "../utils/notificationApi";
 
-// Icons
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import LockOutlineIcon from "@mui/icons-material/LockOutline";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
@@ -171,7 +170,7 @@ export default function UserHeader() {
             setResults([]);
             return;
         }
-        const data = await searchProducts(value); // fetch from context
+        const data = await searchProducts(value); 
         setResults(data || []);
     };
     return (

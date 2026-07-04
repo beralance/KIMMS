@@ -51,7 +51,6 @@ const auctionSchema = new mongoose.Schema(
             type: Date,
             default: null,
         },
-        // Lifecycle of the auction
         status: {
             type: String,
             enum: ["PENDING", "PENDING_CLAIM", "CLAIMED", "COMPLETED", 'CANCELLED', "LIVE", "ENDED", "CLOSED", "UNCLAIMED"],

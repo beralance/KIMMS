@@ -1,7 +1,7 @@
 import { TextField, Box } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useContext } from "react";
-import { ProductContext } from "../contexts/ProductContext"; // adjust path
+import { ProductContext } from "../contexts/ProductContext";
 import debounce from "lodash.debounce";
 
 export default function SearchBar({ placeholder = "Search", height, onResults, sx, ...props }) {

@@ -10,7 +10,7 @@ export default function ScrollSection({ children, sx }) {
         if (entry.intersectionRatio > 0.25) setVisible(true);
         else if (entry.intersectionRatio < 0.15) setVisible(false);
     }, {
-        threshold: Array.from({length: 101}, (_, i) => i / 100), // finer thresholds
+        threshold: Array.from({length: 101}, (_, i) => i / 100),
         rootMargin: "0px 0px -20% 0px"
     });
 

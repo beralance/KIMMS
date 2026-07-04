@@ -1,4 +1,3 @@
-// src/context/OrderContext.jsx
 import { createContext, useState, useEffect, useContext } from "react";
 import { useAuth } from "./AuthContext";
 
@@ -29,7 +28,6 @@ export function OrderProvider({ children }) {
         return () => clearInterval(timer);
     }, [])
     
-    // 1️⃣ Fetch all orders (admin) or optionally filter by userId
     const fetchOrders = async () => {
         try {
             setIsLoading(true)
@@ -61,7 +59,6 @@ export function OrderProvider({ children }) {
         }
     };
 
-    // 2️⃣ Create a new order
     const createOrder = async ({ userId, products, totalPrice }) => {
         try {
             setIsLoading(true);
@@ -81,7 +78,6 @@ export function OrderProvider({ children }) {
         }
     };
 
-    // 3️⃣ Update order status (admin or webhook)
     const updateOrderStatus = async (orderId, newStatus) => {
         try {
             const res = await fetch(`${API_URL}/api/orders/${orderId}/status`, {

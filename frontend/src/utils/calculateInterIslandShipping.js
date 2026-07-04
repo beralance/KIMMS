@@ -1,6 +1,5 @@
 import { getIslandGroupByRegionCode } from "./locationChecker";
 
-
 const MINIMUM_PER_KILO = 155;
 const ADD_PER_KILO_1_TO_5 = 20;
 const ADD_PER_KILO_6_TO_10 = 60;
