@@ -116,13 +116,13 @@ export default function SignUpForm() {
         let avatar;
         if (gender === "male")
             avatar =
-                "https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-male-02.svg.svg";
+                "https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/Kimms%20Bucket/account-avatar-profile-male-01.svg";
         else if (gender === "female")
             avatar =
-                "https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-female-01.svg.svg";
+                "https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/Kimms%20Bucket/account-avatar-profile-female-01.svg";
         else
             avatar =
-                "https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-male-01.svg";
+                "https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/Kimms%20Bucket/account-avatar-profile-male-07.svg";
 
         const payload = {
             email,
@@ -182,7 +182,7 @@ export default function SignUpForm() {
                 googleId: firebaseData.googleId,
                 avatar:
                     firebaseData.avatar ||
-                    "https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-male-01.svg",
+                    "https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/Kimms%20Bucket/account-avatar-profile-male-01.svg",
                 phoneNumber: firebaseData.phoneNumber || "",
                 gender: "other",
                 termsAccepted: tnc,

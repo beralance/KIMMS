@@ -14,9 +14,9 @@ const supabase = createClient(
 );
 
 const DEFAULT_AVATARS = {
-    male: "https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-male-02.svg.svg",
-    female: "https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-female-01.svg.svg",
-    other: "https://blbymugxhgylzhdmfgeb.supabase.co/storage/v1/object/public/assets/account-avatar-profile-male-01.svg",
+    male: "https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/Kimms%20Bucket/account-avatar-profile-male-01.svg",
+    female: "https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/Kimms%20Bucket/account-avatar-profile-female-01.svg",
+    other: "https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/Kimms%20Bucket/account-avatar-profile-male-07.svg",
 };
 
 // SIGN UP (user)
@@ -653,7 +653,7 @@ export const updateUserAvatar = async (req, res) => {
         const fileName = `avatars/${Date.now()}-${uuidv4()}-${sanitizedOriginal}`;
 
         const { data, error } = await supabase.storage
-            .from("User-Assets")
+            .from("Kimms-Bucket")
             .upload(fileName, req.file.buffer, {
                 cacheControl: "3600",
                 upsert: false,
