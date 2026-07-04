@@ -57,7 +57,7 @@ export default function LoginForm({ onSuccess }) {
                 googleId: firebaseUser.uid,
                 avatar:
                     firebaseUser.photoURL ||
-                    "https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/Kimms%20Bucket/assets/account-avatar-profile-male-01.svg",
+                    "https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/assets/account-avatar-profile-male-01.svg",
             };
 
             const res = await fetch(`${API_URL}/api/auth/google-login`, {

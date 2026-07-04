@@ -14,9 +14,9 @@ const supabase = createClient(
 );
 
 const DEFAULT_AVATARS = {
-    male: "https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/Kimms%20Bucket/assets/account-avatar-profile-male-01.svg",
-    female: "https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/Kimms%20Bucket/assets/account-avatar-profile-female-01.svg",
-    other: "https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/Kimms%20Bucket/assets/account-avatar-profile-male-02.svg",
+    male: "https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/assets/account-avatar-profile-male-01.svg",
+    female: "https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/assets/account-avatar-profile-female-01.svg",
+    other: "https://ryanbajkoeratpmdwvuy.supabase.co/storage/v1/object/public/assets/account-avatar-profile-male-02.svg",
 };
 
 // SIGN UP (user)
