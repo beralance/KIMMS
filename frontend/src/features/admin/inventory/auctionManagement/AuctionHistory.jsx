@@ -12,7 +12,6 @@ import { fetchAuctions } from "../../../../utils/auctionApi";
 import dayjs from "dayjs";
 import SectionWrapper from "../../../../components/SectionWrapper";
 import FullScreenLoader from "../../../../components/FullScreenLoader";
-import AuctionNotification from "../../../../../../backend/models/AuctionNotification";
 import { useNavigate } from "react-router-dom";
 import { ChevronRightIcon, CopyIcon } from "lucide-react";
 import TotalParticipant from "./TotalParticipant";
