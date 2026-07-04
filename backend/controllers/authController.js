@@ -653,7 +653,7 @@ export const updateUserAvatar = async (req, res) => {
             const fileName = `avatars/${Date.now()}-${uuidv4()}-${sanitizedOriginal}`;
 
             const { data, error } = await supabase.storage
-                .from("Kimms%Bucket")
+                .from("Kimms Bucket")
                 .upload(fileName, req.file.buffer, {
                     cacheControl: "3600",
                     upsert: false,
@@ -666,7 +666,7 @@ export const updateUserAvatar = async (req, res) => {
             }
 
         const publicUrl = supabase.storage
-            .from("User-Assets")
+            .from("Kimms Bucket")
             .getPublicUrl(fileName).data?.publicUrl;
 
         if (!publicUrl)
@@ -674,12 +674,12 @@ export const updateUserAvatar = async (req, res) => {
                 .status(500)
                 .json({ error: "Failed to generate public URL" });
 
-        if (user.avatar && user.avatar.includes("/User-Assets/")) {
+        if (user.avatar && user.avatar.includes("/Kimms Bucket/")) {
             try {
-                const oldPath = user.avatar.split("/User-Assets/")[1];
+                const oldPath = user.avatar.split("/Kimms Bucket/")[1];
                 if (oldPath) {
                     await supabase.storage
-                        .from("User-Assets")
+                        .from("Kimms Bucket")
                         .remove([oldPath]);
                 }
             } catch (delErr) {
